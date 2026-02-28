@@ -7,6 +7,11 @@ from core.risk.risk_engine import calculate_risk
 from core.simulation.whatif_engine import run_simulation
 from core.buildability.buildability_engine import calculate_buildability
 
+# 🔥 NEW IMPORTS
+from core.utils.heat_visualizer import classify_heat
+from core.ai.buildability_explainer import explain_buildability
+from core.exports.executive_summary import generate_executive_summary
+
 from pathlib import Path
 
 
@@ -69,7 +74,7 @@ def run_demo():
         print("No Conflicts Detected ✓")
 
     # =====================
-    # RISK
+    # RISK (WITH HEAT)
     # =====================
     print("\n--- Risk Assessment ---")
 
@@ -81,12 +86,17 @@ def run_demo():
         critical_path=critical_path
     )
 
-    print("Risk Score:", risk["risk_score"])
-    print("Risk Level:", risk["risk_level"])
+    risk_emoji, risk_color, risk_label = classify_heat(
+        risk["risk_score"],
+        inverse=True
+    )
+
+    print(f"Risk Score: {risk['risk_score']} {risk_emoji}")
+    print(f"Risk Level: {risk_label}")
     print("Risk Breakdown:", risk["breakdown"])
 
     # =====================
-    # BUILDABILITY (UPGRADED)
+    # BUILDABILITY (WITH HEAT)
     # =====================
     print("\n--- Buildability Assessment ---")
 
@@ -97,13 +107,29 @@ def run_demo():
         risk_data=risk
     )
 
-    print("Buildability Score:", buildability["final_score"])
-    print("Buildability Level:", buildability["level"])
+    build_emoji, build_color, build_label = classify_heat(
+        buildability["final_score"],
+        inverse=False
+    )
+
+    print(f"Buildability Score: {buildability['final_score']} {build_emoji}")
+    print(f"Buildability Level: {build_label}")
 
     print("\nBuildability Breakdown:")
     for k, v in buildability.items():
         if k not in ["critical_path"]:
             print(f"{k}: {v}")
+
+    # =====================
+    # AI JUSTIFICATION
+    # =====================
+    print("\n--- AI Engineering Justification ---")
+
+    try:
+        ai_explanation = explain_buildability(buildability)
+        print(ai_explanation)
+    except Exception as e:
+        print("AI Explanation Failed:", e)
 
     # =====================
     # WHAT-IF SIMULATION
@@ -136,13 +162,45 @@ def run_demo():
         risk_data=scenario_risk
     )
 
+    scenario_risk_emoji, _, scenario_risk_label = classify_heat(
+        scenario_risk["risk_score"],
+        inverse=True
+    )
+
+    scenario_build_emoji, _, scenario_build_label = classify_heat(
+        scenario_buildability["final_score"],
+        inverse=False
+    )
+
+    # =====================
+    # SCENARIO DISPLAY
+    # =====================
     print("\n--- Scenario Comparison ---")
+
     print("Baseline Duration:", total_duration)
     print("Scenario Duration:", scenario["total_duration"])
-    print("Baseline Risk:", risk["risk_level"])
-    print("Scenario Risk:", scenario_risk["risk_level"])
-    print("Baseline Buildability:", buildability["level"])
-    print("Scenario Buildability:", scenario_buildability["level"])
+
+    print(f"Baseline Risk: {risk_label}")
+    print(f"Scenario Risk: {scenario_risk_label} {scenario_risk_emoji}")
+
+    print(f"Baseline Buildability: {build_label}")
+    print(f"Scenario Buildability: {scenario_build_label} {scenario_build_emoji}")
+
+    # =====================
+    # EXECUTIVE SUMMARY
+    # =====================
+    print("\n================ EXECUTIVE INTELLIGENCE SUMMARY ================")
+
+    summary = generate_executive_summary(
+        total_duration,
+        scenario["total_duration"],
+        risk_label,
+        scenario_risk_label,
+        build_label,
+        scenario_build_label
+    )
+
+    print(summary)
 
 
 if __name__ == "__main__":
