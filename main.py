@@ -44,7 +44,8 @@ def run_demo():
         print("Cycle detected. Scheduling aborted.")
         return
 
-    G, critical_path, total_duration = run_cpm(G)
+    # 🔥 RESOURCE-AWARE SCHEDULING
+    G, critical_path, total_duration = run_cpm(G, crew_capacity=2)
 
     print("\nTotal Project Duration:", total_duration)
     print("Critical Path:", critical_path)
@@ -122,9 +123,17 @@ def run_demo():
     print("New Risk Score:", scenario["risk"]["risk_score"])
     print("New Risk Level:", scenario["risk"]["risk_level"])
 
-    # Scenario Buildability
+    # 🔥 FIXED: USE SCENARIO GRAPH IF PROVIDED
+    if "graph" in scenario:
+        scenario_graph = scenario["graph"]
+    else:
+        # fallback rebuild (safe fallback)
+        scenario_tasks, scenario_deps = generate_tasks_from_twin(twin)
+        scenario_graph, _ = build_dependency_graph(scenario_tasks, scenario_deps)
+        scenario_graph, _, _ = run_cpm(scenario_graph, crew_capacity=3)
+
     scenario_buildability = calculate_buildability(
-        G,
+        scenario_graph,
         scenario["total_duration"],
         scenario["conflicts"]
     )
