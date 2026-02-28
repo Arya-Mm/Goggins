@@ -60,7 +60,7 @@ def run_demo():
         })
 
     # =====================
-    # CONFLICT DETECTION (VALIDATION ONLY)
+    # CONFLICT VALIDATION
     # =====================
     print("\n--- Conflict Validation ---")
 
@@ -74,14 +74,21 @@ def run_demo():
         print("No Conflicts Detected ✓")
 
     # =====================
-    # RISK ASSESSMENT
+    # RISK ASSESSMENT (UPGRADED)
     # =====================
     print("\n--- Risk Assessment ---")
 
-    risk = calculate_risk(total_duration, len(conflicts))
+    risk = calculate_risk(
+        total_duration=total_duration,
+        conflicts=conflicts,
+        G=G,
+        twin=twin,
+        critical_path=critical_path
+    )
 
     print("Risk Score:", risk["risk_score"])
     print("Risk Level:", risk["risk_level"])
+    print("Risk Breakdown:", risk["breakdown"])
 
     # =====================
     # BUILDABILITY SCORE
@@ -120,14 +127,22 @@ def run_demo():
     else:
         print("No Conflicts in Scenario ✓")
 
-    print("New Risk Score:", scenario["risk"]["risk_score"])
-    print("New Risk Level:", scenario["risk"]["risk_level"])
+    # 🔥 Scenario Risk Using Upgraded Engine
+    scenario_risk = calculate_risk(
+        total_duration=scenario["total_duration"],
+        conflicts=scenario["conflicts"],
+        G=scenario["graph"],
+        twin=twin,
+        critical_path=scenario["critical_path"]
+    )
 
-    # USE SCENARIO GRAPH DIRECTLY
-    scenario_graph = scenario["graph"]
+    print("New Risk Score:", scenario_risk["risk_score"])
+    print("New Risk Level:", scenario_risk["risk_level"])
+    print("Scenario Risk Breakdown:", scenario_risk["breakdown"])
 
+    # Scenario Buildability
     scenario_buildability = calculate_buildability(
-        scenario_graph,
+        scenario["graph"],
         scenario["total_duration"],
         scenario["conflicts"]
     )
@@ -143,7 +158,7 @@ def run_demo():
     print("Baseline Duration:", total_duration)
     print("Scenario Duration:", scenario["total_duration"])
     print("Baseline Risk:", risk["risk_level"])
-    print("Scenario Risk:", scenario["risk"]["risk_level"])
+    print("Scenario Risk:", scenario_risk["risk_level"])
     print("Baseline Buildability:", buildability["buildability_level"])
     print("Scenario Buildability:", scenario_buildability["buildability_level"])
 
