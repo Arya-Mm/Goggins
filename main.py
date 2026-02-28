@@ -1,22 +1,21 @@
-from pathlib import Path
-import sys
-
-BASE_DIR = Path(__file__).parent
-sys.path.insert(0, str(BASE_DIR))
-
 from core.vision.vision_engine import VisionEngine
+from core.twin.twin_builder import StructuralTwinBuilder
+from pathlib import Path
 
 
 def run_demo():
-    print("Running StructuraAI Vision Demo...")
+    print("Running StructuraAI Vision + Twin Demo...")
 
-    demo_pdf = BASE_DIR / "core" / "vision" / "house_plan.pdf"  # put test pdf here
+    demo_pdf = Path("core/vision/house_plan.pdf")
 
-    engine = VisionEngine()
-    result = engine.run(str(demo_pdf))
+    vision = VisionEngine()
+    vision_output = vision.run(str(demo_pdf))
 
-    print("Vision Output:")
-    print(result)
+    twin_builder = StructuralTwinBuilder()
+    twin = twin_builder.build(vision_output)
+
+    print("\nDigital Structural Twin:")
+    print(twin)
 
 
 if __name__ == "__main__":
