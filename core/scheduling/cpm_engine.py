@@ -6,11 +6,34 @@ def run_cpm(G, crew_capacity=None):
     if not nx.is_directed_acyclic_graph(G):
         raise Exception("Graph contains cycle. Cannot schedule.")
 
+    # Initial CPM computation
+    G = compute_cpm(G)
+
+    # Apply resource leveling if capacity defined
+    if crew_capacity is not None:
+        G = apply_resource_leveling(G, crew_capacity)
+        G = compute_cpm(G)  # Recompute after leveling
+
+    total_duration = max(G.nodes[n]["EF"] for n in G.nodes)
+
+    # Critical path
+    critical_path = [
+        n for n in nx.topological_sort(G)
+        if G.nodes[n]["slack"] == 0
+    ]
+
+    return G, critical_path, total_duration
+
+
+# =====================================================
+# CPM CALCULATION
+# =====================================================
+
+def compute_cpm(G):
+
     topo_order = list(nx.topological_sort(G))
 
-    # ======================
     # FORWARD PASS
-    # ======================
     for node in topo_order:
         preds = list(G.predecessors(node))
 
@@ -27,9 +50,7 @@ def run_cpm(G, crew_capacity=None):
 
     total_duration = max(G.nodes[n]["EF"] for n in G.nodes)
 
-    # ======================
     # BACKWARD PASS
-    # ======================
     for node in reversed(topo_order):
         succs = list(G.successors(node))
 
@@ -45,44 +66,37 @@ def run_cpm(G, crew_capacity=None):
         G.nodes[node]["LS"] = LS
         G.nodes[node]["slack"] = LS - G.nodes[node]["ES"]
 
-    # ======================
-    # RESOURCE LEVELING
-    # ======================
-    if crew_capacity is not None:
-        G = apply_resource_leveling(G, crew_capacity)
-        return run_cpm(G, crew_capacity=None)
+    return G
 
-    # ======================
-    # CRITICAL PATH
-    # ======================
-    critical_path = []
-    for node in topo_order:
-        if G.nodes[node]["slack"] == 0:
-            critical_path.append(node)
 
-    return G, critical_path, total_duration
-
+# =====================================================
+# RESOURCE LEVELING (BATCHING MODEL)
+# =====================================================
 
 def apply_resource_leveling(G, crew_capacity):
 
     timeline = build_timeline(G)
 
-    for time, active_tasks in timeline.items():
+    for time in sorted(timeline.keys()):
+
+        active_tasks = timeline[time]
 
         if len(active_tasks) > crew_capacity:
 
-            overload = len(active_tasks) - crew_capacity
-
-            # Sort by highest slack first (delay least critical first)
+            # Deterministic order
             active_tasks_sorted = sorted(
                 active_tasks,
-                key=lambda n: (G.nodes[n]["slack"], G.nodes[n]["ES"]),
-                reverse=True
+                key=lambda n: G.nodes[n]["ES"]
             )
 
-            for i in range(overload):
-                task_to_delay = active_tasks_sorted[i]
-                delay_task(G, task_to_delay, 1)
+            for i, task in enumerate(active_tasks_sorted):
+
+                batch_index = i // crew_capacity
+                new_start = time + batch_index
+
+                if G.nodes[task]["ES"] < new_start:
+                    shift = new_start - G.nodes[task]["ES"]
+                    delay_task(G, task, shift)
 
     return G
 
@@ -103,13 +117,13 @@ def build_timeline(G):
     return timeline
 
 
-def delay_task(G, node, delay):
+def delay_task(G, node, shift):
 
-    G.nodes[node]["ES"] += delay
-    G.nodes[node]["EF"] += delay
+    G.nodes[node]["ES"] += shift
+    G.nodes[node]["EF"] += shift
 
-    # Propagate to successors
+    # Propagate shift to successors
     for succ in G.successors(node):
         if G.nodes[succ]["ES"] < G.nodes[node]["EF"]:
-            shift = G.nodes[node]["EF"] - G.nodes[succ]["ES"]
-            delay_task(G, succ, shift)
+            needed_shift = G.nodes[node]["EF"] - G.nodes[succ]["ES"]
+            delay_task(G, succ, needed_shift)
