@@ -1,6 +1,6 @@
 import os
 import time
-from typing import Dict, List
+from typing import Dict
 import numpy as np
 from ultralytics import YOLO
 
@@ -8,37 +8,42 @@ from ultralytics import YOLO
 class StructuralDetector:
     """
     YOLO-based structural element detector.
-    • Loads custom model if available
-    • Falls back to yolov8n
-    • Falls back to synthetic detection if inference fails
+    Safe, filtered, production-ready.
     """
 
     def __init__(
         self,
         model_path: str = None,
-        confidence_threshold: float = 0.4
+        confidence_threshold: float = 0.25  # lowered from 0.4
     ):
         self.conf_threshold = confidence_threshold
         self.model = None
-        self.model_path = self._resolve_model_path(model_path)
         self.model_used = "none"
+        self.model_path = self._resolve_model_path(model_path)
+        self.allowed_classes = {
+            "column",
+            "wall",
+            "curtain_wall",
+            "stair_case",
+            "door",
+            "sliding_door",
+            "window",
+            "railing"
+        }
+
         self._load_model()
 
-    # ─────────────────────────────────────────────────────────────
+    # ─────────────────────────────────────────────
     # MODEL LOADING
-    # ─────────────────────────────────────────────────────────────
+    # ─────────────────────────────────────────────
 
-    def _resolve_model_path(self, model_path: str) -> str:
-        """
-        Resolve absolute model path safely.
-        """
+    def _resolve_model_path(self, model_path: str):
         if model_path:
             return os.path.abspath(model_path)
 
         default_path = os.path.abspath(
             os.path.join(os.path.dirname(__file__), "..", "data", "best.pt")
         )
-
         return default_path
 
     def _load_model(self):
@@ -57,24 +62,11 @@ class StructuralDetector:
             self.model = None
             self.model_used = "none"
 
-    # ─────────────────────────────────────────────────────────────
+    # ─────────────────────────────────────────────
     # DETECTION
-    # ─────────────────────────────────────────────────────────────
+    # ─────────────────────────────────────────────
 
     def detect(self, image: np.ndarray) -> Dict:
-        """
-        Run detection safely.
-
-        Returns:
-        {
-            "elements": [...],
-            "class_counts": {},
-            "total_detections": int,
-            "model_used": str,
-            "inference_time_ms": float,
-            "average_confidence": float
-        }
-        """
 
         if image is None or not isinstance(image, np.ndarray):
             raise ValueError("Invalid image provided to detector.")
@@ -87,16 +79,20 @@ class StructuralDetector:
             results = self.model(image, verbose=False)[0]
             inference_time = (time.time() - start) * 1000
 
-            if results.boxes is None:
+            if results.boxes is None or len(results.boxes) == 0:
+                print("[YOLO] No raw detections found.")
                 return self._fallback_detection(image)
 
             elements = []
             class_counts = {}
             confidences = []
 
+            raw_count = len(results.boxes)
+
             for box in results.boxes:
                 conf = float(box.conf[0])
 
+                # filter by threshold
                 if conf < self.conf_threshold:
                     continue
 
@@ -105,6 +101,13 @@ class StructuralDetector:
 
                 label = self.model.names.get(cls_id, "unknown")
                 label = str(label).lower().strip().replace(" ", "_")
+
+                # ignore dimension class
+                if label == "dimension":
+                    continue
+
+                if label not in self.allowed_classes:
+                    continue
 
                 class_counts[label] = class_counts.get(label, 0) + 1
                 confidences.append(conf)
@@ -121,6 +124,9 @@ class StructuralDetector:
                     ],
                     "synthetic": False
                 })
+
+            print(f"[YOLO] Raw detections: {raw_count}")
+            print(f"[YOLO] After filtering: {len(elements)}")
 
             if not elements:
                 return self._fallback_detection(image)
@@ -140,14 +146,11 @@ class StructuralDetector:
             print(f"[YOLO] Detection failed: {e}")
             return self._fallback_detection(image)
 
-    # ─────────────────────────────────────────────────────────────
+    # ─────────────────────────────────────────────
     # FALLBACK
-    # ─────────────────────────────────────────────────────────────
+    # ─────────────────────────────────────────────
 
     def _fallback_detection(self, image: np.ndarray) -> Dict:
-        """
-        Minimal synthetic detection to keep pipeline alive.
-        """
 
         h, w = image.shape[:2]
 
@@ -163,6 +166,8 @@ class StructuralDetector:
             ],
             "synthetic": True
         }
+
+        print("[YOLO] Using synthetic fallback.")
 
         return {
             "elements": [synthetic],
