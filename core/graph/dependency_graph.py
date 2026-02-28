@@ -11,7 +11,7 @@ def generate_tasks_from_twin(
     dependencies = []
 
     # =========================
-    # WALLS → BUILD → CURE → INSTALL
+    # WALLS → BUILD → CURE → INSTALL (SEQUENCED)
     # =========================
     for i, wall in enumerate(twin.get("walls", [])):
 
@@ -42,7 +42,7 @@ def generate_tasks_from_twin(
         })
 
         # -----------------------------------
-        # CURING TASK (Scenario adjustable)
+        # CURING TASK
         # -----------------------------------
         tasks.append({
             "task_id": cure_id,
@@ -54,8 +54,12 @@ def generate_tasks_from_twin(
         dependencies.append((build_id, cure_id))
 
         # -----------------------------------
-        # DOOR INSTALLS
+        # INSTALL TASKS (SEQUENTIAL CHAIN)
         # -----------------------------------
+
+        install_tasks = []
+
+        # DOORS
         for d in range(wall.get("attached_doors", 0)):
             door_id = f"door_install_{i}_{d}"
 
@@ -66,27 +70,33 @@ def generate_tasks_from_twin(
                 "type": "door_install"
             })
 
-            dependencies.append((cure_id, door_id))
+            install_tasks.append(door_id)
 
-        # -----------------------------------
-        # WINDOW INSTALLS
-        # -----------------------------------
+        # WINDOWS
         for w in range(wall.get("attached_windows", 0)):
-            win_id = f"window_install_{i}_{w}"
+            window_id = f"window_install_{i}_{w}"
 
             tasks.append({
-                "task_id": win_id,
+                "task_id": window_id,
                 "duration": 1,
                 "resource": 1,
                 "type": "window_install"
             })
 
-            dependencies.append((cure_id, win_id))
+            install_tasks.append(window_id)
+
+        # Chain installs sequentially
+        previous_task = cure_id
+
+        for install_id in install_tasks:
+            dependencies.append((previous_task, install_id))
+            previous_task = install_id
 
     return tasks, dependencies
 
 
 def build_dependency_graph(tasks, dependencies):
+
     G = nx.DiGraph()
 
     for task in tasks:
