@@ -2,20 +2,23 @@ import pytesseract
 import re
 import cv2
 
-# Set path if needed (adjust if different)
 pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
 
 
 def extract_dimensions(blueprint):
     """
     Extract dimension text like 27', 37', 14'-0"x11'-0"
-    using Tesseract OCR.
+    using Tesseract OCR on grayscale image.
     """
 
-    img = blueprint["threshold"]
+    img = blueprint["grayscale"]
 
-    text = pytesseract.image_to_string(img)
+    # Improve OCR clarity
+    img = cv2.GaussianBlur(img, (3, 3), 0)
 
+    text = pytesseract.image_to_string(img, config="--psm 6")
+
+    # Improved regex for architectural dimensions
     dimension_pattern = re.compile(r"\d+'\s?-?\d*\"?")
 
     matches = dimension_pattern.findall(text)
@@ -24,8 +27,8 @@ def extract_dimensions(blueprint):
 
     for match in matches:
         dimensions.append({
-            "text": match,
-            "confidence": 0.85  # Tesseract doesn't give per-word confidence easily
+            "text": match.strip(),
+            "confidence": 0.85
         })
 
     return {

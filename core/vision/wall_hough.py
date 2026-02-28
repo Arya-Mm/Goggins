@@ -3,11 +3,6 @@ import numpy as np
 
 
 def detect_walls(blueprint):
-    """
-    Detect walls using Hough Line Transform.
-    Uses precomputed edges from ingestion layer.
-    """
-
     edges = blueprint["edges"]
 
     lines = cv2.HoughLinesP(
@@ -26,21 +21,19 @@ def detect_walls(blueprint):
 
     for line in lines:
         x1, y1, x2, y2 = line[0]
-
         length = np.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
-
-        # Filter small lines
-        if length < 150:
-            continue
 
         orientation = "horizontal" if abs(y2 - y1) < abs(x2 - x1) else "vertical"
 
         walls.append({
             "start": [int(x1), int(y1)],
             "end": [int(x2), int(y2)],
-            "length_pixels": round(float(length), 2),
+            "length_pixels": float(length),
             "orientation": orientation,
             "confidence": 0.85
         })
+
+    # Sort by length descending
+    walls = sorted(walls, key=lambda w: w["length_pixels"], reverse=True)
 
     return walls
