@@ -1,289 +1,269 @@
 import streamlit as st
-import plotly.express as px
 import plotly.graph_objects as go
+import plotly.express as px
 import pandas as pd
-from pathlib import Path
+import networkx as nx
 import tempfile
 
-# Backend imports
 from core.pipeline.analyzer import analyze_project
 from core.pipeline.streamlit_adapter import adapt_to_dashboard_schema
 
-# ============================================================
+# =========================================================
 # PAGE CONFIG
-# ============================================================
+# =========================================================
 
 st.set_page_config(
+    page_title="StructuraAI",
     layout="wide",
-    page_title="StructuraAI — Command Center",
     page_icon="🏗️"
 )
 
-st.title("🏗️ StructuraAI — Construction Intelligence Command Center")
-st.caption("AI-Powered Structural Analysis | Scheduling | Risk | Buildability")
+# =========================================================
+# ENTERPRISE DESIGN SYSTEM
+# =========================================================
 
-# ============================================================
-# SIDEBAR — WHAT IF CONTROLS
-# ============================================================
+st.markdown("""
+<style>
 
-st.sidebar.header("🔧 What-If Simulation Controls")
+body { background-color: #F5F7FA; }
 
-crew_capacity = st.sidebar.slider("Crew Capacity", 1, 10, 2)
-productivity_factor = st.sidebar.slider("Productivity Factor", 0.5, 2.0, 1.0)
-curing_days = st.sidebar.slider("Curing Days", 1, 7, 2)
+.block-container {
+    padding: 2rem 3rem;
+}
 
-st.sidebar.divider()
+.metric-card {
+    background: white;
+    padding: 20px;
+    border-radius: 14px;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.05);
+}
 
-selected_strategy = st.sidebar.selectbox(
-    "Execution Strategy",
-    ["Baseline", "Fast Track", "Cost Optimized"]
-)
+.section-card {
+    background: white;
+    padding: 24px;
+    border-radius: 16px;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.06);
+    margin-bottom: 25px;
+}
 
-# ============================================================
+h1 {
+    font-weight: 800;
+}
+
+</style>
+""", unsafe_allow_html=True)
+
+# =========================================================
+# SIDEBAR
+# =========================================================
+
+with st.sidebar:
+    st.title("StructuraAI")
+
+    strategy = st.radio(
+        "Execution Strategy",
+        ["Balanced", "Fast Track", "Cost Optimized"]
+    )
+
+    labor = st.slider("Labor Multiplier", 0.5, 2.0, 1.0)
+    delay = st.slider("Material Delay (Days)", 0, 20, 0)
+
+# =========================================================
 # FILE UPLOAD
-# ============================================================
+# =========================================================
 
-uploaded_file = st.file_uploader(
-    "Upload Civil Drawing (PDF)",
-    type=["pdf"]
-)
+st.title("Autonomous Construction Intelligence Platform")
 
-if uploaded_file:
+uploaded = st.file_uploader("Upload Civil Drawing (PDF)", type=["pdf"])
 
-    with st.spinner("Analyzing blueprint and generating structural intelligence..."):
+if not uploaded:
+    st.stop()
 
-        with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
-            tmp.write(uploaded_file.read())
-            tmp_path = tmp.name
+with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
+    tmp.write(uploaded.read())
+    tmp_path = tmp.name
 
-        # Pass dynamic simulation parameters to backend
-        raw_result = analyze_project(
-            tmp_path,
-            crew_capacity=crew_capacity,
-            productivity_factor=productivity_factor,
-            curing_days=curing_days,
-            strategy=selected_strategy
-        )
+raw = analyze_project(tmp_path)
+data = adapt_to_dashboard_schema(raw)
 
-        if "error" in raw_result:
-            st.error(raw_result["error"])
-            st.stop()
+# =========================================================
+# STRATEGY EFFECT
+# =========================================================
 
-        data = adapt_to_dashboard_schema(raw_result)
+base_duration = data["adjusted_metrics"]["duration"]
 
-    # ============================================================
-    # EXECUTIVE KPI SECTION
-    # ============================================================
+if strategy == "Fast Track":
+    duration = int(base_duration * 0.85)
+elif strategy == "Cost Optimized":
+    duration = int(base_duration * 1.15)
+else:
+    duration = base_duration
 
-    st.markdown("## 📊 Executive Metrics")
+duration = int(duration / labor) + delay
 
-    risk_score = raw_result["risk"]["risk_score"]
-    build_score = raw_result["buildability"]["final_score"]
+# =========================================================
+# KPI GRID
+# =========================================================
 
-    def risk_color(score):
-        if score < 40:
-            return "green"
-        elif score < 70:
-            return "orange"
-        else:
-            return "red"
+k1, k2, k3, k4 = st.columns(4)
 
-    col1, col2, col3, col4 = st.columns(4)
+with k1:
+    st.markdown('<div class="metric-card">', unsafe_allow_html=True)
+    st.metric("Detection Confidence", f"{round(data['detection_confidence']*100,2)}%")
+    st.markdown('</div>', unsafe_allow_html=True)
 
-    col1.metric(
-        "Detection Confidence",
-        f"{round(data['detection_confidence'] * 100, 2)}%"
-    )
+with k2:
+    st.markdown('<div class="metric-card">', unsafe_allow_html=True)
+    st.metric("Duration (Days)", duration)
+    st.markdown('</div>', unsafe_allow_html=True)
 
-    col2.metric(
-        "Project Duration (Days)",
-        data["adjusted_metrics"]["duration"]
-    )
+with k3:
+    st.markdown('<div class="metric-card">', unsafe_allow_html=True)
+    st.metric("Buildability Score", data["adjusted_metrics"]["buildability"])
+    st.markdown('</div>', unsafe_allow_html=True)
 
-    col3.markdown(
-        f"<h3 style='color:{risk_color(risk_score)}'>Risk Score: {risk_score}</h3>",
-        unsafe_allow_html=True
-    )
+with k4:
+    st.markdown('<div class="metric-card">', unsafe_allow_html=True)
+    st.metric("Risk Index", round(data["adjusted_metrics"]["risk"],2))
+    st.markdown('</div>', unsafe_allow_html=True)
 
-    col4.markdown(
-        f"<h3 style='color:{risk_color(100 - build_score)}'>Buildability: {build_score}</h3>",
-        unsafe_allow_html=True
-    )
+st.markdown("<br>", unsafe_allow_html=True)
 
-    st.divider()
+# =========================================================
+# ROW 1: SCHEDULE + RISK
+# =========================================================
 
-    # ============================================================
-    # RISK GAUGE
-    # ============================================================
+colA, colB = st.columns([2,1])
 
-    st.subheader("🚨 Overall Risk Gauge")
-
-    fig_gauge = go.Figure(go.Indicator(
-        mode="gauge+number",
-        value=risk_score,
-        title={'text': "Project Risk"},
-        gauge={
-            'axis': {'range': [0, 100]},
-            'bar': {'color': risk_color(risk_score)},
-            'steps': [
-                {'range': [0, 40], 'color': "green"},
-                {'range': [40, 70], 'color': "orange"},
-                {'range': [70, 100], 'color': "red"}
-            ],
-        }
-    ))
-
-    st.plotly_chart(fig_gauge, use_container_width=True)
-
-    st.divider()
-
-    # ============================================================
-    # QUANTITY TAKEOFF
-    # ============================================================
-
-    st.subheader("📦 Quantity Takeoff")
-
-    if data["quantity_takeoff"]:
-        df_qto = pd.DataFrame(data["quantity_takeoff"])
-        st.dataframe(df_qto, use_container_width=True)
-    else:
-        st.info("No quantity data available.")
-
-    st.divider()
-
-    # ============================================================
-    # COST ESTIMATION
-    # ============================================================
-
-    st.subheader("💰 Cost Estimation")
-
-    total_cost = data["cost_estimation"]["total_project_cost"]
-    st.metric("Total Project Cost", f"₹{total_cost:,.0f}")
-
-    if "phase_costs" in data["cost_estimation"]:
-        df_cost = pd.DataFrame(data["cost_estimation"]["phase_costs"])
-        fig_cost = px.bar(df_cost, x="phase", y="cost", title="Phase Cost Distribution")
-        st.plotly_chart(fig_cost, use_container_width=True)
-
-    st.divider()
-
-    # ============================================================
-    # SCHEDULE (GANTT)
-    # ============================================================
-
-    st.subheader("📅 Project Schedule")
+with colA:
+    st.markdown('<div class="section-card">', unsafe_allow_html=True)
+    st.subheader("Project Schedule")
 
     if data["schedule"]:
-        df_schedule = pd.DataFrame(data["schedule"])
-        df_schedule["start"] = pd.to_datetime(df_schedule["start"])
-        df_schedule["finish"] = pd.to_datetime(df_schedule["finish"])
+        df = pd.DataFrame(data["schedule"])
+        df["start"] = pd.to_datetime(df["start"])
+        df["finish"] = pd.to_datetime(df["finish"])
 
-        fig_schedule = px.timeline(
-            df_schedule,
-            x_start="start",
-            x_end="finish",
-            y="task"
-        )
+        fig = px.timeline(df, x_start="start", x_end="finish", y="task")
+        fig.update_layout(height=350)
+        fig.update_yaxes(autorange="reversed")
 
-        fig_schedule.update_yaxes(autorange="reversed")
-        st.plotly_chart(fig_schedule, use_container_width=True)
-    else:
-        st.info("No schedule data available.")
+        st.plotly_chart(fig, use_container_width=True)
+    st.markdown('</div>', unsafe_allow_html=True)
 
-    st.divider()
-
-    # ============================================================
-    # STRATEGY COMPARISON
-    # ============================================================
-
-    st.subheader("⚡ Strategy Comparison")
-
-    baseline_duration = data["adjusted_metrics"]["duration"]
-    fast_track = int(baseline_duration * 0.9)
-    cost_opt = int(baseline_duration * 1.1)
-
-    df_strategy = pd.DataFrame({
-        "Strategy": ["Baseline", "Fast Track", "Cost Optimized"],
-        "Duration": [baseline_duration, fast_track, cost_opt]
-    })
-
-    fig_strategy = px.bar(df_strategy, x="Strategy", y="Duration")
-    st.plotly_chart(fig_strategy, use_container_width=True)
-
-    st.divider()
-
-    # ============================================================
-    # RISK MATRIX
-    # ============================================================
-
-    st.subheader("📊 Risk Matrix")
+with colB:
+    st.markdown('<div class="section-card">', unsafe_allow_html=True)
+    st.subheader("Risk Matrix")
 
     if data["risk_matrix"]:
-        df_risk = pd.DataFrame(data["risk_matrix"])
-        fig_risk = px.bar(
-            df_risk,
-            x="phase",
-            y="risk",
-            color="risk",
-            color_continuous_scale="Reds"
-        )
-        st.plotly_chart(fig_risk, use_container_width=True)
-    else:
-        st.info("No risk data available.")
+        df_r = pd.DataFrame(data["risk_matrix"])
+        fig_r = px.bar(df_r, x="phase", y="risk", color="risk")
+        fig_r.update_layout(height=350)
+        st.plotly_chart(fig_r, use_container_width=True)
+    st.markdown('</div>', unsafe_allow_html=True)
 
-    st.divider()
+# =========================================================
+# ROW 2: DIGITAL TWIN + DEPENDENCY
+# =========================================================
 
-    # ============================================================
-    # CONFLICTS
-    # ============================================================
+colC, colD = st.columns(2)
 
-    st.subheader("⚠️ Detected Conflicts")
+with colC:
+    st.markdown('<div class="section-card">', unsafe_allow_html=True)
+    st.subheader("Digital Structural Twin")
 
-    if data["conflicts"]:
-        for c in data["conflicts"]:
-            st.warning(f"{c['type']}: {c['description']}")
-    else:
-        st.success("No conflicts detected.")
+    twin = raw.get("twin", {})
 
-    st.divider()
+    fig_twin = go.Figure()
 
-    # ============================================================
-    # DIGITAL TWIN
-    # ============================================================
+    for wall in twin.get("walls", []):
+        length = wall.get("length_inches", 100)
+        fig_twin.add_trace(go.Scatter(
+            x=[0, length],
+            y=[0, 0],
+            mode="lines",
+            line=dict(width=6)
+        ))
 
-    st.subheader("🏗️ Digital Structural Twin")
+    fig_twin.update_layout(height=350)
+    st.plotly_chart(fig_twin, use_container_width=True)
+    st.markdown('</div>', unsafe_allow_html=True)
 
-    if "walls" in raw_result["twin"]:
-        st.json(raw_result["twin"])
-    else:
-        st.info("No structural twin data available.")
+with colD:
+    st.markdown('<div class="section-card">', unsafe_allow_html=True)
+    st.subheader("Dependency Graph")
 
-    st.divider()
+    if "dependency_graph" in data:
+        G = nx.DiGraph()
+        G.add_edges_from(data["dependency_graph"]["edges"])
 
-    # ============================================================
-    # AI EXPLANATION
-    # ============================================================
+        pos = nx.spring_layout(G)
 
-    st.subheader("🧠 AI Strategic Explanation")
+        edge_x, edge_y = [], []
 
-    st.write(data["ai_explanation"]["summary"])
-    st.write("Risk Reasoning:", data["ai_explanation"]["risk_reasoning"])
-    st.write("Recommendation:", data["ai_explanation"]["recommendation"])
+        for edge in G.edges():
+            x0, y0 = pos[edge[0]]
+            x1, y1 = pos[edge[1]]
+            edge_x += [x0, x1, None]
+            edge_y += [y0, y1, None]
 
-    st.divider()
+        fig_g = go.Figure()
 
-    # ============================================================
-    # PDF DOWNLOAD
-    # ============================================================
+        fig_g.add_trace(go.Scatter(
+            x=edge_x, y=edge_y,
+            mode="lines"
+        ))
 
-    if "pdf_path" in raw_result:
-        with open(raw_result["pdf_path"], "rb") as f:
-            st.download_button(
-                label="📄 Download Full Project Report (PDF)",
-                data=f,
-                file_name="structuraai_report.pdf",
-                mime="application/pdf"
-            )
+        node_x, node_y = [], []
 
-else:
-    st.info("Upload a blueprint PDF to begin analysis.")
+        for node in G.nodes():
+            x, y = pos[node]
+            node_x.append(x)
+            node_y.append(y)
+
+        fig_g.add_trace(go.Scatter(
+            x=node_x,
+            y=node_y,
+            mode="markers+text",
+            text=list(G.nodes()),
+            textposition="bottom center",
+            marker=dict(size=18)
+        ))
+
+        fig_g.update_layout(height=350)
+        st.plotly_chart(fig_g, use_container_width=True)
+
+    st.markdown('</div>', unsafe_allow_html=True)
+
+# =========================================================
+# STRATEGY COMPARISON
+# =========================================================
+
+st.markdown('<div class="section-card">', unsafe_allow_html=True)
+st.subheader("Strategy Comparison")
+
+df_compare = pd.DataFrame({
+    "Strategy": ["Balanced", "Fast Track", "Cost Optimized"],
+    "Duration": [
+        base_duration,
+        int(base_duration*0.85),
+        int(base_duration*1.15)
+    ]
+})
+
+fig_c = px.bar(df_compare, x="Strategy", y="Duration")
+st.plotly_chart(fig_c, use_container_width=True)
+st.markdown('</div>', unsafe_allow_html=True)
+
+# =========================================================
+# AI SUMMARY
+# =========================================================
+
+st.markdown('<div class="section-card">', unsafe_allow_html=True)
+st.subheader("AI Strategic Report")
+
+st.write(data["ai_explanation"]["summary"])
+st.write("Risk Reasoning:", data["ai_explanation"]["risk_reasoning"])
+st.write("Recommendation:", data["ai_explanation"]["recommendation"])
+
+st.markdown('</div>', unsafe_allow_html=True)
