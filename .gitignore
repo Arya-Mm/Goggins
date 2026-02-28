@@ -1,0 +1,23 @@
+# Python
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# VS Code
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Models
+models/
+*.pt
+*.onnx
+*.bin
+*.weights
+
+# Logs
+*.log
