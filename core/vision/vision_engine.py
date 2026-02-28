@@ -10,12 +10,15 @@ class VisionEngine:
     def __init__(self):
         self.processor = PDFProcessor()
 
-        # Absolute safe model path
+        # Safe absolute model path
         base_dir = Path(__file__).resolve().parents[2]
         model_path = base_dir / "core" / "data" / "best.pt"
 
         self.yolo = YOLOAdapter(str(model_path))
 
+    # -----------------------------
+    # Convert PDF → Image
+    # -----------------------------
     def _pdf_to_image(self, pdf_path):
         doc = fitz.open(pdf_path)
         page = doc[0]
@@ -28,6 +31,26 @@ class VisionEngine:
 
         return img
 
+    # -----------------------------
+    # Normalize labels for Twin Layer
+    # -----------------------------
+    def _normalize_label(self, label):
+
+        mapping = {
+            "Wall": "walls",
+            "Door": "doors",
+            "Window": "windows",
+            "Column": "columns",
+            "Beam": "beams",
+            "Slab": "slabs",
+            "Dimension": "dimension_marks"
+        }
+
+        return mapping.get(label, label.lower())
+
+    # -----------------------------
+    # Structure & Filter Objects
+    # -----------------------------
     def _structure_objects(self, detections, min_conf=0.4):
         structured = {}
 
@@ -35,11 +58,14 @@ class VisionEngine:
             if obj["confidence"] < min_conf:
                 continue
 
-            label = obj["label"]
-            structured.setdefault(label, []).append(obj)
+            norm_label = self._normalize_label(obj["label"])
+            structured.setdefault(norm_label, []).append(obj)
 
         return structured
 
+    # -----------------------------
+    # MAIN ENTRY
+    # -----------------------------
     def run(self, pdf_path):
 
         # 1️⃣ Dimension Extraction
@@ -53,7 +79,7 @@ class VisionEngine:
         image = self._pdf_to_image(pdf_path)
         raw_objects = self.yolo.detect(image)
 
-        # 3️⃣ Structure & Filter Objects
+        # 3️⃣ Structure Objects
         structured_objects = self._structure_objects(raw_objects)
 
         return {
