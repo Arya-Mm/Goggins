@@ -50,6 +50,69 @@ body {
   animation: fadeUp 0.7s ease forwards;
 }
 
+/* Rebar stripe pattern */
+.rebar-pattern {
+  background-image: repeating-linear-gradient(45deg,
+      transparent,
+      transparent 6px,
+      rgba(245, 158, 11, 0.12) 6px,
+      rgba(245, 158, 11, 0.12) 8px);
+}
+
+/* I-beam shape (CSS) */
+.i-beam {
+  position: relative;
+}
+
+.i-beam::before,
+.i-beam::after {
+  content: '';
+  display: block;
+  height: 3px;
+  background: rgba(245, 158, 11, 0.4);
+  border-radius: 2px;
+}
+
+.i-beam>.web {
+  width: 4px;
+  margin: 0 auto;
+  background: rgba(245, 158, 11, 0.25);
+  border-radius: 1px;
+}
+
+/* Blueprint pulse animation */
+@keyframes blueprintPulse {
+
+  0%,
+  100% {
+    opacity: 0.6;
+  }
+
+  50% {
+    opacity: 1;
+  }
+}
+
+.animate-blueprint-pulse {
+  animation: blueprintPulse 2s ease-in-out infinite;
+}
+
+/* Construction bar fill animation */
+@keyframes barFill {
+  from {
+    width: 0%;
+  }
+
+  to {
+    width: var(--bar-w);
+  }
+}
+
+.animate-bar-fill {
+  animation: barFill 1.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  animation-delay: var(--bar-delay, 0s);
+}
+
 /* Number counter styling */
 .stat-number {
   font-size: clamp(2rem, 4vw, 3.5rem);
