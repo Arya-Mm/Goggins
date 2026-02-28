@@ -5,6 +5,7 @@ from core.scheduling.cpm_engine import run_cpm
 from core.conflict.conflict_engine import detect_conflicts
 from core.risk.risk_engine import calculate_risk
 from core.simulation.whatif_engine import run_simulation
+from core.buildability.buildability_engine import calculate_buildability
 
 from pathlib import Path
 
@@ -30,12 +31,11 @@ def run_demo():
     print(twin)
 
     # =====================
-    # BASELINE SCHEDULING
+    # BASELINE EXECUTION
     # =====================
     print("\n================ BASELINE EXECUTION INTELLIGENCE ================")
 
     tasks, dependencies = generate_tasks_from_twin(twin)
-
     G, cycle_valid = build_dependency_graph(tasks, dependencies)
 
     print("\nDependency Graph Valid:", cycle_valid)
@@ -83,6 +83,16 @@ def run_demo():
     print("Risk Level:", risk["risk_level"])
 
     # =====================
+    # BUILDABILITY SCORE
+    # =====================
+    print("\n--- Buildability Assessment ---")
+
+    buildability = calculate_buildability(G, total_duration, conflicts)
+
+    print("Buildability Score:", buildability["buildability_score"])
+    print("Buildability Level:", buildability["buildability_level"])
+
+    # =====================
     # WHAT-IF SIMULATION
     # =====================
     print("\n================ WHAT-IF SIMULATION ================")
@@ -112,11 +122,27 @@ def run_demo():
     print("New Risk Score:", scenario["risk"]["risk_score"])
     print("New Risk Level:", scenario["risk"]["risk_level"])
 
-    print("\n================ INTELLIGENCE SUMMARY ================")
+    # Scenario Buildability
+    scenario_buildability = calculate_buildability(
+        G,
+        scenario["total_duration"],
+        scenario["conflicts"]
+    )
+
+    print("Scenario Buildability Score:", scenario_buildability["buildability_score"])
+    print("Scenario Buildability Level:", scenario_buildability["buildability_level"])
+
+    # =====================
+    # EXECUTIVE SUMMARY
+    # =====================
+    print("\n================ EXECUTIVE INTELLIGENCE SUMMARY ================")
+
     print("Baseline Duration:", total_duration)
     print("Scenario Duration:", scenario["total_duration"])
     print("Baseline Risk:", risk["risk_level"])
     print("Scenario Risk:", scenario["risk"]["risk_level"])
+    print("Baseline Buildability:", buildability["buildability_level"])
+    print("Scenario Buildability:", scenario_buildability["buildability_level"])
 
 
 if __name__ == "__main__":
