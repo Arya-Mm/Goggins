@@ -7,7 +7,7 @@ class StructuralTwinBuilder:
         self.min_confidence = min_confidence
 
     # ----------------------------
-    # Utility Functions
+    # Geometry Utilities
     # ----------------------------
 
     def _bbox_center(self, bbox):
@@ -20,9 +20,6 @@ class StructuralTwinBuilder:
         return math.sqrt((c1[0] - c2[0]) ** 2 + (c1[1] - c2[1]) ** 2)
 
     def _match_dimension(self, wall_bbox, dimensions):
-        """
-        Assign nearest detected dimension to a wall.
-        """
         if not dimensions:
             return None
 
@@ -33,15 +30,27 @@ class StructuralTwinBuilder:
 
         return nearest["inches"]
 
+    def _openings_for_wall(self, wall_bbox, openings, threshold=120):
+        """
+        Assign openings to a wall if they are spatially close.
+        """
+        assigned = []
+
+        for op in openings:
+            dist = self._distance(wall_bbox, op["bbox"])
+            if dist < threshold:
+                assigned.append(op)
+
+        return assigned
+
     # ----------------------------
-    # Quantity Intelligence
+    # Quantity Engine
     # ----------------------------
 
     def compute_quantities(self, twin):
 
-        # Assumptions (can be made configurable later)
-        WALL_HEIGHT_INCHES = 120  # 10 ft
-        WALL_THICKNESS_INCHES = 9  # 9 inch brick wall
+        WALL_HEIGHT = 120
+        WALL_THICKNESS = 9
 
         DOOR_WIDTH = 36
         DOOR_HEIGHT = 84
@@ -49,54 +58,52 @@ class StructuralTwinBuilder:
         WINDOW_WIDTH = 48
         WINDOW_HEIGHT = 48
 
-        total_wall_volume_cuin = 0
+        total_net_volume = 0
 
-        # ---- WALL GROSS VOLUME ----
         for wall in twin["walls"]:
-            length = wall["length_inches"]
 
+            length = wall["length_inches"]
             if length is None:
                 continue
 
-            wall_volume_cuin = (
-                length * WALL_HEIGHT_INCHES * WALL_THICKNESS_INCHES
+            gross_cuin = length * WALL_HEIGHT * WALL_THICKNESS
+
+            # Find openings belonging to this wall
+            doors = self._openings_for_wall(
+                wall["bbox"], twin["doors"]
             )
 
-            wall["volume_cuft"] = round(wall_volume_cuin / 1728, 2)
+            windows = self._openings_for_wall(
+                wall["bbox"], twin["windows"]
+            )
 
-            total_wall_volume_cuin += wall_volume_cuin
+            door_volume = (
+                DOOR_WIDTH * DOOR_HEIGHT * WALL_THICKNESS
+            ) * len(doors)
 
-        gross_volume_cuft = total_wall_volume_cuin / 1728
+            window_volume = (
+                WINDOW_WIDTH * WINDOW_HEIGHT * WALL_THICKNESS
+            ) * len(windows)
 
-        # ---- OPENING DEDUCTIONS ----
-        door_volume_cuin = (
-            DOOR_WIDTH * DOOR_HEIGHT * WALL_THICKNESS_INCHES
-        ) * len(twin["doors"])
+            net_cuin = gross_cuin - (door_volume + window_volume)
 
-        window_volume_cuin = (
-            WINDOW_WIDTH * WINDOW_HEIGHT * WALL_THICKNESS_INCHES
-        ) * len(twin["windows"])
+            if net_cuin < 0:
+                net_cuin = 0
 
-        opening_volume_cuin = door_volume_cuin + window_volume_cuin
-        opening_volume_cuft = opening_volume_cuin / 1728
+            wall["gross_volume_cuft"] = round(gross_cuin / 1728, 2)
+            wall["net_volume_cuft"] = round(net_cuin / 1728, 2)
+            wall["attached_doors"] = len(doors)
+            wall["attached_windows"] = len(windows)
 
-        # ---- NET VOLUME ----
-        net_volume_cuft = gross_volume_cuft - opening_volume_cuft
+            total_net_volume += net_cuin / 1728
 
-        if net_volume_cuft < 0:
-            net_volume_cuft = 0
-
-        twin["gross_wall_volume_cuft"] = round(gross_volume_cuft, 2)
-        twin["opening_volume_cuft"] = round(opening_volume_cuft, 2)
-        twin["net_wall_volume_cuft"] = round(net_volume_cuft, 2)
-
-        # Brick estimation (industry approx)
-        twin["estimated_bricks"] = int(net_volume_cuft * 13.5)
+        twin["total_net_wall_volume_cuft"] = round(total_net_volume, 2)
+        twin["estimated_bricks"] = int(total_net_volume * 13.5)
 
         return twin
 
     # ----------------------------
-    # Main Twin Builder
+    # Main Builder
     # ----------------------------
 
     def build(self, vision_output):
@@ -112,7 +119,6 @@ class StructuralTwinBuilder:
         raw_doors = objects.get("doors", [])
         raw_windows = objects.get("windows", [])
 
-        # ---- WALLS ----
         for obj in raw_walls:
             if obj["confidence"] < self.min_confidence:
                 continue
@@ -127,17 +133,13 @@ class StructuralTwinBuilder:
                 "bbox": obj["bbox"]
             })
 
-        # ---- DOORS ----
         for obj in raw_doors:
-            if obj["confidence"] < self.min_confidence:
-                continue
-            doors.append(obj)
+            if obj["confidence"] >= self.min_confidence:
+                doors.append(obj)
 
-        # ---- WINDOWS ----
         for obj in raw_windows:
-            if obj["confidence"] < self.min_confidence:
-                continue
-            windows.append(obj)
+            if obj["confidence"] >= self.min_confidence:
+                windows.append(obj)
 
         twin = {
             "walls": walls,
