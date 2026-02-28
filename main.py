@@ -25,12 +25,12 @@ def run_demo():
     # ======================================================
 
     STRESS_EMPTY_TWIN = True
-    STRESS_NO_DIMENSION = False
-    STRESS_HIGH_UNCERTAINTY = False
-    STRESS_NO_WALLS = False
-    STRESS_FORCE_CYCLE = False
-    STRESS_ZERO_DURATION = False
-    STRESS_MAX_RISK = False
+    STRESS_NO_DIMENSION = True
+    STRESS_HIGH_UNCERTAINTY = True
+    STRESS_NO_WALLS = True
+    STRESS_FORCE_CYCLE = True
+    STRESS_ZERO_DURATION = True
+    STRESS_MAX_RISK = True
 
     print("Running StructuraAI Vision + Twin Demo...")
 
