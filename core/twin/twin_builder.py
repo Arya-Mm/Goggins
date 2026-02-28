@@ -3,7 +3,7 @@ import math
 
 class StructuralTwinBuilder:
 
-    def __init__(self, min_confidence=0.6):
+    def __init__(self, min_confidence=0.45):
         self.min_confidence = min_confidence
 
     def _compute_scale_factor(self, dimensions):
