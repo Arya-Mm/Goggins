@@ -46,11 +46,33 @@ def run_cpm(G):
         G.nodes[node]["slack"] = LS - G.nodes[node]["ES"]
 
     # ======================
-    # CRITICAL PATH
+    # CLEAN CRITICAL PATH (single chain)
     # ======================
     critical_path = []
-    for node in topo_order:
-        if G.nodes[node]["slack"] == 0:
-            critical_path.append(node)
+
+    # Find starting critical node (ES = 0 and slack = 0)
+    start_nodes = [
+        n for n in topo_order
+        if G.nodes[n]["ES"] == 0 and G.nodes[n]["slack"] == 0
+    ]
+
+    if start_nodes:
+        current = start_nodes[0]
+        critical_path.append(current)
+
+        while True:
+            successors = list(G.successors(current))
+            next_node = None
+
+            for s in successors:
+                if G.nodes[s]["slack"] == 0:
+                    next_node = s
+                    break
+
+            if next_node:
+                critical_path.append(next_node)
+                current = next_node
+            else:
+                break
 
     return G, critical_path, total_duration

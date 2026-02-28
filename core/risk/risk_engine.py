@@ -1,15 +1,13 @@
 def calculate_risk(total_duration, conflict_count):
 
-    risk_score = 0
+    duration_factor = total_duration * 2
+    conflict_factor = conflict_count * 10
 
-    if total_duration > 10:
-        risk_score += 10
+    risk_score = duration_factor + conflict_factor
 
-    risk_score += conflict_count * 5
-
-    if risk_score < 10:
+    if risk_score < 15:
         level = "Low"
-    elif risk_score < 25:
+    elif risk_score < 40:
         level = "Moderate"
     else:
         level = "High"
