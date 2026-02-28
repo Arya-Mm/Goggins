@@ -3,7 +3,7 @@ import math
 
 class StructuralTwinBuilder:
 
-    def __init__(self, min_confidence=0.5):
+    def __init__(self, min_confidence=0.3):
         self.min_confidence = min_confidence
 
     # ----------------------------
