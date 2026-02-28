@@ -58,7 +58,7 @@ def calculate_buildability(G, total_duration, conflicts, risk_data=None):
     duration_penalty = max(0, total_duration - task_count) * 2
     serial_penalty = serial_chains * 1.5
     workforce_penalty = workforce_overload_events * 5
-    risk_penalty = risk_score * 20
+    risk_penalty = risk_score * 2
     slack_bonus = min(12, avg_slack * 4)
 
     final_score = (

@@ -11,6 +11,7 @@ from core.buildability.buildability_engine import calculate_buildability
 from core.utils.heat_visualizer import classify_heat
 from core.ai.buildability_explainer import explain_buildability
 from core.exports.executive_summary import generate_executive_summary
+from core.quantity.quantity_engine import calculate_quantities  # ✅ NEW
 
 from pathlib import Path
 
@@ -34,6 +35,27 @@ def run_demo():
 
     print("\nDigital Structural Twin:")
     print(twin)
+
+    # =====================
+    # 🔥 QUANTITY & COST ENGINE
+    # =====================
+    print("\n================ QUANTITY & COST ESTIMATION ================")
+
+    quantities = calculate_quantities(twin)
+
+    print("\n--- Material Quantities ---")
+    for k, v in quantities["material_quantities"].items():
+        print(f"{k}: {v}")
+
+    print("\n--- Cost Breakdown (₹) ---")
+    for k, v in quantities["cost_breakdown"].items():
+        print(f"{k}: ₹{v}")
+
+    print("\n--- Phase Breakdown ---")
+    for phase, data in quantities["phase_breakdown"].items():
+        print(f"\n{phase.upper()}")
+        for k, v in data.items():
+            print(f"{k}: {v}")
 
     # =====================
     # BASELINE EXECUTION
@@ -172,9 +194,6 @@ def run_demo():
         inverse=False
     )
 
-    # =====================
-    # SCENARIO DISPLAY
-    # =====================
     print("\n--- Scenario Comparison ---")
 
     print("Baseline Duration:", total_duration)
