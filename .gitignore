@@ -19,5 +19,5 @@ models/
 *.bin
 *.weights
 
-# Logs
+# Logsgit
 *.log

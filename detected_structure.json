@@ -1,0 +1,730 @@
+{
+    "columns": [],
+    "beams": [],
+    "slabs": [],
+    "walls": [
+        {
+            "orientation": "vertical",
+            "length_m": 50.277,
+            "thickness_m": 0.2,
+            "height_m": 3.0,
+            "volume_m3": 30.166,
+            "confidence": 0.85
+        },
+        {
+            "orientation": "vertical",
+            "length_m": 50.256,
+            "thickness_m": 0.2,
+            "height_m": 3.0,
+            "volume_m3": 30.154,
+            "confidence": 0.85
+        },
+        {
+            "orientation": "vertical",
+            "length_m": 49.963,
+            "thickness_m": 0.2,
+            "height_m": 3.0,
+            "volume_m3": 29.978,
+            "confidence": 0.85
+        },
+        {
+            "orientation": "horizontal",
+            "length_m": 45.0,
+            "thickness_m": 0.2,
+            "height_m": 3.0,
+            "volume_m3": 27.0,
+            "confidence": 0.85
+        },
+        {
+            "orientation": "vertical",
+            "length_m": 39.87,
+            "thickness_m": 0.2,
+            "height_m": 3.0,
+            "volume_m3": 23.922,
+            "confidence": 0.85
+        },
+        {
+            "orientation": "vertical",
+            "length_m": 39.87,
+            "thickness_m": 0.2,
+            "height_m": 3.0,
+            "volume_m3": 23.922,
+            "confidence": 0.85
+        },
+        {
+            "orientation": "vertical",
+            "length_m": 39.87,
+            "thickness_m": 0.2,
+            "height_m": 3.0,
+            "volume_m3": 23.922,
+            "confidence": 0.85
+        },
+        {
+            "orientation": "horizontal",
+            "length_m": 39.66,
+            "thickness_m": 0.2,
+            "height_m": 3.0,
+            "volume_m3": 23.796,
+            "confidence": 0.85
+        },
+        {
+            "orientation": "horizontal",
+            "length_m": 39.639,
+            "thickness_m": 0.2,
+            "height_m": 3.0,
+            "volume_m3": 23.784,
+            "confidence": 0.85
+        },
+        {
+            "orientation": "vertical",
+            "length_m": 38.111,
+            "thickness_m": 0.2,
+            "height_m": 3.0,
+            "volume_m3": 22.866,
+            "confidence": 0.85
+        },
+        {
+            "orientation": "vertical",
+            "length_m": 38.111,
+            "thickness_m": 0.2,
+            "height_m": 3.0,
+            "volume_m3": 22.866,
+            "confidence": 0.85
+        },
+        {
+            "orientation": "horizontal",
+            "length_m": 29.107,
+            "thickness_m": 0.2,
+            "height_m": 3.0,
+            "volume_m3": 17.464,
+            "confidence": 0.85
+        },
+        {
+            "orientation": "horizontal",
+            "length_m": 29.086,
+            "thickness_m": 0.2,
+            "height_m": 3.0,
+            "volume_m3": 17.451,
+            "confidence": 0.85
+        },
+        {
+            "orientation": "horizontal",
+            "length_m": 29.086,
+            "thickness_m": 0.2,
+            "height_m": 3.0,
+            "volume_m3": 17.451,
+            "confidence": 0.85
+        },
+        {
+            "orientation": "horizontal",
+            "length_m": 27.306,
+            "thickness_m": 0.2,
+            "height_m": 3.0,
+            "volume_m3": 16.383,
+            "confidence": 0.85
+        },
+        {
+            "orientation": "horizontal",
+            "length_m": 15.035,
+            "thickness_m": 0.2,
+            "height_m": 3.0,
+            "volume_m3": 9.021,
+            "confidence": 0.85
+        },
+        {
+            "orientation": "horizontal",
+            "length_m": 14.972,
+            "thickness_m": 0.2,
+            "height_m": 3.0,
+            "volume_m3": 8.983,
+            "confidence": 0.85
+        },
+        {
+            "orientation": "horizontal",
+            "length_m": 13.925,
+            "thickness_m": 0.2,
+            "height_m": 3.0,
+            "volume_m3": 8.355,
+            "confidence": 0.85
+        },
+        {
+            "orientation": "vertical",
+            "length_m": 12.962,
+            "thickness_m": 0.2,
+            "height_m": 3.0,
+            "volume_m3": 7.777,
+            "confidence": 0.85
+        },
+        {
+            "orientation": "vertical",
+            "length_m": 12.857,
+            "thickness_m": 0.2,
+            "height_m": 3.0,
+            "volume_m3": 7.714,
+            "confidence": 0.85
+        },
+        {
+            "orientation": "vertical",
+            "length_m": 11.852,
+            "thickness_m": 0.2,
+            "height_m": 3.0,
+            "volume_m3": 7.111,
+            "confidence": 0.85
+        },
+        {
+            "orientation": "horizontal",
+            "length_m": 11.622,
+            "thickness_m": 0.2,
+            "height_m": 3.0,
+            "volume_m3": 6.973,
+            "confidence": 0.85
+        },
+        {
+            "orientation": "vertical",
+            "length_m": 10.302,
+            "thickness_m": 0.2,
+            "height_m": 3.0,
+            "volume_m3": 6.181,
+            "confidence": 0.85
+        },
+        {
+            "orientation": "horizontal",
+            "length_m": 10.198,
+            "thickness_m": 0.2,
+            "height_m": 3.0,
+            "volume_m3": 6.119,
+            "confidence": 0.85
+        },
+        {
+            "orientation": "vertical",
+            "length_m": 10.072,
+            "thickness_m": 0.2,
+            "height_m": 3.0,
+            "volume_m3": 6.043,
+            "confidence": 0.85
+        },
+        {
+            "orientation": "horizontal",
+            "length_m": 9.716,
+            "thickness_m": 0.2,
+            "height_m": 3.0,
+            "volume_m3": 5.83,
+            "confidence": 0.85
+        },
+        {
+            "orientation": "horizontal",
+            "length_m": 9.716,
+            "thickness_m": 0.2,
+            "height_m": 3.0,
+            "volume_m3": 5.83,
+            "confidence": 0.85
+        },
+        {
+            "orientation": "horizontal",
+            "length_m": 9.716,
+            "thickness_m": 0.2,
+            "height_m": 3.0,
+            "volume_m3": 5.83,
+            "confidence": 0.85
+        },
+        {
+            "orientation": "horizontal",
+            "length_m": 9.674,
+            "thickness_m": 0.2,
+            "height_m": 3.0,
+            "volume_m3": 5.805,
+            "confidence": 0.85
+        },
+        {
+            "orientation": "vertical",
+            "length_m": 9.486,
+            "thickness_m": 0.2,
+            "height_m": 3.0,
+            "volume_m3": 5.691,
+            "confidence": 0.85
+        },
+        {
+            "orientation": "vertical",
+            "length_m": 8.879,
+            "thickness_m": 0.2,
+            "height_m": 3.0,
+            "volume_m3": 5.327,
+            "confidence": 0.85
+        },
+        {
+            "orientation": "horizontal",
+            "length_m": 8.439,
+            "thickness_m": 0.2,
+            "height_m": 3.0,
+            "volume_m3": 5.063,
+            "confidence": 0.85
+        },
+        {
+            "orientation": "horizontal",
+            "length_m": 8.229,
+            "thickness_m": 0.2,
+            "height_m": 3.0,
+            "volume_m3": 4.938,
+            "confidence": 0.85
+        },
+        {
+            "orientation": "horizontal",
+            "length_m": 8.167,
+            "thickness_m": 0.2,
+            "height_m": 3.0,
+            "volume_m3": 4.9,
+            "confidence": 0.85
+        },
+        {
+            "orientation": "horizontal",
+            "length_m": 8.104,
+            "thickness_m": 0.2,
+            "height_m": 3.0,
+            "volume_m3": 4.862,
+            "confidence": 0.85
+        },
+        {
+            "orientation": "vertical",
+            "length_m": 8.104,
+            "thickness_m": 0.2,
+            "height_m": 3.0,
+            "volume_m3": 4.862,
+            "confidence": 0.85
+        },
+        {
+            "orientation": "horizontal",
+            "length_m": 8.104,
+            "thickness_m": 0.2,
+            "height_m": 3.0,
+            "volume_m3": 4.862,
+            "confidence": 0.85
+        },
+        {
+            "orientation": "horizontal",
+            "length_m": 8.083,
+            "thickness_m": 0.2,
+            "height_m": 3.0,
+            "volume_m3": 4.85,
+            "confidence": 0.85
+        },
+        {
+            "orientation": "horizontal",
+            "length_m": 7.161,
+            "thickness_m": 0.2,
+            "height_m": 3.0,
+            "volume_m3": 4.297,
+            "confidence": 0.85
+        },
+        {
+            "orientation": "horizontal",
+            "length_m": 6.889,
+            "thickness_m": 0.2,
+            "height_m": 3.0,
+            "volume_m3": 4.134,
+            "confidence": 0.85
+        },
+        {
+            "orientation": "horizontal",
+            "length_m": 6.847,
+            "thickness_m": 0.2,
+            "height_m": 3.0,
+            "volume_m3": 4.108,
+            "confidence": 0.85
+        },
+        {
+            "orientation": "horizontal",
+            "length_m": 6.764,
+            "thickness_m": 0.2,
+            "height_m": 3.0,
+            "volume_m3": 4.058,
+            "confidence": 0.85
+        },
+        {
+            "orientation": "horizontal",
+            "length_m": 6.764,
+            "thickness_m": 0.2,
+            "height_m": 3.0,
+            "volume_m3": 4.058,
+            "confidence": 0.85
+        },
+        {
+            "orientation": "horizontal",
+            "length_m": 6.638,
+            "thickness_m": 0.2,
+            "height_m": 3.0,
+            "volume_m3": 3.983,
+            "confidence": 0.85
+        },
+        {
+            "orientation": "vertical",
+            "length_m": 6.533,
+            "thickness_m": 0.2,
+            "height_m": 3.0,
+            "volume_m3": 3.92,
+            "confidence": 0.85
+        },
+        {
+            "orientation": "vertical",
+            "length_m": 6.512,
+            "thickness_m": 0.2,
+            "height_m": 3.0,
+            "volume_m3": 3.907,
+            "confidence": 0.85
+        },
+        {
+            "orientation": "vertical",
+            "length_m": 6.512,
+            "thickness_m": 0.2,
+            "height_m": 3.0,
+            "volume_m3": 3.907,
+            "confidence": 0.85
+        },
+        {
+            "orientation": "horizontal",
+            "length_m": 6.491,
+            "thickness_m": 0.2,
+            "height_m": 3.0,
+            "volume_m3": 3.895,
+            "confidence": 0.85
+        },
+        {
+            "orientation": "horizontal",
+            "length_m": 6.491,
+            "thickness_m": 0.2,
+            "height_m": 3.0,
+            "volume_m3": 3.895,
+            "confidence": 0.85
+        },
+        {
+            "orientation": "horizontal",
+            "length_m": 6.45,
+            "thickness_m": 0.2,
+            "height_m": 3.0,
+            "volume_m3": 3.87,
+            "confidence": 0.85
+        },
+        {
+            "orientation": "vertical",
+            "length_m": 6.408,
+            "thickness_m": 0.2,
+            "height_m": 3.0,
+            "volume_m3": 3.845,
+            "confidence": 0.85
+        },
+        {
+            "orientation": "vertical",
+            "length_m": 6.408,
+            "thickness_m": 0.2,
+            "height_m": 3.0,
+            "volume_m3": 3.845,
+            "confidence": 0.85
+        },
+        {
+            "orientation": "horizontal",
+            "length_m": 6.408,
+            "thickness_m": 0.2,
+            "height_m": 3.0,
+            "volume_m3": 3.845,
+            "confidence": 0.85
+        },
+        {
+            "orientation": "horizontal",
+            "length_m": 6.408,
+            "thickness_m": 0.2,
+            "height_m": 3.0,
+            "volume_m3": 3.845,
+            "confidence": 0.85
+        },
+        {
+            "orientation": "horizontal",
+            "length_m": 6.408,
+            "thickness_m": 0.2,
+            "height_m": 3.0,
+            "volume_m3": 3.845,
+            "confidence": 0.85
+        },
+        {
+            "orientation": "horizontal",
+            "length_m": 6.408,
+            "thickness_m": 0.2,
+            "height_m": 3.0,
+            "volume_m3": 3.845,
+            "confidence": 0.85
+        },
+        {
+            "orientation": "horizontal",
+            "length_m": 6.408,
+            "thickness_m": 0.2,
+            "height_m": 3.0,
+            "volume_m3": 3.845,
+            "confidence": 0.85
+        },
+        {
+            "orientation": "horizontal",
+            "length_m": 6.408,
+            "thickness_m": 0.2,
+            "height_m": 3.0,
+            "volume_m3": 3.845,
+            "confidence": 0.85
+        },
+        {
+            "orientation": "horizontal",
+            "length_m": 6.408,
+            "thickness_m": 0.2,
+            "height_m": 3.0,
+            "volume_m3": 3.845,
+            "confidence": 0.85
+        },
+        {
+            "orientation": "horizontal",
+            "length_m": 6.366,
+            "thickness_m": 0.2,
+            "height_m": 3.0,
+            "volume_m3": 3.819,
+            "confidence": 0.85
+        },
+        {
+            "orientation": "vertical",
+            "length_m": 6.366,
+            "thickness_m": 0.2,
+            "height_m": 3.0,
+            "volume_m3": 3.819,
+            "confidence": 0.85
+        },
+        {
+            "orientation": "horizontal",
+            "length_m": 6.366,
+            "thickness_m": 0.2,
+            "height_m": 3.0,
+            "volume_m3": 3.819,
+            "confidence": 0.85
+        },
+        {
+            "orientation": "horizontal",
+            "length_m": 6.366,
+            "thickness_m": 0.2,
+            "height_m": 3.0,
+            "volume_m3": 3.819,
+            "confidence": 0.85
+        },
+        {
+            "orientation": "horizontal",
+            "length_m": 6.366,
+            "thickness_m": 0.2,
+            "height_m": 3.0,
+            "volume_m3": 3.819,
+            "confidence": 0.85
+        },
+        {
+            "orientation": "vertical",
+            "length_m": 6.324,
+            "thickness_m": 0.2,
+            "height_m": 3.0,
+            "volume_m3": 3.794,
+            "confidence": 0.85
+        },
+        {
+            "orientation": "horizontal",
+            "length_m": 6.261,
+            "thickness_m": 0.2,
+            "height_m": 3.0,
+            "volume_m3": 3.757,
+            "confidence": 0.85
+        },
+        {
+            "orientation": "horizontal",
+            "length_m": 5.989,
+            "thickness_m": 0.2,
+            "height_m": 3.0,
+            "volume_m3": 3.593,
+            "confidence": 0.85
+        },
+        {
+            "orientation": "vertical",
+            "length_m": 5.779,
+            "thickness_m": 0.2,
+            "height_m": 3.0,
+            "volume_m3": 3.468,
+            "confidence": 0.85
+        },
+        {
+            "orientation": "horizontal",
+            "length_m": 5.675,
+            "thickness_m": 0.2,
+            "height_m": 3.0,
+            "volume_m3": 3.405,
+            "confidence": 0.85
+        },
+        {
+            "orientation": "horizontal",
+            "length_m": 5.57,
+            "thickness_m": 0.2,
+            "height_m": 3.0,
+            "volume_m3": 3.342,
+            "confidence": 0.85
+        },
+        {
+            "orientation": "horizontal",
+            "length_m": 5.444,
+            "thickness_m": 0.2,
+            "height_m": 3.0,
+            "volume_m3": 3.267,
+            "confidence": 0.85
+        },
+        {
+            "orientation": "vertical",
+            "length_m": 5.444,
+            "thickness_m": 0.2,
+            "height_m": 3.0,
+            "volume_m3": 3.267,
+            "confidence": 0.85
+        },
+        {
+            "orientation": "horizontal",
+            "length_m": 5.423,
+            "thickness_m": 0.2,
+            "height_m": 3.0,
+            "volume_m3": 3.254,
+            "confidence": 0.85
+        },
+        {
+            "orientation": "horizontal",
+            "length_m": 5.382,
+            "thickness_m": 0.2,
+            "height_m": 3.0,
+            "volume_m3": 3.229,
+            "confidence": 0.85
+        },
+        {
+            "orientation": "horizontal",
+            "length_m": 5.319,
+            "thickness_m": 0.2,
+            "height_m": 3.0,
+            "volume_m3": 3.191,
+            "confidence": 0.85
+        },
+        {
+            "orientation": "horizontal",
+            "length_m": 5.193,
+            "thickness_m": 0.2,
+            "height_m": 3.0,
+            "volume_m3": 3.116,
+            "confidence": 0.85
+        },
+        {
+            "orientation": "horizontal",
+            "length_m": 4.795,
+            "thickness_m": 0.2,
+            "height_m": 3.0,
+            "volume_m3": 2.877,
+            "confidence": 0.85
+        },
+        {
+            "orientation": "horizontal",
+            "length_m": 4.649,
+            "thickness_m": 0.2,
+            "height_m": 3.0,
+            "volume_m3": 2.789,
+            "confidence": 0.85
+        },
+        {
+            "orientation": "horizontal",
+            "length_m": 4.46,
+            "thickness_m": 0.2,
+            "height_m": 3.0,
+            "volume_m3": 2.676,
+            "confidence": 0.85
+        },
+        {
+            "orientation": "horizontal",
+            "length_m": 4.46,
+            "thickness_m": 0.2,
+            "height_m": 3.0,
+            "volume_m3": 2.676,
+            "confidence": 0.85
+        },
+        {
+            "orientation": "vertical",
+            "length_m": 4.397,
+            "thickness_m": 0.2,
+            "height_m": 3.0,
+            "volume_m3": 2.638,
+            "confidence": 0.85
+        },
+        {
+            "orientation": "vertical",
+            "length_m": 4.397,
+            "thickness_m": 0.2,
+            "height_m": 3.0,
+            "volume_m3": 2.638,
+            "confidence": 0.85
+        },
+        {
+            "orientation": "vertical",
+            "length_m": 4.397,
+            "thickness_m": 0.2,
+            "height_m": 3.0,
+            "volume_m3": 2.638,
+            "confidence": 0.85
+        },
+        {
+            "orientation": "vertical",
+            "length_m": 4.397,
+            "thickness_m": 0.2,
+            "height_m": 3.0,
+            "volume_m3": 2.638,
+            "confidence": 0.85
+        },
+        {
+            "orientation": "horizontal",
+            "length_m": 4.335,
+            "thickness_m": 0.2,
+            "height_m": 3.0,
+            "volume_m3": 2.601,
+            "confidence": 0.85
+        },
+        {
+            "orientation": "vertical",
+            "length_m": 4.314,
+            "thickness_m": 0.2,
+            "height_m": 3.0,
+            "volume_m3": 2.588,
+            "confidence": 0.85
+        },
+        {
+            "orientation": "horizontal",
+            "length_m": 4.251,
+            "thickness_m": 0.2,
+            "height_m": 3.0,
+            "volume_m3": 2.55,
+            "confidence": 0.85
+        },
+        {
+            "orientation": "horizontal",
+            "length_m": 4.23,
+            "thickness_m": 0.2,
+            "height_m": 3.0,
+            "volume_m3": 2.538,
+            "confidence": 0.85
+        },
+        {
+            "orientation": "horizontal",
+            "length_m": 4.209,
+            "thickness_m": 0.2,
+            "height_m": 3.0,
+            "volume_m3": 2.525,
+            "confidence": 0.85
+        },
+        {
+            "orientation": "horizontal",
+            "length_m": 4.104,
+            "thickness_m": 0.2,
+            "height_m": 3.0,
+            "volume_m3": 2.463,
+            "confidence": 0.85
+        }
+    ],
+    "scale_factor": 0.02094,
+    "total_wall_length_m": 1122.17,
+    "confidence": 0.85
+}
