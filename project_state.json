@@ -1,0 +1,27 @@
+{
+    "timestamp": "2026-02-28 15:12:34.948308",
+    "status": "Completed",
+    "confidence_overall": 0.858,
+    "structural_twin": {
+        "columns": [
+            {
+                "geometry": {
+                    "width": 408.049,
+                    "height": 449.527
+                },
+                "confidence": 0.8578106164932251
+            }
+        ],
+        "beams": [],
+        "slabs": [],
+        "walls": [],
+        "scale_factor": 1.0,
+        "confidence": 0.858
+    },
+    "quantities": {},
+    "schedule": {},
+    "conflicts": [],
+    "risk_report": {},
+    "buildability_score": 100,
+    "explanation": "StructuraAI explanation layer initialized."
+}

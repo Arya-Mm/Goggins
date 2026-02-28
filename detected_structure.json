@@ -1,0 +1,16 @@
+{
+    "columns": [
+        {
+            "geometry": {
+                "width": 408.049,
+                "height": 449.527
+            },
+            "confidence": 0.8578106164932251
+        }
+    ],
+    "beams": [],
+    "slabs": [],
+    "walls": [],
+    "scale_factor": 1.0,
+    "confidence": 0.858
+}
