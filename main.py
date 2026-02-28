@@ -62,7 +62,11 @@ def run_pipeline(file):
         dimensions = extract_dimensions(blueprint)
 
         # 5️⃣ Scale Calibration
-        scale_factor, scale_confidence = calibrate_scale(dimensions)
+        scale_factor, scale_confidence = calibrate_scale(
+        blueprint,
+        walls,
+        dimensions
+)
 
         # 6️⃣ Digital Structural Twin
         structural_twin = build_structural_twin(
