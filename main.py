@@ -58,6 +58,7 @@ def run_pipeline(file):
         walls = detect_walls(blueprint)
 
         # 4️⃣ OCR Dimension Extraction
+        blueprint["walls"] = walls
         dimensions = extract_dimensions(blueprint)
 
         # 5️⃣ Scale Calibration
