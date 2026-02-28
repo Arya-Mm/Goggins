@@ -54,16 +54,34 @@ def calculate_risk(total_duration, conflicts, G=None, twin=None, critical_path=N
     conflict_risk = conflict_count * 5
 
     # -----------------------------------
-    # 5️⃣ Dimension Uncertainty Risk
+    # 5️⃣ CONFIDENCE & UNCERTAINTY RISK (UPGRADED)
     # -----------------------------------
     uncertainty_risk = 0
 
     if twin:
-        uncertain_walls = twin.get("summary", {}).get("uncertain_walls", 0)
-        uncertainty_risk = uncertain_walls * 8
+
+        # 🔹 A. Confidence score propagation
+        confidence_score = twin.get("confidence_score", 100)
+        confidence_risk = max(0, (100 - confidence_score) * 0.4)
+
+        # 🔹 B. Wall-level dimension uncertainty
+        dimension_uncertainty = 0
+        for wall in twin.get("walls", []):
+            if wall.get("dimension_uncertain", False):
+                dimension_uncertainty += 10
+
+        # 🔹 C. Summary-level uncertain wall tracking
+        summary_uncertain = twin.get("summary", {}).get("uncertain_walls", 0)
+        summary_uncertainty_risk = summary_uncertain * 8
+
+        uncertainty_risk = (
+            confidence_risk +
+            dimension_uncertainty +
+            summary_uncertainty_risk
+        )
 
     # -----------------------------------
-    # TOTAL
+    # TOTAL RISK SCORE
     # -----------------------------------
     raw_score = (
         duration_risk +
@@ -76,14 +94,16 @@ def calculate_risk(total_duration, conflicts, G=None, twin=None, critical_path=N
     risk_score = max(0, min(100, round(raw_score, 2)))
 
     # -----------------------------------
-    # Risk Level Classification
+    # Risk Level Classification (Improved)
     # -----------------------------------
     if risk_score < 25:
         risk_level = "Low"
     elif risk_score < 60:
         risk_level = "Moderate"
-    else:
+    elif risk_score < 85:
         risk_level = "High"
+    else:
+        risk_level = "Critical"
 
     return {
         "risk_score": risk_score,
