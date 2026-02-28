@@ -35,7 +35,6 @@ def run_demo():
     # =====================
     print("\n================ BASELINE EXECUTION INTELLIGENCE ================")
 
-    # 🔥 UPDATED CALL (Crew-aware dependency generation)
     tasks, dependencies = generate_tasks_from_twin(
         twin,
         productivity_factor=1.0,
@@ -45,43 +44,32 @@ def run_demo():
 
     G, cycle_valid = build_dependency_graph(tasks, dependencies)
 
-    if cycle_valid:
-        print("\nDependency Graph Valid: ✓ No Cycles")
-    else:
-        print("\nDependency Graph Invalid: ✗ Cycle Detected")
+    if not cycle_valid:
+        print("Dependency Graph Invalid: ✗ Cycle Detected")
         return
 
-    # RESOURCE-AWARE SCHEDULING
+    print("Dependency Graph Valid: ✓ No Cycles")
+
     G, critical_path, total_duration = run_cpm(G, crew_capacity=2)
 
     print("\nTotal Project Duration:", total_duration)
     print("Critical Path:", critical_path)
 
-    print("\nTask Schedule:")
-    for node in G.nodes:
-        print({
-            "task": node,
-            "ES": G.nodes[node]["ES"],
-            "EF": G.nodes[node]["EF"],
-            "Slack": G.nodes[node]["slack"]
-        })
-
     # =====================
-    # CONFLICT VALIDATION
+    # CONFLICTS
     # =====================
     print("\n--- Conflict Validation ---")
 
     conflicts = detect_conflicts(G, crew_capacity=2)
 
     if conflicts:
-        print("Conflicts Detected:")
         for conflict in conflicts:
-            print(conflict)
+            print("⚠", conflict)
     else:
         print("No Conflicts Detected ✓")
 
     # =====================
-    # RISK ASSESSMENT
+    # RISK
     # =====================
     print("\n--- Risk Assessment ---")
 
@@ -98,14 +86,24 @@ def run_demo():
     print("Risk Breakdown:", risk["breakdown"])
 
     # =====================
-    # BUILDABILITY SCORE
+    # BUILDABILITY (UPGRADED)
     # =====================
     print("\n--- Buildability Assessment ---")
 
-    buildability = calculate_buildability(G, total_duration, conflicts)
+    buildability = calculate_buildability(
+        G,
+        total_duration,
+        conflicts,
+        risk_data=risk
+    )
 
-    print("Buildability Score:", buildability["buildability_score"])
-    print("Buildability Level:", buildability["buildability_level"])
+    print("Buildability Score:", buildability["final_score"])
+    print("Buildability Level:", buildability["level"])
+
+    print("\nBuildability Breakdown:")
+    for k, v in buildability.items():
+        if k not in ["critical_path"]:
+            print(f"{k}: {v}")
 
     # =====================
     # WHAT-IF SIMULATION
@@ -123,18 +121,6 @@ def run_demo():
         print("Simulation Error:", scenario["error"])
         return
 
-    print("\nScenario: Increased Crew + Faster Build + Shorter Cure")
-    print("New Total Duration:", scenario["total_duration"])
-    print("New Critical Path:", scenario["critical_path"])
-
-    if scenario["conflicts"]:
-        print("New Conflicts:")
-        for conflict in scenario["conflicts"]:
-            print(conflict)
-    else:
-        print("No Conflicts in Scenario ✓")
-
-    # 🔥 Scenario Risk Using Upgraded Engine
     scenario_risk = calculate_risk(
         total_duration=scenario["total_duration"],
         conflicts=scenario["conflicts"],
@@ -143,31 +129,20 @@ def run_demo():
         critical_path=scenario["critical_path"]
     )
 
-    print("New Risk Score:", scenario_risk["risk_score"])
-    print("New Risk Level:", scenario_risk["risk_level"])
-    print("Scenario Risk Breakdown:", scenario_risk["breakdown"])
-
-    # Scenario Buildability
     scenario_buildability = calculate_buildability(
         scenario["graph"],
         scenario["total_duration"],
-        scenario["conflicts"]
+        scenario["conflicts"],
+        risk_data=scenario_risk
     )
 
-    print("Scenario Buildability Score:", scenario_buildability["buildability_score"])
-    print("Scenario Buildability Level:", scenario_buildability["buildability_level"])
-
-    # =====================
-    # EXECUTIVE SUMMARY
-    # =====================
-    print("\n================ EXECUTIVE INTELLIGENCE SUMMARY ================")
-
+    print("\n--- Scenario Comparison ---")
     print("Baseline Duration:", total_duration)
     print("Scenario Duration:", scenario["total_duration"])
     print("Baseline Risk:", risk["risk_level"])
     print("Scenario Risk:", scenario_risk["risk_level"])
-    print("Baseline Buildability:", buildability["buildability_level"])
-    print("Scenario Buildability:", scenario_buildability["buildability_level"])
+    print("Baseline Buildability:", buildability["level"])
+    print("Scenario Buildability:", scenario_buildability["level"])
 
 
 if __name__ == "__main__":
