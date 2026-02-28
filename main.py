@@ -1,15 +1,14 @@
-import os
 import json
-import streamlit as st
+import os
 from datetime import datetime
 
-    # ===== MODULE IMPORTS (Will exist soon) =====
+# --- Module Imports (will implement layer by layer) ---
 from core.ingestion.loader import load_blueprint
 from core.vision.detector import detect_structural_elements
-from core.vision.wall_hough import detect_walls
+from core.vision.wall_hough import detect_walls_hough
 from core.vision.ocr import extract_dimensions
 from core.twin.scale import calibrate_scale
-from core.twin.twin_builder import build_structural_twin
+from core.twin.builder import build_structural_twin
 from core.twin.takeoff import compute_quantities
 from core.graph.dependency import build_dependency_graph
 from core.scheduling.planner import generate_schedule
@@ -19,113 +18,91 @@ from core.optimization.buildability import compute_buildability_score
 from core.ai.explainer import generate_explanation
 
 
-    # =====================================================
-    # CONFIGURATION
-    # =====================================================
-
-PROJECT_STATE_FILE = "project_state.json"
-DETECTED_STRUCTURE_FILE = "detected_structure.json"
+OUTPUT_DIR = "exports"
+os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 
-    # =====================================================
-    # STREAMLIT UI
-    # =====================================================
-
-st.set_page_config(page_title="StructuraAI", layout="wide")
-st.title("STRUCTURAAI — Autonomous Pre-Construction Intelligence Engine")
-
-uploaded_file = st.file_uploader("Upload Blueprint (Image or PDF)", type=["png", "jpg", "jpeg", "pdf"])
+def export_json(data, filename):
+    path = os.path.join(OUTPUT_DIR, filename)
+    with open(path, "w") as f:
+        json.dump(data, f, indent=4)
+    print(f"[✓] Exported: {path}")
 
 
-    # =====================================================
-    # PIPELINE EXECUTION
-    # =====================================================
+def run_pipeline(image_path: str):
+    print("\n--- STRUCTURAAI PIPELINE START ---\n")
 
-def run_pipeline(file):
     project_state = {
         "timestamp": str(datetime.now()),
-        "status": "Running",
-        "confidence_overall": 1.0,
-        "twin": {},
-        "graph": {},
+        "input_image": image_path,
+        "confidence_summary": {},
+        "scale_factor": None,
         "schedule": {},
         "conflicts": [],
-        "risk": {},
-        "buildability_score": 0,
+        "risk_analysis": {},
+        "buildability_score": None,
         "explanation": ""
     }
 
-    # 1️⃣ Blueprint Ingestion
-    blueprint = load_blueprint(file)
+    # 1️⃣ Blueprint Input & Loading
+    blueprint = load_blueprint(image_path)
 
-    # 2️⃣ Vision Layer
+    # 2️⃣ YOLO Detection
     detections = detect_structural_elements(blueprint)
-    walls = detect_walls(blueprint)
-    blueprint["walls"] = walls
+
+    # 3️⃣ Rule-Based Wall Detection
+    walls = detect_walls_hough(blueprint)
+
+    # 4️⃣ OCR Dimension Extraction
     dimensions = extract_dimensions(blueprint)
 
-    # 3️⃣ Scale Calibration
-    scale_factor, scale_confidence = calibrate_scale(
-        blueprint, walls, dimensions
-    )
+    # 5️⃣ Scale Calibration
+    scale_factor = calibrate_scale(dimensions)
+    project_state["scale_factor"] = scale_factor
 
-    # 4️⃣ Digital Twin
+    # 6️⃣ Digital Structural Twin
     structural_twin = build_structural_twin(
-        detections, walls, dimensions, scale_factor
+        detections=detections,
+        walls=walls,
+        scale_factor=scale_factor
     )
 
-    project_state["twin"] = structural_twin
+    export_json(structural_twin, "detected_structure.json")
 
-    # Save detection artifact
-    with open(DETECTED_STRUCTURE_FILE, "w") as f:
-        json.dump(structural_twin, f, indent=4)
-
-    # 5️⃣ Quantity Takeoff
+    # 7️⃣ Quantity Takeoff
     quantities = compute_quantities(structural_twin)
-    project_state["quantities"] = quantities
+    structural_twin["quantities"] = quantities
 
-    # 6️⃣ Dependency Graph
+    # 8️⃣ Dependency Graph
     dependency_graph = build_dependency_graph(structural_twin)
-    project_state["graph"] = list(dependency_graph.edges())
 
-    # 7️⃣ Scheduling
+    # 9️⃣ Scheduling
     schedule = generate_schedule(dependency_graph, strategy="Balanced")
     project_state["schedule"] = schedule
 
-    # 8️⃣ Conflict Detection
-    conflicts = detect_conflicts(dependency_graph, schedule)
+    # 🔟 Conflict Detection
+    conflicts = detect_conflicts(schedule)
     project_state["conflicts"] = conflicts
 
-    # 9️⃣ Risk Simulation
-    risk_report = simulate_risk(dependency_graph, schedule, conflicts)
-    project_state["risk"] = risk_report
+    # 1️⃣1️⃣ Risk Simulation
+    risk_report = simulate_risk(schedule, conflicts)
+    project_state["risk_analysis"] = risk_report
 
-    # 🔟 Buildability Score
-    buildability_score = compute_buildability_score(
-        dependency_graph, conflicts, risk_report
-    )
-    project_state["buildability_score"] = buildability_score
+    # 1️⃣2️⃣ Buildability Score
+    score = compute_buildability_score(schedule, conflicts, risk_report)
+    project_state["buildability_score"] = score
 
-    # 1️⃣1️⃣ LLM Explanation (Safe Mode)
-    try:
-        explanation = generate_explanation({
-            "schedule": schedule,
-            "conflicts": conflicts,
-            "risk": risk_report,
-            "buildability_score": buildability_score
-        })
-        project_state["explanation"] = explanation
-    except Exception:
-        project_state["explanation"] = "AI explanation temporarily unavailable."
+    # 1️⃣3️⃣ Explanation Layer
+    explanation = generate_explanation(project_state)
+    project_state["explanation"] = explanation
 
-    project_state["confidence_overall"] = min(
-        scale_confidence,
-        structural_twin.get("confidence", 1.0)
-    )
+    # Final Export
+    export_json(project_state, "project_state.json")
 
-    project_state["status"] = "Completed"
-
-    with open(PROJECT_STATE_FILE, "w") as f:
-        json.dump(project_state, f, indent=4)
-
+    print("\n--- PIPELINE COMPLETE ---\n")
     return project_state
+
+
+if __name__ == "__main__":
+    test_image = "data/sample_blueprint.jpg"
+    run_pipeline(test_image)
