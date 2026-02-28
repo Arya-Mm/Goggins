@@ -1,37 +1,57 @@
 import pytesseract
 import re
 import cv2
+import numpy as np
 
 pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
 
 
 def extract_dimensions(blueprint):
     """
-    Extract dimension text like 27', 37', 14'-0"x11'-0"
-    using Tesseract OCR on grayscale image.
+    Geometry-guided OCR using longest boundary lines.
     """
 
     img = blueprint["grayscale"]
-
-    # Improve OCR clarity
-    img = cv2.GaussianBlur(img, (3, 3), 0)
-
-    text = pytesseract.image_to_string(img, config="--psm 6")
-
-    # Improved regex for architectural dimensions
-    dimension_pattern = re.compile(r"\d+'\s?-?\d*\"?")
-
-    matches = dimension_pattern.findall(text)
+    walls = blueprint.get("walls", [])
 
     dimensions = []
 
-    for match in matches:
+    if not walls:
+        return {"dimensions": [], "confidence": 0.7}
+
+    # Find longest horizontal and vertical walls
+    horizontal = next((w for w in walls if w["orientation"] == "horizontal"), None)
+    vertical = next((w for w in walls if w["orientation"] == "vertical"), None)
+
+    h, w = img.shape
+
+    combined_text = ""
+
+    # ---- Horizontal band OCR ----
+    if horizontal:
+        y = horizontal["start"][1]
+        band = img[max(y - 40, 0):min(y + 40, h), :]
+        text = pytesseract.image_to_string(band, config="--psm 6")
+        combined_text += text + " "
+
+    # ---- Vertical band OCR ----
+    if vertical:
+        x = vertical["start"][0]
+        band = img[:, max(x - 40, 0):min(x + 40, w)]
+        text = pytesseract.image_to_string(band, config="--psm 6")
+        combined_text += text
+
+    # Extract dimensions
+    pattern = re.compile(r"\d+'\s?-?\d*\"?")
+    matches = pattern.findall(combined_text)
+
+    for m in matches:
         dimensions.append({
-            "text": match.strip(),
-            "confidence": 0.85
+            "text": m.strip(),
+            "confidence": 0.92
         })
 
     return {
         "dimensions": dimensions,
-        "confidence": 0.85 if dimensions else 0.7
+        "confidence": 0.92 if dimensions else 0.7
     }
