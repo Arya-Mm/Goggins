@@ -6,19 +6,34 @@ def generate_tasks_from_twin(twin):
     tasks = []
     dependencies = []
 
-    # ===== WALLS =====
+    # =========================
+    # WALLS → BUILD → CURE → INSTALL
+    # =========================
     for i, wall in enumerate(twin.get("walls", [])):
+
         build_id = f"wall_build_{i}"
-        duration = math.ceil(wall.get("net_volume_cuft", 1) / 10) or 1
+        cure_id = f"wall_cure_{i}"
+
+        build_duration = max(1, math.ceil(wall.get("net_volume_cuft", 1) / 10))
+        cure_duration = 2  # simplified curing time
 
         tasks.append({
             "task_id": build_id,
-            "duration": duration,
+            "duration": build_duration,
             "resource": 1,
             "type": "wall_build"
         })
 
-        # Doors depend on wall
+        tasks.append({
+            "task_id": cure_id,
+            "duration": cure_duration,
+            "resource": 0,
+            "type": "wall_cure"
+        })
+
+        dependencies.append((build_id, cure_id))
+
+        # DOORS
         for d in range(wall.get("attached_doors", 0)):
             door_id = f"door_install_{i}_{d}"
             tasks.append({
@@ -27,9 +42,9 @@ def generate_tasks_from_twin(twin):
                 "resource": 1,
                 "type": "door_install"
             })
-            dependencies.append((build_id, door_id))
+            dependencies.append((cure_id, door_id))
 
-        # Windows depend on wall
+        # WINDOWS
         for w in range(wall.get("attached_windows", 0)):
             win_id = f"window_install_{i}_{w}"
             tasks.append({
@@ -38,7 +53,7 @@ def generate_tasks_from_twin(twin):
                 "resource": 1,
                 "type": "window_install"
             })
-            dependencies.append((build_id, win_id))
+            dependencies.append((cure_id, win_id))
 
     return tasks, dependencies
 
