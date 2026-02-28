@@ -4,6 +4,7 @@ import networkx as nx
 def calculate_buildability(G, total_duration, conflicts, risk_data=None):
     """
     Fully transparent deterministic Buildability Engine.
+    Robust risk normalization.
     Backward compatible.
     """
 
@@ -29,23 +30,34 @@ def calculate_buildability(G, total_duration, conflicts, risk_data=None):
     try:
         depth = nx.dag_longest_path_length(G)
         critical_path = nx.dag_longest_path(G)
-    except:
+    except Exception:
         depth = 0
         critical_path = []
 
     # Serial chain estimation (nodes with only 1 outgoing edge)
     serial_chains = sum(1 for n in G.nodes if G.out_degree(n) == 1)
 
-    # Workforce overload detection (if stored)
+    # Workforce overload detection
     workforce_overload_events = 0
     for n in G.nodes:
         if G.nodes[n].get("overloaded", False):
             workforce_overload_events += 1
 
-    # Risk density (normalized)
-    risk_score = 0
+    # ==============================
+    # RISK NORMALIZATION (CRITICAL FIX)
+    # ==============================
+
+    risk_score_normalized = 0.0
+
     if risk_data and "risk_score" in risk_data:
-        risk_score = risk_data["risk_score"]
+        raw_risk = risk_data["risk_score"]
+
+        # If already normalized (0–1)
+        if 0 <= raw_risk <= 1:
+            risk_score_normalized = raw_risk
+        else:
+            # Assume 0–100 scale
+            risk_score_normalized = max(0.0, min(1.0, raw_risk / 100.0))
 
     # ==============================
     # SCORING MODEL
@@ -58,7 +70,10 @@ def calculate_buildability(G, total_duration, conflicts, risk_data=None):
     duration_penalty = max(0, total_duration - task_count) * 2
     serial_penalty = serial_chains * 1.5
     workforce_penalty = workforce_overload_events * 5
-    risk_penalty = risk_score * 2
+
+    # Risk penalty scaled properly
+    risk_penalty = risk_score_normalized * 20
+
     slack_bonus = min(12, avg_slack * 4)
 
     final_score = (
@@ -75,7 +90,7 @@ def calculate_buildability(G, total_duration, conflicts, risk_data=None):
     final_score = max(0, min(100, round(final_score, 2)))
 
     # ==============================
-    # RISK LEVEL CLASSIFICATION
+    # CLASSIFICATION
     # ==============================
 
     if final_score >= 85:
@@ -88,7 +103,7 @@ def calculate_buildability(G, total_duration, conflicts, risk_data=None):
         level = "CRITICAL"
 
     # ==============================
-    # BREAKDOWN STRUCTURE
+    # BREAKDOWN
     # ==============================
 
     breakdown = {
@@ -103,7 +118,8 @@ def calculate_buildability(G, total_duration, conflicts, risk_data=None):
         "final_score": final_score,
         "level": level,
         "critical_path": critical_path,
-        "task_count": task_count
+        "task_count": task_count,
+        "risk_score_normalized": round(risk_score_normalized, 3)
     }
 
     return breakdown
