@@ -1,24 +1,22 @@
+from core.vision.vision_engine import VisionEngine
+from core.twin.twin_builder import StructuralTwinBuilder
 from pathlib import Path
-import sys
 
-BASE_DIR = Path(__file__).parent
-sys.path.insert(0, str(BASE_DIR))
-
-from core.ingestion.loader import BlueprintLoader
-from core.vision.detector import StructuralDetector
 
 def run_demo():
-    print("Running StructuraAI Demo...")
+    print("Running StructuraAI Vision + Twin Demo...")
 
-    demo_path = BASE_DIR / "core" / "data" / "demo_blueprint.png"
+    demo_pdf = Path("core/vision/house_plan.pdf")
 
-    loader = BlueprintLoader()
-    raw_img, processed_img = loader.load_and_preprocess(str(demo_path))
+    vision = VisionEngine()
+    vision_output = vision.run(str(demo_pdf))
 
-    detector = StructuralDetector()
-    detections = detector.detect(processed_img)
+    twin_builder = StructuralTwinBuilder()
+    twin = twin_builder.build(vision_output)
 
-    print("Detections:", detections)
+    print("\nDigital Structural Twin:")
+    print(twin)
+
 
 if __name__ == "__main__":
     run_demo()

@@ -1,6 +1,6 @@
 import os
 import time
-from typing import Dict, List
+from typing import Dict
 import numpy as np
 from ultralytics import YOLO
 
@@ -8,38 +8,43 @@ from ultralytics import YOLO
 class StructuralDetector:
     """
     YOLO-based structural element detector.
-    • Loads custom model if available
-    • Falls back to yolov8n
-    • Falls back to synthetic detection if inference fails
+    Stable hybrid detection layer.
     """
 
     def __init__(
         self,
         model_path: str = None,
-        confidence_threshold: float = 0.4
+        confidence_threshold: float = 0.25
     ):
         self.conf_threshold = confidence_threshold
         self.model = None
-        self.model_path = self._resolve_model_path(model_path)
         self.model_used = "none"
+        self.model_path = self._resolve_model_path(model_path)
+
+        self.allowed_classes = {
+            "column",
+            "wall",
+            "curtain_wall",
+            "stair_case",
+            "door",
+            "sliding_door",
+            "window",
+            "railing"
+        }
+
         self._load_model()
 
-    # ─────────────────────────────────────────────────────────────
+    # ─────────────────────────────────────────────
     # MODEL LOADING
-    # ─────────────────────────────────────────────────────────────
+    # ─────────────────────────────────────────────
 
-    def _resolve_model_path(self, model_path: str) -> str:
-        """
-        Resolve absolute model path safely.
-        """
+    def _resolve_model_path(self, model_path: str):
         if model_path:
             return os.path.abspath(model_path)
 
-        default_path = os.path.abspath(
+        return os.path.abspath(
             os.path.join(os.path.dirname(__file__), "..", "data", "best.pt")
         )
-
-        return default_path
 
     def _load_model(self):
         try:
@@ -57,30 +62,17 @@ class StructuralDetector:
             self.model = None
             self.model_used = "none"
 
-    # ─────────────────────────────────────────────────────────────
+    # ─────────────────────────────────────────────
     # DETECTION
-    # ─────────────────────────────────────────────────────────────
+    # ─────────────────────────────────────────────
 
     def detect(self, image: np.ndarray) -> Dict:
-        """
-        Run detection safely.
-
-        Returns:
-        {
-            "elements": [...],
-            "class_counts": {},
-            "total_detections": int,
-            "model_used": str,
-            "inference_time_ms": float,
-            "average_confidence": float
-        }
-        """
 
         if image is None or not isinstance(image, np.ndarray):
             raise ValueError("Invalid image provided to detector.")
 
         if self.model is None:
-            return self._fallback_detection(image)
+            return self._synthetic_detection(image)
 
         try:
             start = time.time()
@@ -88,23 +80,32 @@ class StructuralDetector:
             inference_time = (time.time() - start) * 1000
 
             if results.boxes is None:
-                return self._fallback_detection(image)
+                print("[YOLO] No detections at all.")
+                return self._empty_detection(inference_time)
 
             elements = []
             class_counts = {}
             confidences = []
 
+            raw_count = len(results.boxes)
+
             for box in results.boxes:
                 conf = float(box.conf[0])
-
-                if conf < self.conf_threshold:
-                    continue
-
                 cls_id = int(box.cls[0])
                 x1, y1, x2, y2 = box.xyxy[0].tolist()
 
                 label = self.model.names.get(cls_id, "unknown")
                 label = str(label).lower().strip().replace(" ", "_")
+
+                # ignore dimension class
+                if label == "dimension":
+                    continue
+
+                if label not in self.allowed_classes:
+                    continue
+
+                if conf < self.conf_threshold:
+                    continue
 
                 class_counts[label] = class_counts.get(label, 0) + 1
                 confidences.append(conf)
@@ -122,8 +123,11 @@ class StructuralDetector:
                     "synthetic": False
                 })
 
+            print(f"[YOLO] Raw detections: {raw_count}")
+            print(f"[YOLO] After filtering: {len(elements)}")
+
             if not elements:
-                return self._fallback_detection(image)
+                return self._empty_detection(inference_time)
 
             avg_conf = sum(confidences) / len(confidences)
 
@@ -138,32 +142,31 @@ class StructuralDetector:
 
         except Exception as e:
             print(f"[YOLO] Detection failed: {e}")
-            return self._fallback_detection(image)
+            return self._synthetic_detection(image)
 
-    # ─────────────────────────────────────────────────────────────
-    # FALLBACK
-    # ─────────────────────────────────────────────────────────────
+    # ─────────────────────────────────────────────
+    # HELPERS
+    # ─────────────────────────────────────────────
 
-    def _fallback_detection(self, image: np.ndarray) -> Dict:
-        """
-        Minimal synthetic detection to keep pipeline alive.
-        """
+    def _empty_detection(self, inference_time):
+        return {
+            "elements": [],
+            "class_counts": {},
+            "total_detections": 0,
+            "model_used": self.model_used,
+            "inference_time_ms": round(inference_time, 2),
+            "average_confidence": 0.0
+        }
 
+    def _synthetic_detection(self, image):
         h, w = image.shape[:2]
-
         synthetic = {
             "id": "synthetic_1",
             "type": "synthetic_column",
             "confidence": 0.5,
-            "bbox": [
-                int(w * 0.4),
-                int(h * 0.4),
-                int(w * 0.6),
-                int(h * 0.6)
-            ],
+            "bbox": [int(w * 0.4), int(h * 0.4), int(w * 0.6), int(h * 0.6)],
             "synthetic": True
         }
-
         return {
             "elements": [synthetic],
             "class_counts": {"synthetic_column": 1},
