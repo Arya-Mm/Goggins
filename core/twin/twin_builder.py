@@ -3,68 +3,91 @@ import math
 
 class StructuralTwinBuilder:
 
-    def __init__(self):
-        pass
+    def __init__(self, min_confidence=0.6):
+        self.min_confidence = min_confidence
 
-    # -------------------------
-    # Estimate Scale
-    # -------------------------
-    def estimate_scale(self, dimensions):
+    def _compute_scale_factor(self, dimensions):
         """
-        Estimate pixel-to-inch scale using longest dimension.
+        Compute scale factor using detected dimension annotations.
+        Uses first valid dimension.
         """
         if not dimensions:
             return 1.0  # fallback
 
-        # Choose largest real dimension
-        largest = max(dimensions, key=lambda d: d["inches"])
-        real_inches = largest["inches"]
+        # Take first dimension
+        dim = dimensions[0]
 
-        x0, y0, x1, y1 = largest["bbox"]
-        pixel_length = math.dist((x0, y0), (x1, y1))
+        x1, y1, x2, y2 = dim["bbox"]
+        pixel_length = abs(x2 - x1)
 
         if pixel_length == 0:
             return 1.0
 
-        return real_inches / pixel_length
+        return dim["inches"] / pixel_length
 
-    # -------------------------
-    # Convert Walls to Geometry
-    # -------------------------
-    def build_walls(self, wall_detections, scale):
-        walls = []
+    def _compute_wall_length(self, bbox, scale_factor):
+        """
+        Compute wall length using dominant axis (not diagonal).
+        """
+        x1, y1, x2, y2 = bbox
 
-        for wall in wall_detections:
-            x0, y0, x1, y1 = wall["bbox"]
+        width = abs(x2 - x1)
+        height = abs(y2 - y1)
 
-            pixel_length = math.dist((x0, y0), (x1, y1))
-            real_length = pixel_length * scale
+        wall_pixels = max(width, height)
 
-            walls.append({
-                "length_inches": round(real_length, 2),
-                "confidence": wall["confidence"],
-                "bbox": wall["bbox"]
-            })
+        return round(wall_pixels * scale_factor, 2)
 
-        return walls
-
-    # -------------------------
-    # Build Twin
-    # -------------------------
     def build(self, vision_output):
 
         dimensions = vision_output.get("dimensions", [])
         objects = vision_output.get("objects", {})
 
-        scale = self.estimate_scale(dimensions)
+        scale_factor = self._compute_scale_factor(dimensions)
 
-        walls = self.build_walls(objects.get("walls", []), scale)
+        walls = []
+        doors = []
+        windows = []
+
+        # Handle grouped object format
+        raw_walls = objects.get("walls", [])
+        raw_doors = objects.get("doors", [])
+        raw_windows = objects.get("windows", [])
+
+        # ---- WALLS ----
+        for obj in raw_walls:
+            if obj["confidence"] < self.min_confidence:
+                continue
+
+            length_inches = self._compute_wall_length(
+                obj["bbox"], scale_factor
+            )
+
+            walls.append({
+                "length_inches": length_inches,
+                "confidence": obj["confidence"],
+                "bbox": obj["bbox"]
+            })
+
+        # ---- DOORS ----
+        for obj in raw_doors:
+            if obj["confidence"] < self.min_confidence:
+                continue
+
+            doors.append(obj)
+
+        # ---- WINDOWS ----
+        for obj in raw_windows:
+            if obj["confidence"] < self.min_confidence:
+                continue
+
+            windows.append(obj)
 
         twin = {
-            "scale_factor": round(scale, 4),
+            "scale_factor": round(scale_factor, 4),
             "walls": walls,
-            "doors": objects.get("doors", []),
-            "windows": objects.get("windows", []),
+            "doors": doors,
+            "windows": windows,
             "columns": objects.get("columns", []),
             "beams": objects.get("beams", []),
             "slabs": objects.get("slabs", [])
