@@ -6,6 +6,10 @@ class StructuralTwinBuilder:
     def __init__(self, min_confidence=0.5):
         self.min_confidence = min_confidence
 
+    # ----------------------------
+    # Geometry Utilities
+    # ----------------------------
+
     def _bbox_center(self, bbox):
         x1, y1, x2, y2 = bbox
         return ((x1 + x2) / 2, (y1 + y2) / 2)
@@ -32,6 +36,10 @@ class StructuralTwinBuilder:
             if self._distance(wall_bbox, op["bbox"]) < threshold:
                 assigned.append(op)
         return assigned
+
+    # ----------------------------
+    # Quantity Computation
+    # ----------------------------
 
     def compute_quantities(self, twin):
 
@@ -87,15 +95,17 @@ class StructuralTwinBuilder:
 
         return twin
 
+    # ----------------------------
+    # Confidence & Buildability
+    # ----------------------------
+
     def compute_scores(self, twin, dimensions):
 
         # Confidence Score
-        wall_conf = (
-            sum(w["confidence"] for w in twin["walls"])
-            / len(twin["walls"])
-            if twin["walls"]
-            else 0
-        )
+        if twin["walls"]:
+            wall_conf = sum(w["confidence"] for w in twin["walls"]) / len(twin["walls"])
+        else:
+            wall_conf = 0
 
         dimension_score = 1 if dimensions else 0
 
@@ -107,17 +117,29 @@ class StructuralTwinBuilder:
         score = 0
 
         if twin["walls"]:
-            score += 40
+            score += 30
+
         if dimensions:
             score += 20
+
         if twin["total_net_wall_volume_cuft"] > 0:
             score += 20
-        if twin["estimated_bricks"] > 0:
-            score += 20
 
-        twin["buildability_score"] = score
+        if twin["estimated_bricks"] > 0:
+            score += 10
+
+        # Penalize unrealistic door density
+        if len(twin["walls"]) > 0:
+            if len(twin["doors"]) > len(twin["walls"]) * 6:
+                score -= 10
+
+        twin["buildability_score"] = max(0, min(100, score))
 
         return twin
+
+    # ----------------------------
+    # Main Twin Builder
+    # ----------------------------
 
     def build(self, vision_output):
 
@@ -170,6 +192,7 @@ class StructuralTwinBuilder:
             "window_count": len(windows),
             "net_volume_cuft": twin["total_net_wall_volume_cuft"],
             "estimated_bricks": twin["estimated_bricks"],
+            "confidence_score": twin["confidence_score"],
             "buildability_score": twin["buildability_score"]
         }
 
