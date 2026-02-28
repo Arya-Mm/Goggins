@@ -5,12 +5,13 @@ import math
 def generate_tasks_from_twin(
     twin,
     productivity_factor=1.0,
-    curing_days=2
+    curing_days=2,
+    crew_capacity=2
 ):
     tasks = []
     dependencies = []
 
-    print(">>> USING SEQUENTIAL INSTALL MODEL <<<")
+    print(">>> USING BATCHED INSTALL MODEL <<<")
 
     for i, wall in enumerate(twin.get("walls", [])):
 
@@ -18,7 +19,7 @@ def generate_tasks_from_twin(
         cure_id = f"wall_cure_{i}"
 
         # -----------------------------
-        # WALL BUILD DURATION
+        # BUILD DURATION
         # -----------------------------
         base_duration = max(
             1,
@@ -47,9 +48,8 @@ def generate_tasks_from_twin(
         dependencies.append((build_id, cure_id))
 
         # -----------------------------
-        # INSTALL TASKS (STRICT CHAIN)
+        # INSTALL TASKS
         # -----------------------------
-
         install_ids = []
 
         for d in range(wall.get("attached_doors", 0)):
@@ -72,12 +72,36 @@ def generate_tasks_from_twin(
             })
             install_ids.append(win_id)
 
-        # Force strict sequencing
+        # -----------------------------
+        # BATCHING LOGIC
+        # -----------------------------
         if install_ids:
-            dependencies.append((cure_id, install_ids[0]))
 
-            for j in range(1, len(install_ids)):
-                dependencies.append((install_ids[j-1], install_ids[j]))
+            batches = [
+                install_ids[x:x + crew_capacity]
+                for x in range(0, len(install_ids), crew_capacity)
+            ]
+
+            previous_anchor = cure_id
+
+            for batch_index, batch in enumerate(batches):
+
+                batch_anchor = f"batch_{i}_{batch_index}"
+
+                # Dummy anchor node to represent batch completion
+                tasks.append({
+                    "task_id": batch_anchor,
+                    "duration": 0,
+                    "resource": 0,
+                    "type": "batch_anchor"
+                })
+
+                # All tasks in batch depend on previous anchor
+                for task_id in batch:
+                    dependencies.append((previous_anchor, task_id))
+                    dependencies.append((task_id, batch_anchor))
+
+                previous_anchor = batch_anchor
 
     return tasks, dependencies
 
@@ -91,10 +115,6 @@ def build_dependency_graph(tasks, dependencies):
 
     for dep in dependencies:
         G.add_edge(dep[0], dep[1])
-
-    print("Dependencies:")
-    for edge in G.edges:
-        print(edge)
 
     cycle_valid = nx.is_directed_acyclic_graph(G)
 
