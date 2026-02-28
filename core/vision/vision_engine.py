@@ -8,7 +8,7 @@ class VisionEngine:
 
     def __init__(self):
         self.processor = PDFProcessor()
-        self.yolo = YOLOAdapter("core/models/best.pt")
+        self.yolo = YOLOAdapter("core/data/best.pt")
 
     def _pdf_to_image(self, pdf_path):
 
