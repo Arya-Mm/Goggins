@@ -2,6 +2,8 @@ from core.vision.vision_engine import VisionEngine
 from core.twin.twin_builder import StructuralTwinBuilder
 from core.graph.dependency_graph import generate_tasks_from_twin, build_dependency_graph
 from core.scheduling.cpm_engine import run_cpm
+from core.conflict.conflict_engine import detect_conflicts
+from core.risk.risk_engine import calculate_risk
 
 from pathlib import Path
 
@@ -54,6 +56,30 @@ def run_demo():
             "EF": G.nodes[node]["EF"],
             "Slack": G.nodes[node]["slack"]
         })
+
+    # =====================
+    # CONFLICT DETECTION
+    # =====================
+    print("\n--- Conflict Detection ---")
+
+    conflicts = detect_conflicts(G, crew_capacity=2)
+
+    if conflicts:
+        print("Conflicts Detected:")
+        for conflict in conflicts:
+            print(conflict)
+    else:
+        print("No Conflicts Detected")
+
+    # =====================
+    # RISK ASSESSMENT
+    # =====================
+    print("\n--- Risk Assessment ---")
+
+    risk = calculate_risk(total_duration, len(conflicts))
+
+    print("Risk Score:", risk["risk_score"])
+    print("Risk Level:", risk["risk_level"])
 
 
 if __name__ == "__main__":
