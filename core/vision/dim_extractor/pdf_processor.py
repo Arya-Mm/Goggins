@@ -1,8 +1,7 @@
 import pdfplumber
-import fitz  # PyMuPDF
-from typing import Dict, List, Tuple
+import fitz
+from typing import Dict
 from .dimension_parser import DimensionParser
-from .code_detector import CodeDetector
 
 class PDFProcessor:
     def __init__(self):
