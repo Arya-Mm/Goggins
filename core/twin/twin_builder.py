@@ -1,9 +1,10 @@
 import math
 
 
-DEFAULT_WALL_THICKNESS = 0.2
-DEFAULT_WALL_HEIGHT = 3.0
-PARALLEL_TOLERANCE = 5  # pixels
+DEFAULT_WALL_THICKNESS = 0.2  # meters
+DEFAULT_WALL_HEIGHT = 3.0     # meters
+PARALLEL_TOLERANCE = 5        # pixels
+MIN_WALL_LENGTH_M = 2.5       # minimum structural wall length
 
 
 def are_parallel_duplicates(w1, w2):
@@ -40,7 +41,6 @@ def deduplicate_walls(walls):
                 cluster.append(w2)
                 used.add(j)
 
-        # Choose the longest wall in cluster
         main_wall = max(cluster, key=lambda w: w["length_pixels"])
         filtered.append(main_wall)
 
@@ -49,14 +49,21 @@ def deduplicate_walls(walls):
 
 def build_structural_twin(detections, walls, dimensions, scale_factor):
 
+    # Step 1 — Deduplicate
     walls = deduplicate_walls(walls)
 
     structured_walls = []
     total_confidence = []
+    total_length_m = 0
 
     for w in walls:
 
         real_length = w["length_pixels"] * scale_factor
+
+        # 🔥 Structural filter (ignore micro fragments)
+        if real_length < MIN_WALL_LENGTH_M:
+            continue
+
         volume = real_length * DEFAULT_WALL_THICKNESS * DEFAULT_WALL_HEIGHT
 
         structured_walls.append({
@@ -69,8 +76,12 @@ def build_structural_twin(detections, walls, dimensions, scale_factor):
         })
 
         total_confidence.append(w["confidence"])
+        total_length_m += real_length
 
-    overall_conf = sum(total_confidence) / len(total_confidence) if total_confidence else 0.5
+    if total_confidence:
+        overall_conf = sum(total_confidence) / len(total_confidence)
+    else:
+        overall_conf = 0.5
 
     return {
         "columns": [],
@@ -78,5 +89,6 @@ def build_structural_twin(detections, walls, dimensions, scale_factor):
         "slabs": [],
         "walls": structured_walls,
         "scale_factor": scale_factor,
+        "total_wall_length_m": round(total_length_m, 2),
         "confidence": round(overall_conf, 3)
     }
