@@ -4,19 +4,19 @@ import streamlit as st
 from datetime import datetime
 
 # ===== MODULE IMPORTS (Will exist soon) =====
-from ingestion.loader import load_blueprint
-from vision.detector import detect_structural_elements
-from vision.wall_hough import detect_walls
-from vision.ocr import extract_dimensions
-from twin.scale import calibrate_scale
-from twin.builder import build_structural_twin
-from twin.takeoff import compute_quantities
-from graph.dependency import build_dependency_graph
-from scheduling.planner import generate_schedule
-from conflict.checker import detect_conflicts
-from risk.simulator import simulate_risk
-from optimization.buildability import compute_buildability_score
-from ai.explainer import generate_explanation
+from core.ingestion.loader import load_blueprint
+from core.vision.detector import detect_structural_elements
+from core.vision.wall_hough import detect_walls
+from core.vision.ocr import extract_dimensions
+from core.twin.scale import calibrate_scale
+from core.twin.twin_builder import build_structural_twin
+from core.twin.takeoff import compute_quantities
+from core.graph.dependency import build_dependency_graph
+from core.scheduling.planner import generate_schedule
+from core.conflict.checker import detect_conflicts
+from core.risk.simulator import simulate_risk
+from core.optimization.buildability import compute_buildability_score
+from core.ai.explainer import generate_explanation
 
 
 # =====================================================
