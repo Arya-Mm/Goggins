@@ -4,21 +4,20 @@ import sys
 BASE_DIR = Path(__file__).parent
 sys.path.insert(0, str(BASE_DIR))
 
-from core.ingestion.loader import BlueprintLoader
-from core.vision.detector import StructuralDetector
+from core.vision.vision_engine import VisionEngine
+
 
 def run_demo():
-    print("Running StructuraAI Demo...")
+    print("Running StructuraAI Vision Demo...")
 
-    demo_path = BASE_DIR / "core" / "data" / "demo_blueprint.png"
+    demo_pdf = BASE_DIR / "core" / "vision" / "house_plan.pdf"  # put test pdf here
 
-    loader = BlueprintLoader()
-    raw_img, processed_img = loader.load_and_preprocess(str(demo_path))
+    engine = VisionEngine()
+    result = engine.run(str(demo_pdf))
 
-    detector = StructuralDetector()
-    detections = detector.detect(processed_img)
+    print("Vision Output:")
+    print(result)
 
-    print("Detections:", detections)
 
 if __name__ == "__main__":
     run_demo()
