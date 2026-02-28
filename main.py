@@ -6,8 +6,6 @@ from core.conflict.conflict_engine import detect_conflicts
 from core.risk.risk_engine import calculate_risk
 from core.simulation.whatif_engine import run_simulation
 from core.buildability.buildability_engine import calculate_buildability
-
-# 🔥 NEW IMPORTS
 from core.utils.heat_visualizer import classify_heat
 from core.ai.buildability_explainer import explain_buildability
 from core.exports.executive_summary import generate_executive_summary
@@ -35,7 +33,21 @@ def run_demo():
     # =====================
     twin_builder = StructuralTwinBuilder()
     twin = twin_builder.build(vision_output)
+        # =====================
+    # STRESS TEST: EMPTY DRAWING
+    # =====================
+    STRESS_EMPTY = True   # change to False after test
 
+    if STRESS_EMPTY:
+        twin = {
+            "walls": [],
+            "doors": [],
+            "windows": [],
+            "columns": [],
+            "beams": [],
+            "slabs": [],
+            "summary": {}
+        }
     print("\nDigital Structural Twin:")
     print(twin)
 
