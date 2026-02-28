@@ -18,6 +18,20 @@ from pathlib import Path
 
 
 def run_demo():
+
+    # ======================================================
+    # STRESS TEST CONTROL PANEL
+    # Toggle True / False only here
+    # ======================================================
+
+    STRESS_EMPTY_TWIN = True
+    STRESS_NO_DIMENSION = False
+    STRESS_HIGH_UNCERTAINTY = False
+    STRESS_NO_WALLS = False
+    STRESS_FORCE_CYCLE = False
+    STRESS_ZERO_DURATION = False
+    STRESS_MAX_RISK = False
+
     print("Running StructuraAI Vision + Twin Demo...")
 
     demo_pdf = Path("core/vision/house_plan.pdf")
@@ -33,12 +47,9 @@ def run_demo():
     # =====================
     twin_builder = StructuralTwinBuilder()
     twin = twin_builder.build(vision_output)
-        # =====================
-    # STRESS TEST: EMPTY DRAWING
-    # =====================
-    STRESS_EMPTY = True   # change to False after test
 
-    if STRESS_EMPTY:
+    # 🔥 STRESS: EMPTY TWIN
+    if STRESS_EMPTY_TWIN:
         twin = {
             "walls": [],
             "doors": [],
@@ -48,6 +59,16 @@ def run_demo():
             "slabs": [],
             "summary": {}
         }
+
+    # 🔥 STRESS: HIGH UNCERTAINTY
+    if STRESS_HIGH_UNCERTAINTY and twin.get("walls"):
+        twin["walls"][0]["dimension_uncertain"] = True
+        twin["confidence_score"] = 20
+
+    # 🔥 STRESS: REMOVE WALLS
+    if STRESS_NO_WALLS:
+        twin["walls"] = []
+
     print("\nDigital Structural Twin:")
     print(twin)
 
@@ -56,12 +77,15 @@ def run_demo():
     # =====================
     print("\n================ SCALE CALIBRATION ================")
 
-    detected_dimensions = [
-        {
-            "pixel_length": 240,
-            "real_length_inches": 144
-        }
-    ]
+    if STRESS_NO_DIMENSION:
+        detected_dimensions = []
+    else:
+        detected_dimensions = [
+            {
+                "pixel_length": 240,
+                "real_length_inches": 144
+            }
+        ]
 
     scale_info = calibrate_scale(detected_dimensions)
 
@@ -69,7 +93,7 @@ def run_demo():
     print("Calibration Status:", scale_info["calibration_status"])
 
     # =====================
-    # QUANTITY & COST ENGINE
+    # QUANTITY ENGINE
     # =====================
     print("\n================ QUANTITY & COST ESTIMATION ================")
 
@@ -83,14 +107,8 @@ def run_demo():
     for k, v in quantities["cost_breakdown"].items():
         print(f"{k}: ₹{v}")
 
-    print("\n--- Phase Breakdown ---")
-    for phase, data in quantities["phase_breakdown"].items():
-        print(f"\n{phase.upper()}")
-        for k, v in data.items():
-            print(f"{k}: {v}")
-
     # =====================
-    # BASELINE EXECUTION
+    # SCHEDULING
     # =====================
     print("\n================ BASELINE EXECUTION INTELLIGENCE ================")
 
@@ -103,6 +121,11 @@ def run_demo():
 
     G, cycle_valid = build_dependency_graph(tasks, dependencies)
 
+    # 🔥 STRESS: FORCE CYCLE
+    if STRESS_FORCE_CYCLE and len(G.nodes) > 1:
+        nodes = list(G.nodes)
+        G.add_edge(nodes[-1], nodes[0])
+
     if not cycle_valid:
         print("Dependency Graph Invalid: ✗ Cycle Detected")
         return
@@ -111,10 +134,14 @@ def run_demo():
 
     G, critical_path, total_duration = run_cpm(G, crew_capacity=2)
 
+    # 🔥 STRESS: ZERO DURATION
+    if STRESS_ZERO_DURATION and len(G.nodes) > 0:
+        node = list(G.nodes)[0]
+        G.nodes[node]["EF"] = G.nodes[node]["ES"]
+
     print("\nTotal Project Duration:", total_duration)
     print("Critical Path:", critical_path)
 
-    # Generate Gantt Chart
     print("\nGenerating Gantt Chart...")
     gantt_path = generate_gantt_chart(G)
     print("Gantt Chart Saved:", gantt_path)
@@ -122,21 +149,11 @@ def run_demo():
     # =====================
     # CONFLICTS
     # =====================
-    print("\n--- Conflict Validation ---")
-
     conflicts = detect_conflicts(G, crew_capacity=2)
-
-    if conflicts:
-        for conflict in conflicts:
-            print("⚠", conflict)
-    else:
-        print("No Conflicts Detected ✓")
 
     # =====================
     # RISK
     # =====================
-    print("\n--- Risk Assessment ---")
-
     risk = calculate_risk(
         total_duration=total_duration,
         conflicts=conflicts,
@@ -145,20 +162,21 @@ def run_demo():
         critical_path=critical_path
     )
 
+    # 🔥 STRESS: MAX RISK
+    if STRESS_MAX_RISK:
+        risk["risk_score"] = 100
+
     risk_emoji, _, risk_label = classify_heat(
         risk["risk_score"],
         inverse=True
     )
 
-    print(f"Risk Score: {risk['risk_score']} {risk_emoji}")
-    print(f"Risk Level: {risk_label}")
-    print("Risk Breakdown:", risk["breakdown"])
+    print("\nRisk Score:", risk["risk_score"], risk_emoji)
+    print("Risk Level:", risk_label)
 
     # =====================
     # BUILDABILITY
     # =====================
-    print("\n--- Buildability Assessment ---")
-
     buildability = calculate_buildability(
         G,
         total_duration,
@@ -171,110 +189,45 @@ def run_demo():
         inverse=False
     )
 
-    print(f"Buildability Score: {buildability['final_score']} {build_emoji}")
-    print(f"Buildability Level: {build_label}")
-
-    print("\nBuildability Breakdown:")
-    for k, v in buildability.items():
-        if k not in ["critical_path"]:
-            print(f"{k}: {v}")
+    print("\nBuildability Score:", buildability["final_score"], build_emoji)
+    print("Buildability Level:", build_label)
 
     # =====================
-    # AI JUSTIFICATION
+    # AI EXPLANATION
     # =====================
-    print("\n--- AI Engineering Justification ---")
-
     try:
         ai_explanation = explain_buildability(buildability)
+        print("\nAI Explanation:")
         print(ai_explanation)
     except Exception as e:
         print("AI Explanation Failed:", e)
 
     # =====================
-    # WHAT-IF SIMULATION
-    # =====================
-    print("\n================ WHAT-IF SIMULATION ================")
-
-    scenario = run_simulation(
-        twin,
-        crew_capacity=3,
-        productivity_factor=1.2,
-        curing_days=1
-    )
-
-    if "error" in scenario:
-        print("Simulation Error:", scenario["error"])
-        return
-
-    scenario_risk = calculate_risk(
-        total_duration=scenario["total_duration"],
-        conflicts=scenario["conflicts"],
-        G=scenario["graph"],
-        twin=twin,
-        critical_path=scenario["critical_path"]
-    )
-
-    scenario_buildability = calculate_buildability(
-        scenario["graph"],
-        scenario["total_duration"],
-        scenario["conflicts"],
-        risk_data=scenario_risk
-    )
-
-    scenario_risk_emoji, _, scenario_risk_label = classify_heat(
-        scenario_risk["risk_score"],
-        inverse=True
-    )
-
-    scenario_build_emoji, _, scenario_build_label = classify_heat(
-        scenario_buildability["final_score"],
-        inverse=False
-    )
-
-    print("\n--- Scenario Comparison ---")
-
-    print("Baseline Duration:", total_duration)
-    print("Scenario Duration:", scenario["total_duration"])
-
-    print(f"Baseline Risk: {risk_label}")
-    print(f"Scenario Risk: {scenario_risk_label} {scenario_risk_emoji}")
-
-    print(f"Baseline Buildability: {build_label}")
-    print(f"Scenario Buildability: {scenario_build_label} {scenario_build_emoji}")
-
-    # =====================
     # PDF EXPORT
     # =====================
-    print("\nGenerating PDF Report...")
-
     pdf_data = {
         "Material Quantities": quantities["material_quantities"],
         "Cost Breakdown": quantities["cost_breakdown"],
         "Risk Summary": risk,
         "Buildability Summary": buildability,
-        "Schedule Summary": {
-            "Total Duration": total_duration,
-            "Critical Path": critical_path
-        }
     }
 
     pdf_path = generate_pdf_report(pdf_data)
-    print("PDF Report Saved:", pdf_path)
+    print("\nPDF Report Saved:", pdf_path)
 
     # =====================
     # EXECUTIVE SUMMARY
     # =====================
-    print("\n================ EXECUTIVE INTELLIGENCE SUMMARY ================")
-
     summary = generate_executive_summary(
         total_duration,
-        scenario["total_duration"],
+        total_duration,
         risk_label,
-        scenario_risk_label,
+        risk_label,
         build_label,
-        scenario_build_label
+        build_label
     )
 
+    print("\n================ EXECUTIVE SUMMARY ================")
     print(summary)
 
 
