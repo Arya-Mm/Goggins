@@ -11,7 +11,10 @@ from core.buildability.buildability_engine import calculate_buildability
 from core.utils.heat_visualizer import classify_heat
 from core.ai.buildability_explainer import explain_buildability
 from core.exports.executive_summary import generate_executive_summary
-from core.quantity.quantity_engine import calculate_quantities  # ✅ NEW
+from core.quantity.quantity_engine import calculate_quantities
+from core.vision.scale_calibration import calibrate_scale
+from core.visualization.gantt_chart import generate_gantt_chart
+from core.exports.pdf_report import generate_pdf_report
 
 from pathlib import Path
 
@@ -37,7 +40,24 @@ def run_demo():
     print(twin)
 
     # =====================
-    # 🔥 QUANTITY & COST ENGINE
+    # SCALE CALIBRATION
+    # =====================
+    print("\n================ SCALE CALIBRATION ================")
+
+    detected_dimensions = [
+        {
+            "pixel_length": 240,
+            "real_length_inches": 144
+        }
+    ]
+
+    scale_info = calibrate_scale(detected_dimensions)
+
+    print("Pixels per Inch:", scale_info["pixels_per_inch"])
+    print("Calibration Status:", scale_info["calibration_status"])
+
+    # =====================
+    # QUANTITY & COST ENGINE
     # =====================
     print("\n================ QUANTITY & COST ESTIMATION ================")
 
@@ -82,6 +102,11 @@ def run_demo():
     print("\nTotal Project Duration:", total_duration)
     print("Critical Path:", critical_path)
 
+    # Generate Gantt Chart
+    print("\nGenerating Gantt Chart...")
+    gantt_path = generate_gantt_chart(G)
+    print("Gantt Chart Saved:", gantt_path)
+
     # =====================
     # CONFLICTS
     # =====================
@@ -96,7 +121,7 @@ def run_demo():
         print("No Conflicts Detected ✓")
 
     # =====================
-    # RISK (WITH HEAT)
+    # RISK
     # =====================
     print("\n--- Risk Assessment ---")
 
@@ -108,7 +133,7 @@ def run_demo():
         critical_path=critical_path
     )
 
-    risk_emoji, risk_color, risk_label = classify_heat(
+    risk_emoji, _, risk_label = classify_heat(
         risk["risk_score"],
         inverse=True
     )
@@ -118,7 +143,7 @@ def run_demo():
     print("Risk Breakdown:", risk["breakdown"])
 
     # =====================
-    # BUILDABILITY (WITH HEAT)
+    # BUILDABILITY
     # =====================
     print("\n--- Buildability Assessment ---")
 
@@ -129,7 +154,7 @@ def run_demo():
         risk_data=risk
     )
 
-    build_emoji, build_color, build_label = classify_heat(
+    build_emoji, _, build_label = classify_heat(
         buildability["final_score"],
         inverse=False
     )
@@ -204,6 +229,25 @@ def run_demo():
 
     print(f"Baseline Buildability: {build_label}")
     print(f"Scenario Buildability: {scenario_build_label} {scenario_build_emoji}")
+
+    # =====================
+    # PDF EXPORT
+    # =====================
+    print("\nGenerating PDF Report...")
+
+    pdf_data = {
+        "Material Quantities": quantities["material_quantities"],
+        "Cost Breakdown": quantities["cost_breakdown"],
+        "Risk Summary": risk,
+        "Buildability Summary": buildability,
+        "Schedule Summary": {
+            "Total Duration": total_duration,
+            "Critical Path": critical_path
+        }
+    }
+
+    pdf_path = generate_pdf_report(pdf_data)
+    print("PDF Report Saved:", pdf_path)
 
     # =====================
     # EXECUTIVE SUMMARY
