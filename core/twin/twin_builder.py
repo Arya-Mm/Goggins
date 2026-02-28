@@ -3,53 +3,41 @@ import math
 
 class StructuralTwinBuilder:
 
-    def __init__(self, min_confidence=0.45):
+    def __init__(self, min_confidence=0.5):
         self.min_confidence = min_confidence
 
-    def _compute_scale_factor(self, dimensions):
+    def _bbox_center(self, bbox):
+        x1, y1, x2, y2 = bbox
+        return ((x1 + x2) / 2, (y1 + y2) / 2)
+
+    def _distance(self, b1, b2):
+        c1 = self._bbox_center(b1)
+        c2 = self._bbox_center(b2)
+        return math.sqrt((c1[0] - c2[0])**2 + (c1[1] - c2[1])**2)
+
+    def _match_dimension(self, wall_bbox, dimensions):
         """
-        Compute scale factor using detected dimension annotations.
-        Uses first valid dimension.
+        Assign nearest dimension to wall.
         """
         if not dimensions:
-            return 1.0  # fallback
+            return None
 
-        # Take first dimension
-        dim = dimensions[0]
+        nearest = min(
+            dimensions,
+            key=lambda d: self._distance(wall_bbox, d["bbox"])
+        )
 
-        x1, y1, x2, y2 = dim["bbox"]
-        pixel_length = abs(x2 - x1)
-
-        if pixel_length == 0:
-            return 1.0
-
-        return dim["inches"] / pixel_length
-
-    def _compute_wall_length(self, bbox, scale_factor):
-        """
-        Compute wall length using dominant axis (not diagonal).
-        """
-        x1, y1, x2, y2 = bbox
-
-        width = abs(x2 - x1)
-        height = abs(y2 - y1)
-
-        wall_pixels = max(width, height)
-
-        return round(wall_pixels * scale_factor, 2)
+        return nearest["inches"]
 
     def build(self, vision_output):
 
         dimensions = vision_output.get("dimensions", [])
         objects = vision_output.get("objects", {})
 
-        scale_factor = self._compute_scale_factor(dimensions)
-
         walls = []
         doors = []
         windows = []
 
-        # Handle grouped object format
         raw_walls = objects.get("walls", [])
         raw_doors = objects.get("doors", [])
         raw_windows = objects.get("windows", [])
@@ -59,12 +47,10 @@ class StructuralTwinBuilder:
             if obj["confidence"] < self.min_confidence:
                 continue
 
-            length_inches = self._compute_wall_length(
-                obj["bbox"], scale_factor
-            )
+            real_length = self._match_dimension(obj["bbox"], dimensions)
 
             walls.append({
-                "length_inches": length_inches,
+                "length_inches": real_length,
                 "confidence": obj["confidence"],
                 "bbox": obj["bbox"]
             })
@@ -73,18 +59,15 @@ class StructuralTwinBuilder:
         for obj in raw_doors:
             if obj["confidence"] < self.min_confidence:
                 continue
-
             doors.append(obj)
 
         # ---- WINDOWS ----
         for obj in raw_windows:
             if obj["confidence"] < self.min_confidence:
                 continue
-
             windows.append(obj)
 
         twin = {
-            "scale_factor": round(scale_factor, 4),
             "walls": walls,
             "doors": doors,
             "windows": windows,
