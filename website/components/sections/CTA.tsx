@@ -24,14 +24,7 @@ export default function CTA() {
                     deterministic, explainable construction intelligence.
                 </p>
 
-                <div className="flex flex-wrap justify-center gap-4">
-                    <button className="btn-primary text-base px-10 py-4">
-                        Contact StructuraAI
-                    </button>
-                    <button className="btn-outline text-base px-10 py-4">
-                        View Architecture
-                    </button>
-                </div>
+
 
                 {/* Trust bar */}
                 <div className="mt-16 pt-8 border-t border-border flex flex-wrap justify-center gap-8 text-muted text-sm">

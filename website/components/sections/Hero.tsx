@@ -31,11 +31,11 @@ export default function Hero() {
 
                         {/* CTAs */}
                         <div className="flex flex-wrap gap-4 mb-12">
-                            <button className="btn-primary text-base">Request Demo</button>
-                            <button className="btn-outline text-base flex items-center gap-2">
+                            <a href="/demo" className="btn-primary text-base">Request Demo</a>
+                            <a href="/#demo" className="btn-outline text-base flex items-center gap-2">
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10" /><polygon points="10 8 16 12 10 16 10 8" /></svg>
                                 Watch Overview
-                            </button>
+                            </a>
                         </div>
 
                         {/* Stats bar */}

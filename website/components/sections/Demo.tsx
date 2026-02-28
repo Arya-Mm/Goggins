@@ -53,10 +53,10 @@ export default function Demo() {
                             ))}
                         </div>
 
-                        <button className="btn-primary mt-10 inline-flex items-center gap-2">
-                            Request a Live Demo
+                        <a href="/demo" className="btn-primary mt-10 inline-flex items-center gap-2">
+                            Watch the Demo
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
-                        </button>
+                        </a>
                     </div>
 
                     {/* RIGHT: Construction bar charts + metrics */}

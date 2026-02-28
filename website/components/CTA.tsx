@@ -18,9 +18,9 @@ export default function CTA() {
                             </span>
                         </h2>
                         <p className="text-white/30 text-xs mb-6">See how StructuraAI handles your project type.</p>
-                        <a href="mailto:demo@structuraai.com" id="cta-schedule-demo"
+                        <a href="/demo" id="cta-schedule-demo"
                             className="btn-primary inline-flex items-center gap-2 text-sm px-6 py-2.5 rounded-lg">
-                            Schedule a Demo
+                            Watch Demo
                             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                             </svg>
