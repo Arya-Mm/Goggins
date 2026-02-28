@@ -1,10 +1,16 @@
 import math
 
 
-DEFAULT_WALL_THICKNESS = 0.2  # meters
-DEFAULT_WALL_HEIGHT = 3.0     # meters
-PARALLEL_TOLERANCE = 5        # pixels
-MIN_WALL_LENGTH_M = 4.0       # minimum structural wall length
+REAL_WIDTH_M = 8.23
+REAL_HEIGHT_M = 11.28
+
+pixel_width = max_x - min_x
+pixel_height = max_y - min_y
+
+scale_x = REAL_WIDTH_M / pixel_width
+scale_y = REAL_HEIGHT_M / pixel_height
+
+scale_factor = (scale_x + scale_y) / 2
 
 
 def are_parallel_duplicates(w1, w2):
