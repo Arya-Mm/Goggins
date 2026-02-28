@@ -1,6 +1,17 @@
 def calculate_risk(total_duration, conflicts, G=None, twin=None, critical_path=None):
 
-    total_tasks = len(G.nodes) if G else 1
+    # -----------------------------------
+    # Task Counts (Exclude batch anchors)
+    # -----------------------------------
+    if G:
+        execution_nodes = [
+            n for n in G.nodes
+            if not str(n).startswith("batch_")
+        ]
+        total_tasks = len(execution_nodes)
+    else:
+        total_tasks = 1
+
     conflict_count = len(conflicts) if isinstance(conflicts, list) else conflicts
 
     # -----------------------------------
@@ -12,7 +23,13 @@ def calculate_risk(total_duration, conflicts, G=None, twin=None, critical_path=N
     # 2️⃣ Critical Path Sensitivity
     # -----------------------------------
     if critical_path and total_tasks > 0:
-        cp_ratio = len(critical_path) / total_tasks
+
+        execution_cp = [
+            n for n in critical_path
+            if not str(n).startswith("batch_")
+        ]
+
+        cp_ratio = len(execution_cp) / total_tasks
         critical_risk = cp_ratio * 25
     else:
         critical_risk = 0
@@ -20,10 +37,14 @@ def calculate_risk(total_duration, conflicts, G=None, twin=None, critical_path=N
     # -----------------------------------
     # 3️⃣ Serial Chain Risk
     # -----------------------------------
-    longest_chain = 0
-
     if critical_path:
-        longest_chain = len(critical_path)
+        execution_cp = [
+            n for n in critical_path
+            if not str(n).startswith("batch_")
+        ]
+        longest_chain = len(execution_cp)
+    else:
+        longest_chain = 0
 
     chain_risk = max(0, longest_chain - 4) * 3
 
