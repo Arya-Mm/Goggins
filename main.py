@@ -25,8 +25,8 @@ def run_demo():
     # ======================================================
 
     STRESS_EMPTY_TWIN = False
-    STRESS_NO_DIMENSION = True
-    STRESS_HIGH_UNCERTAINTY = False
+    STRESS_NO_DIMENSION = False
+    STRESS_HIGH_UNCERTAINTY = True
     STRESS_NO_WALLS = False
     STRESS_FORCE_CYCLE = False
     STRESS_ZERO_DURATION = False
