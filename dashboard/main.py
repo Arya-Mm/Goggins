@@ -1,38 +1,57 @@
 import streamlit as st
-import json
-import os
+from core.twin.twin_builder import build_structural_twin
 
+# Page Config
 st.set_page_config(layout="wide")
+
 st.title("StructuraAI – Autonomous Pre-Construction Intelligence")
 
-uploaded_file = st.file_uploader("Upload Blueprint", type=["png", "jpg", "pdf"])
+st.markdown("Upload a civil engineering blueprint to generate execution intelligence.")
+
+uploaded_file = st.file_uploader("Upload Blueprint", type=["png", "jpg", "jpeg", "pdf"])
 
 if uploaded_file:
-    st.success("Blueprint uploaded successfully")
 
-    # Fake twin (temporary)
-    twin = {
-        "columns": 8,
-        "beams": 12,
-        "slabs": 3
-    }
+    st.success("Blueprint uploaded successfully.")
+
+    # =============================
+    # DIGITAL STRUCTURAL TWIN
+    # =============================
+    twin_obj = build_structural_twin()
+    twin = twin_obj.to_dict()
 
     st.subheader("Digital Structural Twin")
-    st.json(twin)
+    col1, col2, col3 = st.columns(3)
 
-    # Fake strategy
-    strategy = {
-        "type": "Balanced",
-        "duration_days": 120
-    }
+    col1.metric("Columns", twin["columns"])
+    col2.metric("Beams", twin["beams"])
+    col3.metric("Slabs", twin["slabs"])
+
+    # =============================
+    # EXECUTION STRATEGY (TEMP)
+    # =============================
+    strategy_type = "Balanced"
+    estimated_duration = 120
 
     st.subheader("Execution Strategy")
-    st.json(strategy)
+    st.write(f"Strategy Type: **{strategy_type}**")
+    st.write(f"Estimated Duration: **{estimated_duration} days**")
 
-    # Fake score
+    # =============================
+    # BUILDABILITY SCORE (TEMP)
+    # =============================
+    buildability_score = 82
+
     st.subheader("Buildability Score")
-    st.metric("Score", "82 / 100")
+    st.metric("Score", f"{buildability_score} / 100")
 
-    # Fake explanation
+    # =============================
+    # AI INSIGHT (TEMP EXPLANATION)
+    # =============================
     st.subheader("AI Insight")
-    st.info("Balanced strategy minimizes concurrency risk while maintaining steady execution.")
+    st.info(
+        "Balanced strategy minimizes concurrency risk while maintaining steady structural progression."
+    )
+
+else:
+    st.info("Please upload a blueprint to begin.")
