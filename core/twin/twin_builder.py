@@ -6,10 +6,6 @@ class StructuralTwinBuilder:
     def __init__(self, min_confidence=0.5):
         self.min_confidence = min_confidence
 
-    # ----------------------------
-    # Geometry Utilities
-    # ----------------------------
-
     def _bbox_center(self, bbox):
         x1, y1, x2, y2 = bbox
         return ((x1 + x2) / 2, (y1 + y2) / 2)
@@ -31,21 +27,11 @@ class StructuralTwinBuilder:
         return nearest["inches"]
 
     def _openings_for_wall(self, wall_bbox, openings, threshold=120):
-        """
-        Assign openings to a wall if they are spatially close.
-        """
         assigned = []
-
         for op in openings:
-            dist = self._distance(wall_bbox, op["bbox"])
-            if dist < threshold:
+            if self._distance(wall_bbox, op["bbox"]) < threshold:
                 assigned.append(op)
-
         return assigned
-
-    # ----------------------------
-    # Quantity Engine
-    # ----------------------------
 
     def compute_quantities(self, twin):
 
@@ -68,7 +54,6 @@ class StructuralTwinBuilder:
 
             gross_cuin = length * WALL_HEIGHT * WALL_THICKNESS
 
-            # Find openings belonging to this wall
             doors = self._openings_for_wall(
                 wall["bbox"], twin["doors"]
             )
@@ -102,9 +87,37 @@ class StructuralTwinBuilder:
 
         return twin
 
-    # ----------------------------
-    # Main Builder
-    # ----------------------------
+    def compute_scores(self, twin, dimensions):
+
+        # Confidence Score
+        wall_conf = (
+            sum(w["confidence"] for w in twin["walls"])
+            / len(twin["walls"])
+            if twin["walls"]
+            else 0
+        )
+
+        dimension_score = 1 if dimensions else 0
+
+        twin["confidence_score"] = round(
+            (wall_conf * 70 + dimension_score * 30), 2
+        )
+
+        # Buildability Score
+        score = 0
+
+        if twin["walls"]:
+            score += 40
+        if dimensions:
+            score += 20
+        if twin["total_net_wall_volume_cuft"] > 0:
+            score += 20
+        if twin["estimated_bricks"] > 0:
+            score += 20
+
+        twin["buildability_score"] = score
+
+        return twin
 
     def build(self, vision_output):
 
@@ -120,18 +133,16 @@ class StructuralTwinBuilder:
         raw_windows = objects.get("windows", [])
 
         for obj in raw_walls:
-            if obj["confidence"] < self.min_confidence:
-                continue
+            if obj["confidence"] >= self.min_confidence:
+                real_length = self._match_dimension(
+                    obj["bbox"], dimensions
+                )
 
-            real_length = self._match_dimension(
-                obj["bbox"], dimensions
-            )
-
-            walls.append({
-                "length_inches": real_length,
-                "confidence": obj["confidence"],
-                "bbox": obj["bbox"]
-            })
+                walls.append({
+                    "length_inches": real_length,
+                    "confidence": obj["confidence"],
+                    "bbox": obj["bbox"]
+                })
 
         for obj in raw_doors:
             if obj["confidence"] >= self.min_confidence:
@@ -151,5 +162,15 @@ class StructuralTwinBuilder:
         }
 
         twin = self.compute_quantities(twin)
+        twin = self.compute_scores(twin, dimensions)
+
+        twin["summary"] = {
+            "wall_count": len(walls),
+            "door_count": len(doors),
+            "window_count": len(windows),
+            "net_volume_cuft": twin["total_net_wall_volume_cuft"],
+            "estimated_bricks": twin["estimated_bricks"],
+            "buildability_score": twin["buildability_score"]
+        }
 
         return twin
