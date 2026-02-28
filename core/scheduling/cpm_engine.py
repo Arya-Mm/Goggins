@@ -1,16 +1,39 @@
 import networkx as nx
 
 
-def run_cpm(G):
+def run_cpm(G, crew_capacity=None):
 
     if not nx.is_directed_acyclic_graph(G):
         raise Exception("Graph contains cycle. Cannot schedule.")
 
+    # Initial CPM computation
+    G = compute_cpm(G)
+
+    # Apply resource leveling if capacity defined
+    if crew_capacity is not None:
+        G = apply_resource_leveling(G, crew_capacity)
+        G = compute_cpm(G)  # Recompute after leveling
+
+    total_duration = max(G.nodes[n]["EF"] for n in G.nodes)
+
+    # Critical path
+    critical_path = [
+        n for n in nx.topological_sort(G)
+        if G.nodes[n]["slack"] == 0
+    ]
+
+    return G, critical_path, total_duration
+
+
+# =====================================================
+# CPM CALCULATION
+# =====================================================
+
+def compute_cpm(G):
+
     topo_order = list(nx.topological_sort(G))
 
-    # ======================
     # FORWARD PASS
-    # ======================
     for node in topo_order:
         preds = list(G.predecessors(node))
 
@@ -27,9 +50,7 @@ def run_cpm(G):
 
     total_duration = max(G.nodes[n]["EF"] for n in G.nodes)
 
-    # ======================
     # BACKWARD PASS
-    # ======================
     for node in reversed(topo_order):
         succs = list(G.successors(node))
 
@@ -45,34 +66,64 @@ def run_cpm(G):
         G.nodes[node]["LS"] = LS
         G.nodes[node]["slack"] = LS - G.nodes[node]["ES"]
 
-    # ======================
-    # CLEAN CRITICAL PATH (single chain)
-    # ======================
-    critical_path = []
+    return G
 
-    # Find starting critical node (ES = 0 and slack = 0)
-    start_nodes = [
-        n for n in topo_order
-        if G.nodes[n]["ES"] == 0 and G.nodes[n]["slack"] == 0
-    ]
 
-    if start_nodes:
-        current = start_nodes[0]
-        critical_path.append(current)
+# =====================================================
+# RESOURCE LEVELING (BATCHING MODEL)
+# =====================================================
 
-        while True:
-            successors = list(G.successors(current))
-            next_node = None
+def apply_resource_leveling(G, crew_capacity):
 
-            for s in successors:
-                if G.nodes[s]["slack"] == 0:
-                    next_node = s
-                    break
+    timeline = build_timeline(G)
 
-            if next_node:
-                critical_path.append(next_node)
-                current = next_node
-            else:
-                break
+    for time in sorted(timeline.keys()):
 
-    return G, critical_path, total_duration
+        active_tasks = timeline[time]
+
+        if len(active_tasks) > crew_capacity:
+
+            # Deterministic order
+            active_tasks_sorted = sorted(
+                active_tasks,
+                key=lambda n: G.nodes[n]["ES"]
+            )
+
+            for i, task in enumerate(active_tasks_sorted):
+
+                batch_index = i // crew_capacity
+                new_start = time + batch_index
+
+                if G.nodes[task]["ES"] < new_start:
+                    shift = new_start - G.nodes[task]["ES"]
+                    delay_task(G, task, shift)
+
+    return G
+
+
+def build_timeline(G):
+
+    timeline = {}
+
+    for node in G.nodes:
+        ES = G.nodes[node]["ES"]
+        EF = G.nodes[node]["EF"]
+
+        for t in range(ES, EF):
+            if t not in timeline:
+                timeline[t] = []
+            timeline[t].append(node)
+
+    return timeline
+
+
+def delay_task(G, node, shift):
+
+    G.nodes[node]["ES"] += shift
+    G.nodes[node]["EF"] += shift
+
+    # Propagate shift to successors
+    for succ in G.successors(node):
+        if G.nodes[succ]["ES"] < G.nodes[node]["EF"]:
+            needed_shift = G.nodes[node]["EF"] - G.nodes[succ]["ES"]
+            delay_task(G, succ, needed_shift)

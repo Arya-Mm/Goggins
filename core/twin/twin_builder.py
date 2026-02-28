@@ -19,16 +19,21 @@ class StructuralTwinBuilder:
         c2 = self._bbox_center(b2)
         return math.sqrt((c1[0] - c2[0]) ** 2 + (c1[1] - c2[1]) ** 2)
 
-    def _match_dimension(self, wall_bbox, dimensions):
+    def _match_dimension(self, wall_bbox, dimensions, threshold=150):
         if not dimensions:
-            return None
+            return None, True
 
         nearest = min(
             dimensions,
             key=lambda d: self._distance(wall_bbox, d["bbox"])
         )
 
-        return nearest["inches"]
+        distance = self._distance(wall_bbox, nearest["bbox"])
+
+        if distance > threshold:
+            return None, True
+
+        return nearest["inches"], False
 
     def _openings_for_wall(self, wall_bbox, openings, threshold=120):
         assigned = []
@@ -58,6 +63,8 @@ class StructuralTwinBuilder:
 
             length = wall["length_inches"]
             if length is None:
+                wall["gross_volume_cuft"] = 0
+                wall["net_volume_cuft"] = 0
                 continue
 
             gross_cuin = length * WALL_HEIGHT * WALL_THICKNESS
@@ -101,39 +108,52 @@ class StructuralTwinBuilder:
 
     def compute_scores(self, twin, dimensions):
 
-        # Confidence Score
-        if twin["walls"]:
-            wall_conf = sum(w["confidence"] for w in twin["walls"]) / len(twin["walls"])
-        else:
-            wall_conf = 0
+        # -------------------------
+        # Detection Confidence
+        # -------------------------
+
+        def avg_conf(objs):
+            if not objs:
+                return 0
+            return sum(o["confidence"] for o in objs) / len(objs)
+
+        wall_conf = avg_conf(twin["walls"])
+        door_conf = avg_conf(twin["doors"])
+        window_conf = avg_conf(twin["windows"])
 
         dimension_score = 1 if dimensions else 0
 
         twin["confidence_score"] = round(
-            (wall_conf * 70 + dimension_score * 30), 2
+            (wall_conf * 50 + door_conf * 20 + window_conf * 10 + dimension_score * 20),
+            2
         )
 
+        # -------------------------
         # Buildability Score
-        score = 0
+        # -------------------------
 
-        if twin["walls"]:
-            score += 30
+        score = 100
 
-        if dimensions:
-            score += 20
+        # Penalize uncertainty
+        uncertain_walls = sum(
+            1 for w in twin["walls"]
+            if w.get("dimension_uncertain", False)
+        )
 
-        if twin["total_net_wall_volume_cuft"] > 0:
-            score += 20
+        score -= uncertain_walls * 5
 
-        if twin["estimated_bricks"] > 0:
-            score += 10
+        # Penalize zero volume
+        if twin["total_net_wall_volume_cuft"] == 0:
+            score -= 20
 
-        # Penalize unrealistic door density
+        # Penalize excessive door density
         if len(twin["walls"]) > 0:
             if len(twin["doors"]) > len(twin["walls"]) * 6:
                 score -= 10
 
-        twin["buildability_score"] = max(0, min(100, score))
+        score = max(0, min(100, score))
+
+        twin["buildability_score"] = score
 
         return twin
 
@@ -156,14 +176,16 @@ class StructuralTwinBuilder:
 
         for obj in raw_walls:
             if obj["confidence"] >= self.min_confidence:
-                real_length = self._match_dimension(
+
+                real_length, uncertain = self._match_dimension(
                     obj["bbox"], dimensions
                 )
 
                 walls.append({
                     "length_inches": real_length,
                     "confidence": obj["confidence"],
-                    "bbox": obj["bbox"]
+                    "bbox": obj["bbox"],
+                    "dimension_uncertain": uncertain
                 })
 
         for obj in raw_doors:
@@ -193,7 +215,10 @@ class StructuralTwinBuilder:
             "net_volume_cuft": twin["total_net_wall_volume_cuft"],
             "estimated_bricks": twin["estimated_bricks"],
             "confidence_score": twin["confidence_score"],
-            "buildability_score": twin["buildability_score"]
+            "buildability_score": twin["buildability_score"],
+            "uncertain_walls": sum(
+                1 for w in walls if w.get("dimension_uncertain", False)
+            )
         }
 
         return twin
