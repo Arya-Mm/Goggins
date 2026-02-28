@@ -4,14 +4,6 @@
     "slabs": [],
     "walls": [
         {
-            "start": [
-                179,
-                2637
-            ],
-            "end": [
-                179,
-                236
-            ],
             "orientation": "vertical",
             "length_m": 50.277,
             "thickness_m": 0.2,
@@ -20,14 +12,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                2070,
-                2637
-            ],
-            "end": [
-                2070,
-                237
-            ],
             "orientation": "vertical",
             "length_m": 50.256,
             "thickness_m": 0.2,
@@ -36,78 +20,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                2072,
-                2637
-            ],
-            "end": [
-                2072,
-                237
-            ],
-            "orientation": "vertical",
-            "length_m": 50.256,
-            "thickness_m": 0.2,
-            "height_m": 3.0,
-            "volume_m3": 30.154,
-            "confidence": 0.85
-        },
-        {
-            "start": [
-                177,
-                2636
-            ],
-            "end": [
-                177,
-                237
-            ],
-            "orientation": "vertical",
-            "length_m": 50.235,
-            "thickness_m": 0.2,
-            "height_m": 3.0,
-            "volume_m3": 30.141,
-            "confidence": 0.85
-        },
-        {
-            "start": [
-                2071,
-                2634
-            ],
-            "end": [
-                2071,
-                240
-            ],
-            "orientation": "vertical",
-            "length_m": 50.13,
-            "thickness_m": 0.2,
-            "height_m": 3.0,
-            "volume_m3": 30.078,
-            "confidence": 0.85
-        },
-        {
-            "start": [
-                176,
-                2633
-            ],
-            "end": [
-                176,
-                240
-            ],
-            "orientation": "vertical",
-            "length_m": 50.109,
-            "thickness_m": 0.2,
-            "height_m": 3.0,
-            "volume_m3": 30.066,
-            "confidence": 0.85
-        },
-        {
-            "start": [
-                178,
-                2629
-            ],
-            "end": [
-                178,
-                243
-            ],
             "orientation": "vertical",
             "length_m": 49.963,
             "thickness_m": 0.2,
@@ -116,14 +28,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                50,
-                2783
-            ],
-            "end": [
-                2199,
-                2783
-            ],
             "orientation": "horizontal",
             "length_m": 45.0,
             "thickness_m": 0.2,
@@ -132,14 +36,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                1879,
-                2407
-            ],
-            "end": [
-                1879,
-                503
-            ],
             "orientation": "vertical",
             "length_m": 39.87,
             "thickness_m": 0.2,
@@ -148,14 +44,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                404,
-                2407
-            ],
-            "end": [
-                404,
-                503
-            ],
             "orientation": "vertical",
             "length_m": 39.87,
             "thickness_m": 0.2,
@@ -164,14 +52,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                492,
-                2407
-            ],
-            "end": [
-                492,
-                503
-            ],
             "orientation": "vertical",
             "length_m": 39.87,
             "thickness_m": 0.2,
@@ -180,62 +60,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                406,
-                2407
-            ],
-            "end": [
-                406,
-                503
-            ],
-            "orientation": "vertical",
-            "length_m": 39.87,
-            "thickness_m": 0.2,
-            "height_m": 3.0,
-            "volume_m3": 23.922,
-            "confidence": 0.85
-        },
-        {
-            "start": [
-                1881,
-                2407
-            ],
-            "end": [
-                1881,
-                503
-            ],
-            "orientation": "vertical",
-            "length_m": 39.87,
-            "thickness_m": 0.2,
-            "height_m": 3.0,
-            "volume_m3": 23.922,
-            "confidence": 0.85
-        },
-        {
-            "start": [
-                490,
-                2406
-            ],
-            "end": [
-                490,
-                504
-            ],
-            "orientation": "vertical",
-            "length_m": 39.828,
-            "thickness_m": 0.2,
-            "height_m": 3.0,
-            "volume_m3": 23.897,
-            "confidence": 0.85
-        },
-        {
-            "start": [
-                177,
-                2637
-            ],
-            "end": [
-                2071,
-                2637
-            ],
             "orientation": "horizontal",
             "length_m": 39.66,
             "thickness_m": 0.2,
@@ -244,14 +68,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                176,
-                239
-            ],
-            "end": [
-                2069,
-                239
-            ],
             "orientation": "horizontal",
             "length_m": 39.639,
             "thickness_m": 0.2,
@@ -260,94 +76,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                177,
-                2635
-            ],
-            "end": [
-                2069,
-                2635
-            ],
-            "orientation": "horizontal",
-            "length_m": 39.618,
-            "thickness_m": 0.2,
-            "height_m": 3.0,
-            "volume_m3": 23.771,
-            "confidence": 0.85
-        },
-        {
-            "start": [
-                178,
-                237
-            ],
-            "end": [
-                2069,
-                237
-            ],
-            "orientation": "horizontal",
-            "length_m": 39.598,
-            "thickness_m": 0.2,
-            "height_m": 3.0,
-            "volume_m3": 23.759,
-            "confidence": 0.85
-        },
-        {
-            "start": [
-                180,
-                236
-            ],
-            "end": [
-                2071,
-                236
-            ],
-            "orientation": "horizontal",
-            "length_m": 39.598,
-            "thickness_m": 0.2,
-            "height_m": 3.0,
-            "volume_m3": 23.759,
-            "confidence": 0.85
-        },
-        {
-            "start": [
-                183,
-                2636
-            ],
-            "end": [
-                2069,
-                2636
-            ],
-            "orientation": "horizontal",
-            "length_m": 39.493,
-            "thickness_m": 0.2,
-            "height_m": 3.0,
-            "volume_m3": 23.696,
-            "confidence": 0.85
-        },
-        {
-            "start": [
-                183,
-                238
-            ],
-            "end": [
-                2069,
-                238
-            ],
-            "orientation": "horizontal",
-            "length_m": 39.493,
-            "thickness_m": 0.2,
-            "height_m": 3.0,
-            "volume_m3": 23.696,
-            "confidence": 0.85
-        },
-        {
-            "start": [
-                1837,
-                2365
-            ],
-            "end": [
-                1837,
-                545
-            ],
             "orientation": "vertical",
             "length_m": 38.111,
             "thickness_m": 0.2,
@@ -356,14 +84,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                535,
-                2365
-            ],
-            "end": [
-                535,
-                545
-            ],
             "orientation": "vertical",
             "length_m": 38.111,
             "thickness_m": 0.2,
@@ -372,46 +92,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                533,
-                2363
-            ],
-            "end": [
-                533,
-                547
-            ],
-            "orientation": "vertical",
-            "length_m": 38.027,
-            "thickness_m": 0.2,
-            "height_m": 3.0,
-            "volume_m3": 22.816,
-            "confidence": 0.85
-        },
-        {
-            "start": [
-                1839,
-                2362
-            ],
-            "end": [
-                1839,
-                548
-            ],
-            "orientation": "vertical",
-            "length_m": 37.985,
-            "thickness_m": 0.2,
-            "height_m": 3.0,
-            "volume_m3": 22.791,
-            "confidence": 0.85
-        },
-        {
-            "start": [
-                491,
-                442
-            ],
-            "end": [
-                1881,
-                442
-            ],
             "orientation": "horizontal",
             "length_m": 29.107,
             "thickness_m": 0.2,
@@ -420,14 +100,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                491,
-                503
-            ],
-            "end": [
-                1880,
-                503
-            ],
             "orientation": "horizontal",
             "length_m": 29.086,
             "thickness_m": 0.2,
@@ -436,14 +108,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                491,
-                2407
-            ],
-            "end": [
-                1880,
-                2407
-            ],
             "orientation": "horizontal",
             "length_m": 29.086,
             "thickness_m": 0.2,
@@ -452,46 +116,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                493,
-                505
-            ],
-            "end": [
-                1878,
-                505
-            ],
-            "orientation": "horizontal",
-            "length_m": 29.002,
-            "thickness_m": 0.2,
-            "height_m": 3.0,
-            "volume_m3": 17.401,
-            "confidence": 0.85
-        },
-        {
-            "start": [
-                493,
-                2405
-            ],
-            "end": [
-                1878,
-                2405
-            ],
-            "orientation": "horizontal",
-            "length_m": 29.002,
-            "thickness_m": 0.2,
-            "height_m": 3.0,
-            "volume_m3": 17.401,
-            "confidence": 0.85
-        },
-        {
-            "start": [
-                534,
-                545
-            ],
-            "end": [
-                1838,
-                545
-            ],
             "orientation": "horizontal",
             "length_m": 27.306,
             "thickness_m": 0.2,
@@ -500,14 +124,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                536,
-                1769
-            ],
-            "end": [
-                1254,
-                1769
-            ],
             "orientation": "horizontal",
             "length_m": 15.035,
             "thickness_m": 0.2,
@@ -516,30 +132,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                536,
-                1767
-            ],
-            "end": [
-                1253,
-                1767
-            ],
-            "orientation": "horizontal",
-            "length_m": 15.014,
-            "thickness_m": 0.2,
-            "height_m": 3.0,
-            "volume_m3": 9.008,
-            "confidence": 0.85
-        },
-        {
-            "start": [
-                536,
-                2365
-            ],
-            "end": [
-                1251,
-                2365
-            ],
             "orientation": "horizontal",
             "length_m": 14.972,
             "thickness_m": 0.2,
@@ -548,30 +140,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                537,
-                2363
-            ],
-            "end": [
-                1250,
-                2363
-            ],
-            "orientation": "horizontal",
-            "length_m": 14.93,
-            "thickness_m": 0.2,
-            "height_m": 3.0,
-            "volume_m3": 8.958,
-            "confidence": 0.85
-        },
-        {
-            "start": [
-                491,
-                440
-            ],
-            "end": [
-                1156,
-                440
-            ],
             "orientation": "horizontal",
             "length_m": 13.925,
             "thickness_m": 0.2,
@@ -580,14 +148,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                1273,
-                2364
-            ],
-            "end": [
-                1273,
-                1745
-            ],
             "orientation": "vertical",
             "length_m": 12.962,
             "thickness_m": 0.2,
@@ -596,30 +156,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                1275,
-                2365
-            ],
-            "end": [
-                1275,
-                1746
-            ],
-            "orientation": "vertical",
-            "length_m": 12.962,
-            "thickness_m": 0.2,
-            "height_m": 3.0,
-            "volume_m3": 7.777,
-            "confidence": 0.85
-        },
-        {
-            "start": [
-                1018,
-                1747
-            ],
-            "end": [
-                1018,
-                1133
-            ],
             "orientation": "vertical",
             "length_m": 12.857,
             "thickness_m": 0.2,
@@ -628,30 +164,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                1020,
-                1747
-            ],
-            "end": [
-                1020,
-                1135
-            ],
-            "orientation": "vertical",
-            "length_m": 12.815,
-            "thickness_m": 0.2,
-            "height_m": 3.0,
-            "volume_m3": 7.689,
-            "confidence": 0.85
-        },
-        {
-            "start": [
-                1528,
-                2364
-            ],
-            "end": [
-                1528,
-                1798
-            ],
             "orientation": "vertical",
             "length_m": 11.852,
             "thickness_m": 0.2,
@@ -660,30 +172,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                1530,
-                2365
-            ],
-            "end": [
-                1530,
-                1800
-            ],
-            "orientation": "vertical",
-            "length_m": 11.831,
-            "thickness_m": 0.2,
-            "height_m": 3.0,
-            "volume_m3": 7.099,
-            "confidence": 0.85
-        },
-        {
-            "start": [
-                534,
-                1113
-            ],
-            "end": [
-                1089,
-                1113
-            ],
             "orientation": "horizontal",
             "length_m": 11.622,
             "thickness_m": 0.2,
@@ -692,30 +180,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                536,
-                1111
-            ],
-            "end": [
-                1090,
-                1111
-            ],
-            "orientation": "horizontal",
-            "length_m": 11.601,
-            "thickness_m": 0.2,
-            "height_m": 3.0,
-            "volume_m3": 6.96,
-            "confidence": 0.85
-        },
-        {
-            "start": [
-                1620,
-                2276
-            ],
-            "end": [
-                1620,
-                1784
-            ],
             "orientation": "vertical",
             "length_m": 10.302,
             "thickness_m": 0.2,
@@ -724,30 +188,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                1618,
-                2276
-            ],
-            "end": [
-                1618,
-                1784
-            ],
-            "orientation": "vertical",
-            "length_m": 10.302,
-            "thickness_m": 0.2,
-            "height_m": 3.0,
-            "volume_m3": 6.181,
-            "confidence": 0.85
-        },
-        {
-            "start": [
-                1020,
-                1132
-            ],
-            "end": [
-                1507,
-                1132
-            ],
             "orientation": "horizontal",
             "length_m": 10.198,
             "thickness_m": 0.2,
@@ -756,14 +196,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                1770,
-                2276
-            ],
-            "end": [
-                1770,
-                1795
-            ],
             "orientation": "vertical",
             "length_m": 10.072,
             "thickness_m": 0.2,
@@ -772,30 +204,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                1772,
-                2276
-            ],
-            "end": [
-                1772,
-                1795
-            ],
-            "orientation": "vertical",
-            "length_m": 10.072,
-            "thickness_m": 0.2,
-            "height_m": 3.0,
-            "volume_m3": 6.043,
-            "confidence": 0.85
-        },
-        {
-            "start": [
-                534,
-                1134
-            ],
-            "end": [
-                998,
-                1134
-            ],
             "orientation": "horizontal",
             "length_m": 9.716,
             "thickness_m": 0.2,
@@ -804,14 +212,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                534,
-                1747
-            ],
-            "end": [
-                998,
-                1747
-            ],
             "orientation": "horizontal",
             "length_m": 9.716,
             "thickness_m": 0.2,
@@ -820,14 +220,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                534,
-                1493
-            ],
-            "end": [
-                998,
-                1493
-            ],
             "orientation": "horizontal",
             "length_m": 9.716,
             "thickness_m": 0.2,
@@ -836,14 +228,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                536,
-                1514
-            ],
-            "end": [
-                998,
-                1514
-            ],
             "orientation": "horizontal",
             "length_m": 9.674,
             "thickness_m": 0.2,
@@ -852,78 +236,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                536,
-                1516
-            ],
-            "end": [
-                998,
-                1516
-            ],
-            "orientation": "horizontal",
-            "length_m": 9.674,
-            "thickness_m": 0.2,
-            "height_m": 3.0,
-            "volume_m3": 5.805,
-            "confidence": 0.85
-        },
-        {
-            "start": [
-                536,
-                1745
-            ],
-            "end": [
-                998,
-                1745
-            ],
-            "orientation": "horizontal",
-            "length_m": 9.674,
-            "thickness_m": 0.2,
-            "height_m": 3.0,
-            "volume_m3": 5.805,
-            "confidence": 0.85
-        },
-        {
-            "start": [
-                536,
-                1495
-            ],
-            "end": [
-                996,
-                1495
-            ],
-            "orientation": "horizontal",
-            "length_m": 9.632,
-            "thickness_m": 0.2,
-            "height_m": 3.0,
-            "volume_m3": 5.779,
-            "confidence": 0.85
-        },
-        {
-            "start": [
-                536,
-                1132
-            ],
-            "end": [
-                995,
-                1132
-            ],
-            "orientation": "horizontal",
-            "length_m": 9.611,
-            "thickness_m": 0.2,
-            "height_m": 3.0,
-            "volume_m3": 5.767,
-            "confidence": 0.85
-        },
-        {
-            "start": [
-                1509,
-                1589
-            ],
-            "end": [
-                1509,
-                1136
-            ],
             "orientation": "vertical",
             "length_m": 9.486,
             "thickness_m": 0.2,
@@ -932,30 +244,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                1506,
-                1587
-            ],
-            "end": [
-                1506,
-                1135
-            ],
-            "orientation": "vertical",
-            "length_m": 9.465,
-            "thickness_m": 0.2,
-            "height_m": 3.0,
-            "volume_m3": 5.679,
-            "confidence": 0.85
-        },
-        {
-            "start": [
-                1252,
-                2364
-            ],
-            "end": [
-                1252,
-                1940
-            ],
             "orientation": "vertical",
             "length_m": 8.879,
             "thickness_m": 0.2,
@@ -964,30 +252,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                1254,
-                2363
-            ],
-            "end": [
-                1254,
-                1940
-            ],
-            "orientation": "vertical",
-            "length_m": 8.858,
-            "thickness_m": 0.2,
-            "height_m": 3.0,
-            "volume_m3": 5.315,
-            "confidence": 0.85
-        },
-        {
-            "start": [
-                979,
-                2699
-            ],
-            "end": [
-                1382,
-                2699
-            ],
             "orientation": "horizontal",
             "length_m": 8.439,
             "thickness_m": 0.2,
@@ -996,14 +260,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                1028,
-                547
-            ],
-            "end": [
-                1421,
-                547
-            ],
             "orientation": "horizontal",
             "length_m": 8.229,
             "thickness_m": 0.2,
@@ -1012,14 +268,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                1448,
-                2363
-            ],
-            "end": [
-                1838,
-                2363
-            ],
             "orientation": "horizontal",
             "length_m": 8.167,
             "thickness_m": 0.2,
@@ -1028,14 +276,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                703,
-                574
-            ],
-            "end": [
-                1090,
-                574
-            ],
             "orientation": "horizontal",
             "length_m": 8.104,
             "thickness_m": 0.2,
@@ -1044,30 +284,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                703,
-                576
-            ],
-            "end": [
-                1090,
-                576
-            ],
-            "orientation": "horizontal",
-            "length_m": 8.104,
-            "thickness_m": 0.2,
-            "height_m": 3.0,
-            "volume_m3": 4.862,
-            "confidence": 0.85
-        },
-        {
-            "start": [
-                1684,
-                2210
-            ],
-            "end": [
-                1684,
-                1823
-            ],
             "orientation": "vertical",
             "length_m": 8.104,
             "thickness_m": 0.2,
@@ -1076,14 +292,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                703,
-                2336
-            ],
-            "end": [
-                1090,
-                2336
-            ],
             "orientation": "horizontal",
             "length_m": 8.104,
             "thickness_m": 0.2,
@@ -1092,30 +300,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                703,
-                2334
-            ],
-            "end": [
-                1090,
-                2334
-            ],
-            "orientation": "horizontal",
-            "length_m": 8.104,
-            "thickness_m": 0.2,
-            "height_m": 3.0,
-            "volume_m3": 4.862,
-            "confidence": 0.85
-        },
-        {
-            "start": [
-                1547,
-                2698
-            ],
-            "end": [
-                1933,
-                2698
-            ],
             "orientation": "horizontal",
             "length_m": 8.083,
             "thickness_m": 0.2,
@@ -1124,30 +308,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                1682,
-                2207
-            ],
-            "end": [
-                1682,
-                1823
-            ],
-            "orientation": "vertical",
-            "length_m": 8.041,
-            "thickness_m": 0.2,
-            "height_m": 3.0,
-            "volume_m3": 4.825,
-            "confidence": 0.85
-        },
-        {
-            "start": [
-                1548,
-                2699
-            ],
-            "end": [
-                1890,
-                2699
-            ],
             "orientation": "horizontal",
             "length_m": 7.161,
             "thickness_m": 0.2,
@@ -1156,14 +316,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                1507,
-                1589
-            ],
-            "end": [
-                1836,
-                1589
-            ],
             "orientation": "horizontal",
             "length_m": 6.889,
             "thickness_m": 0.2,
@@ -1172,30 +324,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                1510,
-                1587
-            ],
-            "end": [
-                1838,
-                1587
-            ],
-            "orientation": "horizontal",
-            "length_m": 6.868,
-            "thickness_m": 0.2,
-            "height_m": 3.0,
-            "volume_m3": 4.121,
-            "confidence": 0.85
-        },
-        {
-            "start": [
-                1104,
-                1210
-            ],
-            "end": [
-                1431,
-                1210
-            ],
             "orientation": "horizontal",
             "length_m": 6.847,
             "thickness_m": 0.2,
@@ -1204,14 +332,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                1106,
-                1290
-            ],
-            "end": [
-                1429,
-                1290
-            ],
             "orientation": "horizontal",
             "length_m": 6.764,
             "thickness_m": 0.2,
@@ -1220,14 +340,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                1106,
-                1217
-            ],
-            "end": [
-                1429,
-                1217
-            ],
             "orientation": "horizontal",
             "length_m": 6.764,
             "thickness_m": 0.2,
@@ -1236,14 +348,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                1109,
-                1283
-            ],
-            "end": [
-                1426,
-                1283
-            ],
             "orientation": "horizontal",
             "length_m": 6.638,
             "thickness_m": 0.2,
@@ -1252,14 +356,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                1252,
-                1113
-            ],
-            "end": [
-                1252,
-                801
-            ],
             "orientation": "vertical",
             "length_m": 6.533,
             "thickness_m": 0.2,
@@ -1268,14 +364,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                1860,
-                985
-            ],
-            "end": [
-                1860,
-                674
-            ],
             "orientation": "vertical",
             "length_m": 6.512,
             "thickness_m": 0.2,
@@ -1284,14 +372,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                1858,
-                985
-            ],
-            "end": [
-                1858,
-                674
-            ],
             "orientation": "vertical",
             "length_m": 6.512,
             "thickness_m": 0.2,
@@ -1300,30 +380,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                514,
-                985
-            ],
-            "end": [
-                514,
-                674
-            ],
-            "orientation": "vertical",
-            "length_m": 6.512,
-            "thickness_m": 0.2,
-            "height_m": 3.0,
-            "volume_m3": 3.907,
-            "confidence": 0.85
-        },
-        {
-            "start": [
-                1528,
-                1360
-            ],
-            "end": [
-                1838,
-                1360
-            ],
             "orientation": "horizontal",
             "length_m": 6.491,
             "thickness_m": 0.2,
@@ -1332,14 +388,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                1528,
-                1566
-            ],
-            "end": [
-                1838,
-                1566
-            ],
             "orientation": "horizontal",
             "length_m": 6.491,
             "thickness_m": 0.2,
@@ -1348,14 +396,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                1528,
-                1338
-            ],
-            "end": [
-                1836,
-                1338
-            ],
             "orientation": "horizontal",
             "length_m": 6.45,
             "thickness_m": 0.2,
@@ -1364,30 +404,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                1528,
-                1362
-            ],
-            "end": [
-                1836,
-                1362
-            ],
-            "orientation": "horizontal",
-            "length_m": 6.45,
-            "thickness_m": 0.2,
-            "height_m": 3.0,
-            "volume_m3": 3.87,
-            "confidence": 0.85
-        },
-        {
-            "start": [
-                514,
-                2217
-            ],
-            "end": [
-                514,
-                1911
-            ],
             "orientation": "vertical",
             "length_m": 6.408,
             "thickness_m": 0.2,
@@ -1396,14 +412,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                512,
-                2217
-            ],
-            "end": [
-                512,
-                1911
-            ],
             "orientation": "vertical",
             "length_m": 6.408,
             "thickness_m": 0.2,
@@ -1412,78 +420,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                769,
-                854
-            ],
-            "end": [
-                769,
-                548
-            ],
-            "orientation": "vertical",
-            "length_m": 6.408,
-            "thickness_m": 0.2,
-            "height_m": 3.0,
-            "volume_m3": 3.845,
-            "confidence": 0.85
-        },
-        {
-            "start": [
-                767,
-                2362
-            ],
-            "end": [
-                767,
-                2056
-            ],
-            "orientation": "vertical",
-            "length_m": 6.408,
-            "thickness_m": 0.2,
-            "height_m": 3.0,
-            "volume_m3": 3.845,
-            "confidence": 0.85
-        },
-        {
-            "start": [
-                1026,
-                854
-            ],
-            "end": [
-                1026,
-                548
-            ],
-            "orientation": "vertical",
-            "length_m": 6.408,
-            "thickness_m": 0.2,
-            "height_m": 3.0,
-            "volume_m3": 3.845,
-            "confidence": 0.85
-        },
-        {
-            "start": [
-                1024,
-                2362
-            ],
-            "end": [
-                1024,
-                2056
-            ],
-            "orientation": "vertical",
-            "length_m": 6.408,
-            "thickness_m": 0.2,
-            "height_m": 3.0,
-            "volume_m3": 3.845,
-            "confidence": 0.85
-        },
-        {
-            "start": [
-                1530,
-                1568
-            ],
-            "end": [
-                1836,
-                1568
-            ],
             "orientation": "horizontal",
             "length_m": 6.408,
             "thickness_m": 0.2,
@@ -1492,14 +428,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                1532,
-                1953
-            ],
-            "end": [
-                1838,
-                1953
-            ],
             "orientation": "horizontal",
             "length_m": 6.408,
             "thickness_m": 0.2,
@@ -1508,14 +436,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                1532,
-                2123
-            ],
-            "end": [
-                1838,
-                2123
-            ],
             "orientation": "horizontal",
             "length_m": 6.408,
             "thickness_m": 0.2,
@@ -1524,14 +444,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                1532,
-                1910
-            ],
-            "end": [
-                1838,
-                1910
-            ],
             "orientation": "horizontal",
             "length_m": 6.408,
             "thickness_m": 0.2,
@@ -1540,14 +452,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                1532,
-                2166
-            ],
-            "end": [
-                1838,
-                2166
-            ],
             "orientation": "horizontal",
             "length_m": 6.408,
             "thickness_m": 0.2,
@@ -1556,14 +460,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                1532,
-                1823
-            ],
-            "end": [
-                1838,
-                1823
-            ],
             "orientation": "horizontal",
             "length_m": 6.408,
             "thickness_m": 0.2,
@@ -1572,14 +468,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                1532,
-                2210
-            ],
-            "end": [
-                1838,
-                2210
-            ],
             "orientation": "horizontal",
             "length_m": 6.408,
             "thickness_m": 0.2,
@@ -1588,30 +476,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                1532,
-                2080
-            ],
-            "end": [
-                1838,
-                2080
-            ],
-            "orientation": "horizontal",
-            "length_m": 6.408,
-            "thickness_m": 0.2,
-            "height_m": 3.0,
-            "volume_m3": 3.845,
-            "confidence": 0.85
-        },
-        {
-            "start": [
-                1532,
-                1865
-            ],
-            "end": [
-                1836,
-                1865
-            ],
             "orientation": "horizontal",
             "length_m": 6.366,
             "thickness_m": 0.2,
@@ -1620,46 +484,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                1532,
-                1951
-            ],
-            "end": [
-                1836,
-                1951
-            ],
-            "orientation": "horizontal",
-            "length_m": 6.366,
-            "thickness_m": 0.2,
-            "height_m": 3.0,
-            "volume_m3": 3.819,
-            "confidence": 0.85
-        },
-        {
-            "start": [
-                1532,
-                1908
-            ],
-            "end": [
-                1836,
-                1908
-            ],
-            "orientation": "horizontal",
-            "length_m": 6.366,
-            "thickness_m": 0.2,
-            "height_m": 3.0,
-            "volume_m3": 3.819,
-            "confidence": 0.85
-        },
-        {
-            "start": [
-                1423,
-                853
-            ],
-            "end": [
-                1423,
-                549
-            ],
             "orientation": "vertical",
             "length_m": 6.366,
             "thickness_m": 0.2,
@@ -1668,14 +492,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                1532,
-                2082
-            ],
-            "end": [
-                1836,
-                2082
-            ],
             "orientation": "horizontal",
             "length_m": 6.366,
             "thickness_m": 0.2,
@@ -1684,14 +500,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                1532,
-                2125
-            ],
-            "end": [
-                1836,
-                2125
-            ],
             "orientation": "horizontal",
             "length_m": 6.366,
             "thickness_m": 0.2,
@@ -1700,14 +508,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                1532,
-                2208
-            ],
-            "end": [
-                1836,
-                2208
-            ],
             "orientation": "horizontal",
             "length_m": 6.366,
             "thickness_m": 0.2,
@@ -1716,126 +516,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                1532,
-                2168
-            ],
-            "end": [
-                1836,
-                2168
-            ],
-            "orientation": "horizontal",
-            "length_m": 6.366,
-            "thickness_m": 0.2,
-            "height_m": 3.0,
-            "volume_m3": 3.819,
-            "confidence": 0.85
-        },
-        {
-            "start": [
-                1532,
-                2039
-            ],
-            "end": [
-                1836,
-                2039
-            ],
-            "orientation": "horizontal",
-            "length_m": 6.366,
-            "thickness_m": 0.2,
-            "height_m": 3.0,
-            "volume_m3": 3.819,
-            "confidence": 0.85
-        },
-        {
-            "start": [
-                1532,
-                2037
-            ],
-            "end": [
-                1836,
-                2037
-            ],
-            "orientation": "horizontal",
-            "length_m": 6.366,
-            "thickness_m": 0.2,
-            "height_m": 3.0,
-            "volume_m3": 3.819,
-            "confidence": 0.85
-        },
-        {
-            "start": [
-                1532,
-                1825
-            ],
-            "end": [
-                1836,
-                1825
-            ],
-            "orientation": "horizontal",
-            "length_m": 6.366,
-            "thickness_m": 0.2,
-            "height_m": 3.0,
-            "volume_m3": 3.819,
-            "confidence": 0.85
-        },
-        {
-            "start": [
-                1532,
-                1996
-            ],
-            "end": [
-                1836,
-                1996
-            ],
-            "orientation": "horizontal",
-            "length_m": 6.366,
-            "thickness_m": 0.2,
-            "height_m": 3.0,
-            "volume_m3": 3.819,
-            "confidence": 0.85
-        },
-        {
-            "start": [
-                1532,
-                1994
-            ],
-            "end": [
-                1836,
-                1994
-            ],
-            "orientation": "horizontal",
-            "length_m": 6.366,
-            "thickness_m": 0.2,
-            "height_m": 3.0,
-            "volume_m3": 3.819,
-            "confidence": 0.85
-        },
-        {
-            "start": [
-                737,
-                2348
-            ],
-            "end": [
-                1041,
-                2348
-            ],
-            "orientation": "horizontal",
-            "length_m": 6.366,
-            "thickness_m": 0.2,
-            "height_m": 3.0,
-            "volume_m3": 3.819,
-            "confidence": 0.85
-        },
-        {
-            "start": [
-                1680,
-                851
-            ],
-            "end": [
-                1680,
-                549
-            ],
             "orientation": "vertical",
             "length_m": 6.324,
             "thickness_m": 0.2,
@@ -1844,30 +524,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                1425,
-                851
-            ],
-            "end": [
-                1425,
-                549
-            ],
-            "orientation": "vertical",
-            "length_m": 6.324,
-            "thickness_m": 0.2,
-            "height_m": 3.0,
-            "volume_m3": 3.794,
-            "confidence": 0.85
-        },
-        {
-            "start": [
-                1403,
-                562
-            ],
-            "end": [
-                1702,
-                562
-            ],
             "orientation": "horizontal",
             "length_m": 6.261,
             "thickness_m": 0.2,
@@ -1876,14 +532,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                979,
-                2686
-            ],
-            "end": [
-                1265,
-                2686
-            ],
             "orientation": "horizontal",
             "length_m": 5.989,
             "thickness_m": 0.2,
@@ -1892,14 +540,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                1254,
-                1111
-            ],
-            "end": [
-                1254,
-                835
-            ],
             "orientation": "vertical",
             "length_m": 5.779,
             "thickness_m": 0.2,
@@ -1908,14 +548,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                721,
-                2350
-            ],
-            "end": [
-                992,
-                2350
-            ],
             "orientation": "horizontal",
             "length_m": 5.675,
             "thickness_m": 0.2,
@@ -1924,14 +556,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                1419,
-                560
-            ],
-            "end": [
-                1685,
-                560
-            ],
             "orientation": "horizontal",
             "length_m": 5.57,
             "thickness_m": 0.2,
@@ -1940,14 +564,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                1422,
-                548
-            ],
-            "end": [
-                1682,
-                548
-            ],
             "orientation": "horizontal",
             "length_m": 5.444,
             "thickness_m": 0.2,
@@ -1956,14 +572,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                638,
-                1392
-            ],
-            "end": [
-                638,
-                1132
-            ],
             "orientation": "vertical",
             "length_m": 5.444,
             "thickness_m": 0.2,
@@ -1972,14 +580,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                1423,
-                852
-            ],
-            "end": [
-                1682,
-                852
-            ],
             "orientation": "horizontal",
             "length_m": 5.423,
             "thickness_m": 0.2,
@@ -1988,46 +588,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                1423,
-                854
-            ],
-            "end": [
-                1682,
-                854
-            ],
-            "orientation": "horizontal",
-            "length_m": 5.423,
-            "thickness_m": 0.2,
-            "height_m": 3.0,
-            "volume_m3": 3.254,
-            "confidence": 0.85
-        },
-        {
-            "start": [
-                636,
-                1390
-            ],
-            "end": [
-                636,
-                1132
-            ],
-            "orientation": "vertical",
-            "length_m": 5.403,
-            "thickness_m": 0.2,
-            "height_m": 3.0,
-            "volume_m3": 3.242,
-            "confidence": 0.85
-        },
-        {
-            "start": [
-                769,
-                2058
-            ],
-            "end": [
-                1026,
-                2058
-            ],
             "orientation": "horizontal",
             "length_m": 5.382,
             "thickness_m": 0.2,
@@ -2036,14 +596,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                1018,
-                1745
-            ],
-            "end": [
-                1272,
-                1745
-            ],
             "orientation": "horizontal",
             "length_m": 5.319,
             "thickness_m": 0.2,
@@ -2052,30 +604,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                771,
-                2055
-            ],
-            "end": [
-                1023,
-                2055
-            ],
-            "orientation": "horizontal",
-            "length_m": 5.277,
-            "thickness_m": 0.2,
-            "height_m": 3.0,
-            "volume_m3": 3.166,
-            "confidence": 0.85
-        },
-        {
-            "start": [
-                1193,
-                1257
-            ],
-            "end": [
-                1441,
-                1257
-            ],
             "orientation": "horizontal",
             "length_m": 5.193,
             "thickness_m": 0.2,
@@ -2084,14 +612,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                979,
-                2685
-            ],
-            "end": [
-                1208,
-                2685
-            ],
             "orientation": "horizontal",
             "length_m": 4.795,
             "thickness_m": 0.2,
@@ -2100,14 +620,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                1066,
-                153
-            ],
-            "end": [
-                1288,
-                153
-            ],
             "orientation": "horizontal",
             "length_m": 4.649,
             "thickness_m": 0.2,
@@ -2116,14 +628,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                1072,
-                2689
-            ],
-            "end": [
-                1285,
-                2689
-            ],
             "orientation": "horizontal",
             "length_m": 4.46,
             "thickness_m": 0.2,
@@ -2132,14 +636,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                1228,
-                1256
-            ],
-            "end": [
-                1441,
-                1256
-            ],
             "orientation": "horizontal",
             "length_m": 4.46,
             "thickness_m": 0.2,
@@ -2148,30 +644,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                1229,
-                1255
-            ],
-            "end": [
-                1441,
-                1255
-            ],
-            "orientation": "horizontal",
-            "length_m": 4.439,
-            "thickness_m": 0.2,
-            "height_m": 3.0,
-            "volume_m3": 2.664,
-            "confidence": 0.85
-        },
-        {
-            "start": [
-                1217,
-                1525
-            ],
-            "end": [
-                1217,
-                1315
-            ],
             "orientation": "vertical",
             "length_m": 4.397,
             "thickness_m": 0.2,
@@ -2180,14 +652,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                1210,
-                1525
-            ],
-            "end": [
-                1210,
-                1315
-            ],
             "orientation": "vertical",
             "length_m": 4.397,
             "thickness_m": 0.2,
@@ -2196,14 +660,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                1108,
-                1525
-            ],
-            "end": [
-                1108,
-                1315
-            ],
             "orientation": "vertical",
             "length_m": 4.397,
             "thickness_m": 0.2,
@@ -2212,14 +668,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                1113,
-                1525
-            ],
-            "end": [
-                1113,
-                1315
-            ],
             "orientation": "vertical",
             "length_m": 4.397,
             "thickness_m": 0.2,
@@ -2228,78 +676,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                1212,
-                1525
-            ],
-            "end": [
-                1212,
-                1315
-            ],
-            "orientation": "vertical",
-            "length_m": 4.397,
-            "thickness_m": 0.2,
-            "height_m": 3.0,
-            "volume_m3": 2.638,
-            "confidence": 0.85
-        },
-        {
-            "start": [
-                1115,
-                1525
-            ],
-            "end": [
-                1115,
-                1315
-            ],
-            "orientation": "vertical",
-            "length_m": 4.397,
-            "thickness_m": 0.2,
-            "height_m": 3.0,
-            "volume_m3": 2.638,
-            "confidence": 0.85
-        },
-        {
-            "start": [
-                1106,
-                1524
-            ],
-            "end": [
-                1106,
-                1316
-            ],
-            "orientation": "vertical",
-            "length_m": 4.356,
-            "thickness_m": 0.2,
-            "height_m": 3.0,
-            "volume_m3": 2.613,
-            "confidence": 0.85
-        },
-        {
-            "start": [
-                1219,
-                1524
-            ],
-            "end": [
-                1219,
-                1317
-            ],
-            "orientation": "vertical",
-            "length_m": 4.335,
-            "thickness_m": 0.2,
-            "height_m": 3.0,
-            "volume_m3": 2.601,
-            "confidence": 0.85
-        },
-        {
-            "start": [
-                1547,
-                2697
-            ],
-            "end": [
-                1754,
-                2697
-            ],
             "orientation": "horizontal",
             "length_m": 4.335,
             "thickness_m": 0.2,
@@ -2308,14 +684,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                512,
-                1423
-            ],
-            "end": [
-                512,
-                1217
-            ],
             "orientation": "vertical",
             "length_m": 4.314,
             "thickness_m": 0.2,
@@ -2324,14 +692,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                1548,
-                2703
-            ],
-            "end": [
-                1751,
-                2703
-            ],
             "orientation": "horizontal",
             "length_m": 4.251,
             "thickness_m": 0.2,
@@ -2340,14 +700,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                1086,
-                154
-            ],
-            "end": [
-                1288,
-                154
-            ],
             "orientation": "horizontal",
             "length_m": 4.23,
             "thickness_m": 0.2,
@@ -2356,14 +708,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                979,
-                2687
-            ],
-            "end": [
-                1180,
-                2687
-            ],
             "orientation": "horizontal",
             "length_m": 4.209,
             "thickness_m": 0.2,
@@ -2372,30 +716,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                979,
-                2688
-            ],
-            "end": [
-                1175,
-                2691
-            ],
-            "orientation": "horizontal",
-            "length_m": 4.105,
-            "thickness_m": 0.2,
-            "height_m": 3.0,
-            "volume_m3": 2.463,
-            "confidence": 0.85
-        },
-        {
-            "start": [
-                1089,
-                2680
-            ],
-            "end": [
-                1285,
-                2680
-            ],
             "orientation": "horizontal",
             "length_m": 4.104,
             "thickness_m": 0.2,
@@ -2404,14 +724,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                998,
-                1494
-            ],
-            "end": [
-                998,
-                1305
-            ],
             "orientation": "vertical",
             "length_m": 3.958,
             "thickness_m": 0.2,
@@ -2420,14 +732,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                1458,
-                940
-            ],
-            "end": [
-                1647,
-                940
-            ],
             "orientation": "horizontal",
             "length_m": 3.958,
             "thickness_m": 0.2,
@@ -2436,30 +740,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                996,
-                1492
-            ],
-            "end": [
-                996,
-                1305
-            ],
-            "orientation": "vertical",
-            "length_m": 3.916,
-            "thickness_m": 0.2,
-            "height_m": 3.0,
-            "volume_m3": 2.349,
-            "confidence": 0.85
-        },
-        {
-            "start": [
-                1652,
-                2685
-            ],
-            "end": [
-                1837,
-                2685
-            ],
             "orientation": "horizontal",
             "length_m": 3.874,
             "thickness_m": 0.2,
@@ -2468,14 +748,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                636,
-                2695
-            ],
-            "end": [
-                821,
-                2695
-            ],
             "orientation": "horizontal",
             "length_m": 3.874,
             "thickness_m": 0.2,
@@ -2484,14 +756,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                1086,
-                155
-            ],
-            "end": [
-                1271,
-                155
-            ],
             "orientation": "horizontal",
             "length_m": 3.874,
             "thickness_m": 0.2,
@@ -2500,14 +764,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                636,
-                2696
-            ],
-            "end": [
-                821,
-                2696
-            ],
             "orientation": "horizontal",
             "length_m": 3.874,
             "thickness_m": 0.2,
@@ -2516,62 +772,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                1652,
-                2680
-            ],
-            "end": [
-                1837,
-                2680
-            ],
-            "orientation": "horizontal",
-            "length_m": 3.874,
-            "thickness_m": 0.2,
-            "height_m": 3.0,
-            "volume_m3": 2.324,
-            "confidence": 0.85
-        },
-        {
-            "start": [
-                1027,
-                2697
-            ],
-            "end": [
-                1203,
-                2697
-            ],
-            "orientation": "horizontal",
-            "length_m": 3.685,
-            "thickness_m": 0.2,
-            "height_m": 3.0,
-            "volume_m3": 2.211,
-            "confidence": 0.85
-        },
-        {
-            "start": [
-                1027,
-                2696
-            ],
-            "end": [
-                1202,
-                2696
-            ],
-            "orientation": "horizontal",
-            "length_m": 3.664,
-            "thickness_m": 0.2,
-            "height_m": 3.0,
-            "volume_m3": 2.199,
-            "confidence": 0.85
-        },
-        {
-            "start": [
-                1849,
-                171
-            ],
-            "end": [
-                2022,
-                171
-            ],
             "orientation": "horizontal",
             "length_m": 3.623,
             "thickness_m": 0.2,
@@ -2580,14 +780,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                1023,
-                2690
-            ],
-            "end": [
-                1195,
-                2693
-            ],
             "orientation": "horizontal",
             "length_m": 3.602,
             "thickness_m": 0.2,
@@ -2596,62 +788,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                1850,
-                173
-            ],
-            "end": [
-                2022,
-                173
-            ],
-            "orientation": "horizontal",
-            "length_m": 3.602,
-            "thickness_m": 0.2,
-            "height_m": 3.0,
-            "volume_m3": 2.161,
-            "confidence": 0.85
-        },
-        {
-            "start": [
-                1850,
-                172
-            ],
-            "end": [
-                2022,
-                172
-            ],
-            "orientation": "horizontal",
-            "length_m": 3.602,
-            "thickness_m": 0.2,
-            "height_m": 3.0,
-            "volume_m3": 2.161,
-            "confidence": 0.85
-        },
-        {
-            "start": [
-                1016,
-                2688
-            ],
-            "end": [
-                1181,
-                2688
-            ],
-            "orientation": "horizontal",
-            "length_m": 3.455,
-            "thickness_m": 0.2,
-            "height_m": 3.0,
-            "volume_m3": 2.073,
-            "confidence": 0.85
-        },
-        {
-            "start": [
-                502,
-                2688
-            ],
-            "end": [
-                664,
-                2688
-            ],
             "orientation": "horizontal",
             "length_m": 3.392,
             "thickness_m": 0.2,
@@ -2660,14 +796,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                979,
-                2704
-            ],
-            "end": [
-                1140,
-                2704
-            ],
             "orientation": "horizontal",
             "length_m": 3.371,
             "thickness_m": 0.2,
@@ -2676,30 +804,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                503,
-                2687
-            ],
-            "end": [
-                664,
-                2687
-            ],
-            "orientation": "horizontal",
-            "length_m": 3.371,
-            "thickness_m": 0.2,
-            "height_m": 3.0,
-            "volume_m3": 2.023,
-            "confidence": 0.85
-        },
-        {
-            "start": [
-                1858,
-                1780
-            ],
-            "end": [
-                1858,
-                1625
-            ],
             "orientation": "vertical",
             "length_m": 3.246,
             "thickness_m": 0.2,
@@ -2708,14 +812,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                1605,
-                2386
-            ],
-            "end": [
-                1759,
-                2386
-            ],
             "orientation": "horizontal",
             "length_m": 3.225,
             "thickness_m": 0.2,
@@ -2724,14 +820,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                662,
-                2682
-            ],
-            "end": [
-                815,
-                2682
-            ],
             "orientation": "horizontal",
             "length_m": 3.204,
             "thickness_m": 0.2,
@@ -2740,14 +828,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                1607,
-                2384
-            ],
-            "end": [
-                1760,
-                2384
-            ],
             "orientation": "horizontal",
             "length_m": 3.204,
             "thickness_m": 0.2,
@@ -2756,78 +836,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                1532,
-                1868
-            ],
-            "end": [
-                1685,
-                1868
-            ],
-            "orientation": "horizontal",
-            "length_m": 3.204,
-            "thickness_m": 0.2,
-            "height_m": 3.0,
-            "volume_m3": 1.922,
-            "confidence": 0.85
-        },
-        {
-            "start": [
-                1685,
-                2684
-            ],
-            "end": [
-                1837,
-                2684
-            ],
-            "orientation": "horizontal",
-            "length_m": 3.183,
-            "thickness_m": 0.2,
-            "height_m": 3.0,
-            "volume_m3": 1.91,
-            "confidence": 0.85
-        },
-        {
-            "start": [
-                1686,
-                1867
-            ],
-            "end": [
-                1838,
-                1867
-            ],
-            "orientation": "horizontal",
-            "length_m": 3.183,
-            "thickness_m": 0.2,
-            "height_m": 3.0,
-            "volume_m3": 1.91,
-            "confidence": 0.85
-        },
-        {
-            "start": [
-                651,
-                2683
-            ],
-            "end": [
-                802,
-                2683
-            ],
-            "orientation": "horizontal",
-            "length_m": 3.162,
-            "thickness_m": 0.2,
-            "height_m": 3.0,
-            "volume_m3": 1.897,
-            "confidence": 0.85
-        },
-        {
-            "start": [
-                1089,
-                1135
-            ],
-            "end": [
-                1239,
-                1135
-            ],
             "orientation": "horizontal",
             "length_m": 3.141,
             "thickness_m": 0.2,
@@ -2836,14 +844,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                1233,
-                1134
-            ],
-            "end": [
-                1233,
-                985
-            ],
             "orientation": "vertical",
             "length_m": 3.12,
             "thickness_m": 0.2,
@@ -2852,14 +852,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                1297,
-                1134
-            ],
-            "end": [
-                1297,
-                985
-            ],
             "orientation": "vertical",
             "length_m": 3.12,
             "thickness_m": 0.2,
@@ -2868,46 +860,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                1295,
-                1135
-            ],
-            "end": [
-                1295,
-                986
-            ],
-            "orientation": "vertical",
-            "length_m": 3.12,
-            "thickness_m": 0.2,
-            "height_m": 3.0,
-            "volume_m3": 1.872,
-            "confidence": 0.85
-        },
-        {
-            "start": [
-                653,
-                2684
-            ],
-            "end": [
-                802,
-                2684
-            ],
-            "orientation": "horizontal",
-            "length_m": 3.12,
-            "thickness_m": 0.2,
-            "height_m": 3.0,
-            "volume_m3": 1.872,
-            "confidence": 0.85
-        },
-        {
-            "start": [
-                1290,
-                1134
-            ],
-            "end": [
-                1290,
-                986
-            ],
             "orientation": "vertical",
             "length_m": 3.099,
             "thickness_m": 0.2,
@@ -2916,30 +868,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                1288,
-                1134
-            ],
-            "end": [
-                1288,
-                986
-            ],
-            "orientation": "vertical",
-            "length_m": 3.099,
-            "thickness_m": 0.2,
-            "height_m": 3.0,
-            "volume_m3": 1.859,
-            "confidence": 0.85
-        },
-        {
-            "start": [
-                823,
-                2308
-            ],
-            "end": [
-                971,
-                2308
-            ],
             "orientation": "horizontal",
             "length_m": 3.099,
             "thickness_m": 0.2,
@@ -2948,14 +876,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                937,
-                361
-            ],
-            "end": [
-                1085,
-                361
-            ],
             "orientation": "horizontal",
             "length_m": 3.099,
             "thickness_m": 0.2,
@@ -2964,14 +884,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                1621,
-                2274
-            ],
-            "end": [
-                1769,
-                2274
-            ],
             "orientation": "horizontal",
             "length_m": 3.099,
             "thickness_m": 0.2,
@@ -2980,30 +892,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                937,
-                362
-            ],
-            "end": [
-                1085,
-                362
-            ],
-            "orientation": "horizontal",
-            "length_m": 3.099,
-            "thickness_m": 0.2,
-            "height_m": 3.0,
-            "volume_m3": 1.859,
-            "confidence": 0.85
-        },
-        {
-            "start": [
-                661,
-                2679
-            ],
-            "end": [
-                808,
-                2679
-            ],
             "orientation": "horizontal",
             "length_m": 3.078,
             "thickness_m": 0.2,
@@ -3012,94 +900,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                649,
-                2694
-            ],
-            "end": [
-                796,
-                2694
-            ],
-            "orientation": "horizontal",
-            "length_m": 3.078,
-            "thickness_m": 0.2,
-            "height_m": 3.0,
-            "volume_m3": 1.847,
-            "confidence": 0.85
-        },
-        {
-            "start": [
-                649,
-                2690
-            ],
-            "end": [
-                796,
-                2690
-            ],
-            "orientation": "horizontal",
-            "length_m": 3.078,
-            "thickness_m": 0.2,
-            "height_m": 3.0,
-            "volume_m3": 1.847,
-            "confidence": 0.85
-        },
-        {
-            "start": [
-                649,
-                2692
-            ],
-            "end": [
-                796,
-                2692
-            ],
-            "orientation": "horizontal",
-            "length_m": 3.078,
-            "thickness_m": 0.2,
-            "height_m": 3.0,
-            "volume_m3": 1.847,
-            "confidence": 0.85
-        },
-        {
-            "start": [
-                649,
-                2691
-            ],
-            "end": [
-                796,
-                2691
-            ],
-            "orientation": "horizontal",
-            "length_m": 3.078,
-            "thickness_m": 0.2,
-            "height_m": 3.0,
-            "volume_m3": 1.847,
-            "confidence": 0.85
-        },
-        {
-            "start": [
-                649,
-                2693
-            ],
-            "end": [
-                796,
-                2693
-            ],
-            "orientation": "horizontal",
-            "length_m": 3.078,
-            "thickness_m": 0.2,
-            "height_m": 3.0,
-            "volume_m3": 1.847,
-            "confidence": 0.85
-        },
-        {
-            "start": [
-                662,
-                2681
-            ],
-            "end": [
-                808,
-                2681
-            ],
             "orientation": "horizontal",
             "length_m": 3.057,
             "thickness_m": 0.2,
@@ -3108,14 +908,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                871,
-                1542
-            ],
-            "end": [
-                1017,
-                1542
-            ],
             "orientation": "horizontal",
             "length_m": 3.057,
             "thickness_m": 0.2,
@@ -3124,14 +916,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                871,
-                1162
-            ],
-            "end": [
-                1017,
-                1162
-            ],
             "orientation": "horizontal",
             "length_m": 3.057,
             "thickness_m": 0.2,
@@ -3140,14 +924,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                871,
-                1160
-            ],
-            "end": [
-                1017,
-                1160
-            ],
             "orientation": "horizontal",
             "length_m": 3.057,
             "thickness_m": 0.2,
@@ -3156,14 +932,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                1126,
-                1797
-            ],
-            "end": [
-                1272,
-                1797
-            ],
             "orientation": "horizontal",
             "length_m": 3.057,
             "thickness_m": 0.2,
@@ -3172,14 +940,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                871,
-                1533
-            ],
-            "end": [
-                1017,
-                1533
-            ],
             "orientation": "horizontal",
             "length_m": 3.057,
             "thickness_m": 0.2,
@@ -3188,126 +948,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                1126,
-                1795
-            ],
-            "end": [
-                1272,
-                1795
-            ],
-            "orientation": "horizontal",
-            "length_m": 3.057,
-            "thickness_m": 0.2,
-            "height_m": 3.0,
-            "volume_m3": 1.834,
-            "confidence": 0.85
-        },
-        {
-            "start": [
-                871,
-                1540
-            ],
-            "end": [
-                1017,
-                1540
-            ],
-            "orientation": "horizontal",
-            "length_m": 3.057,
-            "thickness_m": 0.2,
-            "height_m": 3.0,
-            "volume_m3": 1.834,
-            "confidence": 0.85
-        },
-        {
-            "start": [
-                1126,
-                1790
-            ],
-            "end": [
-                1272,
-                1790
-            ],
-            "orientation": "horizontal",
-            "length_m": 3.057,
-            "thickness_m": 0.2,
-            "height_m": 3.0,
-            "volume_m3": 1.834,
-            "confidence": 0.85
-        },
-        {
-            "start": [
-                871,
-                1154
-            ],
-            "end": [
-                1017,
-                1154
-            ],
-            "orientation": "horizontal",
-            "length_m": 3.057,
-            "thickness_m": 0.2,
-            "height_m": 3.0,
-            "volume_m3": 1.834,
-            "confidence": 0.85
-        },
-        {
-            "start": [
-                871,
-                1535
-            ],
-            "end": [
-                1017,
-                1535
-            ],
-            "orientation": "horizontal",
-            "length_m": 3.057,
-            "thickness_m": 0.2,
-            "height_m": 3.0,
-            "volume_m3": 1.834,
-            "confidence": 0.85
-        },
-        {
-            "start": [
-                1235,
-                1131
-            ],
-            "end": [
-                1235,
-                986
-            ],
-            "orientation": "vertical",
-            "length_m": 3.036,
-            "thickness_m": 0.2,
-            "height_m": 3.0,
-            "volume_m3": 1.822,
-            "confidence": 0.85
-        },
-        {
-            "start": [
-                872,
-                1152
-            ],
-            "end": [
-                1017,
-                1152
-            ],
-            "orientation": "horizontal",
-            "length_m": 3.036,
-            "thickness_m": 0.2,
-            "height_m": 3.0,
-            "volume_m3": 1.822,
-            "confidence": 0.85
-        },
-        {
-            "start": [
-                1143,
-                2683
-            ],
-            "end": [
-                1285,
-                2686
-            ],
             "orientation": "horizontal",
             "length_m": 2.974,
             "thickness_m": 0.2,
@@ -3316,30 +956,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                1027,
-                2695
-            ],
-            "end": [
-                1168,
-                2695
-            ],
-            "orientation": "horizontal",
-            "length_m": 2.953,
-            "thickness_m": 0.2,
-            "height_m": 3.0,
-            "volume_m3": 1.772,
-            "confidence": 0.85
-        },
-        {
-            "start": [
-                1244,
-                2703
-            ],
-            "end": [
-                1382,
-                2703
-            ],
             "orientation": "horizontal",
             "length_m": 2.89,
             "thickness_m": 0.2,
@@ -3348,30 +964,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                1795,
-                2703
-            ],
-            "end": [
-                1933,
-                2703
-            ],
-            "orientation": "horizontal",
-            "length_m": 2.89,
-            "thickness_m": 0.2,
-            "height_m": 3.0,
-            "volume_m3": 1.734,
-            "confidence": 0.85
-        },
-        {
-            "start": [
-                1477,
-                600
-            ],
-            "end": [
-                1613,
-                600
-            ],
             "orientation": "horizontal",
             "length_m": 2.848,
             "thickness_m": 0.2,
@@ -3380,14 +972,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                979,
-                2695
-            ],
-            "end": [
-                1113,
-                2693
-            ],
             "orientation": "horizontal",
             "length_m": 2.806,
             "thickness_m": 0.2,
@@ -3396,14 +980,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                1287,
-                349
-            ],
-            "end": [
-                1421,
-                349
-            ],
             "orientation": "horizontal",
             "length_m": 2.806,
             "thickness_m": 0.2,
@@ -3412,14 +988,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                850,
-                1374
-            ],
-            "end": [
-                984,
-                1374
-            ],
             "orientation": "horizontal",
             "length_m": 2.806,
             "thickness_m": 0.2,
@@ -3428,30 +996,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                824,
-                603
-            ],
-            "end": [
-                957,
-                599
-            ],
-            "orientation": "horizontal",
-            "length_m": 2.786,
-            "thickness_m": 0.2,
-            "height_m": 3.0,
-            "volume_m3": 1.672,
-            "confidence": 0.85
-        },
-        {
-            "start": [
-                1479,
-                602
-            ],
-            "end": [
-                1612,
-                602
-            ],
             "orientation": "horizontal",
             "length_m": 2.785,
             "thickness_m": 0.2,
@@ -3460,78 +1004,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                1154,
-                173
-            ],
-            "end": [
-                1287,
-                173
-            ],
-            "orientation": "horizontal",
-            "length_m": 2.785,
-            "thickness_m": 0.2,
-            "height_m": 3.0,
-            "volume_m3": 1.671,
-            "confidence": 0.85
-        },
-        {
-            "start": [
-                1287,
-                350
-            ],
-            "end": [
-                1420,
-                350
-            ],
-            "orientation": "horizontal",
-            "length_m": 2.785,
-            "thickness_m": 0.2,
-            "height_m": 3.0,
-            "volume_m3": 1.671,
-            "confidence": 0.85
-        },
-        {
-            "start": [
-                1548,
-                2702
-            ],
-            "end": [
-                1679,
-                2702
-            ],
-            "orientation": "horizontal",
-            "length_m": 2.743,
-            "thickness_m": 0.2,
-            "height_m": 3.0,
-            "volume_m3": 1.646,
-            "confidence": 0.85
-        },
-        {
-            "start": [
-                1548,
-                2701
-            ],
-            "end": [
-                1678,
-                2701
-            ],
-            "orientation": "horizontal",
-            "length_m": 2.722,
-            "thickness_m": 0.2,
-            "height_m": 3.0,
-            "volume_m3": 1.633,
-            "confidence": 0.85
-        },
-        {
-            "start": [
-                1548,
-                2700
-            ],
-            "end": [
-                1677,
-                2700
-            ],
             "orientation": "horizontal",
             "length_m": 2.701,
             "thickness_m": 0.2,
@@ -3540,30 +1012,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                854,
-                1489
-            ],
-            "end": [
-                983,
-                1489
-            ],
-            "orientation": "horizontal",
-            "length_m": 2.701,
-            "thickness_m": 0.2,
-            "height_m": 3.0,
-            "volume_m3": 1.621,
-            "confidence": 0.85
-        },
-        {
-            "start": [
-                637,
-                2699
-            ],
-            "end": [
-                765,
-                2697
-            ],
             "orientation": "horizontal",
             "length_m": 2.681,
             "thickness_m": 0.2,
@@ -3572,46 +1020,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                1661,
-                154
-            ],
-            "end": [
-                1789,
-                152
-            ],
-            "orientation": "horizontal",
-            "length_m": 2.681,
-            "thickness_m": 0.2,
-            "height_m": 3.0,
-            "volume_m3": 1.608,
-            "confidence": 0.85
-        },
-        {
-            "start": [
-                856,
-                1487
-            ],
-            "end": [
-                983,
-                1487
-            ],
-            "orientation": "horizontal",
-            "length_m": 2.659,
-            "thickness_m": 0.2,
-            "height_m": 3.0,
-            "volume_m3": 1.596,
-            "confidence": 0.85
-        },
-        {
-            "start": [
-                1506,
-                1996
-            ],
-            "end": [
-                1506,
-                1870
-            ],
             "orientation": "vertical",
             "length_m": 2.638,
             "thickness_m": 0.2,
@@ -3620,14 +1028,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                1319,
-                1250
-            ],
-            "end": [
-                1441,
-                1252
-            ],
             "orientation": "horizontal",
             "length_m": 2.555,
             "thickness_m": 0.2,
@@ -3636,14 +1036,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                836,
-                2276
-            ],
-            "end": [
-                958,
-                2276
-            ],
             "orientation": "horizontal",
             "length_m": 2.555,
             "thickness_m": 0.2,
@@ -3652,14 +1044,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                1287,
-                348
-            ],
-            "end": [
-                1409,
-                348
-            ],
             "orientation": "horizontal",
             "length_m": 2.555,
             "thickness_m": 0.2,
@@ -3668,14 +1052,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                836,
-                634
-            ],
-            "end": [
-                958,
-                634
-            ],
             "orientation": "horizontal",
             "length_m": 2.555,
             "thickness_m": 0.2,
@@ -3684,14 +1060,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                1492,
-                632
-            ],
-            "end": [
-                1613,
-                632
-            ],
             "orientation": "horizontal",
             "length_m": 2.534,
             "thickness_m": 0.2,
@@ -3700,30 +1068,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                1510,
-                1324
-            ],
-            "end": [
-                1631,
-                1324
-            ],
-            "orientation": "horizontal",
-            "length_m": 2.534,
-            "thickness_m": 0.2,
-            "height_m": 3.0,
-            "volume_m3": 1.52,
-            "confidence": 0.85
-        },
-        {
-            "start": [
-                849,
-                1492
-            ],
-            "end": [
-                849,
-                1372
-            ],
             "orientation": "vertical",
             "length_m": 2.513,
             "thickness_m": 0.2,
@@ -3732,30 +1076,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                1321,
-                1253
-            ],
-            "end": [
-                1441,
-                1253
-            ],
-            "orientation": "horizontal",
-            "length_m": 2.513,
-            "thickness_m": 0.2,
-            "height_m": 3.0,
-            "volume_m3": 1.508,
-            "confidence": 0.85
-        },
-        {
-            "start": [
-                985,
-                1492
-            ],
-            "end": [
-                985,
-                1372
-            ],
             "orientation": "vertical",
             "length_m": 2.513,
             "thickness_m": 0.2,
@@ -3764,46 +1084,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                847,
-                1492
-            ],
-            "end": [
-                847,
-                1373
-            ],
-            "orientation": "vertical",
-            "length_m": 2.492,
-            "thickness_m": 0.2,
-            "height_m": 3.0,
-            "volume_m3": 1.495,
-            "confidence": 0.85
-        },
-        {
-            "start": [
-                987,
-                1492
-            ],
-            "end": [
-                987,
-                1373
-            ],
-            "orientation": "vertical",
-            "length_m": 2.492,
-            "thickness_m": 0.2,
-            "height_m": 3.0,
-            "volume_m3": 1.495,
-            "confidence": 0.85
-        },
-        {
-            "start": [
-                1444,
-                359
-            ],
-            "end": [
-                1562,
-                362
-            ],
             "orientation": "horizontal",
             "length_m": 2.472,
             "thickness_m": 0.2,
@@ -3812,30 +1092,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                1444,
-                352
-            ],
-            "end": [
-                1562,
-                350
-            ],
-            "orientation": "horizontal",
-            "length_m": 2.471,
-            "thickness_m": 0.2,
-            "height_m": 3.0,
-            "volume_m3": 1.483,
-            "confidence": 0.85
-        },
-        {
-            "start": [
-                1168,
-                2698
-            ],
-            "end": [
-                1285,
-                2696
-            ],
             "orientation": "horizontal",
             "length_m": 2.45,
             "thickness_m": 0.2,
@@ -3844,14 +1100,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                853,
-                1489
-            ],
-            "end": [
-                853,
-                1372
-            ],
             "orientation": "vertical",
             "length_m": 2.45,
             "thickness_m": 0.2,
@@ -3860,30 +1108,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                855,
-                1489
-            ],
-            "end": [
-                855,
-                1372
-            ],
-            "orientation": "vertical",
-            "length_m": 2.45,
-            "thickness_m": 0.2,
-            "height_m": 3.0,
-            "volume_m3": 1.47,
-            "confidence": 0.85
-        },
-        {
-            "start": [
-                638,
-                2675
-            ],
-            "end": [
-                754,
-                2677
-            ],
             "orientation": "horizontal",
             "length_m": 2.429,
             "thickness_m": 0.2,
@@ -3892,14 +1116,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                637,
-                1392
-            ],
-            "end": [
-                753,
-                1392
-            ],
             "orientation": "horizontal",
             "length_m": 2.429,
             "thickness_m": 0.2,
@@ -3908,14 +1124,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                1277,
-                1239
-            ],
-            "end": [
-                1391,
-                1235
-            ],
             "orientation": "horizontal",
             "length_m": 2.389,
             "thickness_m": 0.2,
@@ -3924,30 +1132,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                722,
-                1390
-            ],
-            "end": [
-                836,
-                1390
-            ],
-            "orientation": "horizontal",
-            "length_m": 2.387,
-            "thickness_m": 0.2,
-            "height_m": 3.0,
-            "volume_m3": 1.432,
-            "confidence": 0.85
-        },
-        {
-            "start": [
-                1106,
-                1516
-            ],
-            "end": [
-                1219,
-                1516
-            ],
             "orientation": "horizontal",
             "length_m": 2.366,
             "thickness_m": 0.2,
@@ -3956,30 +1140,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                982,
-                1485
-            ],
-            "end": [
-                982,
-                1372
-            ],
-            "orientation": "vertical",
-            "length_m": 2.366,
-            "thickness_m": 0.2,
-            "height_m": 3.0,
-            "volume_m3": 1.42,
-            "confidence": 0.85
-        },
-        {
-            "start": [
-                1412,
-                172
-            ],
-            "end": [
-                1524,
-                172
-            ],
             "orientation": "horizontal",
             "length_m": 2.345,
             "thickness_m": 0.2,
@@ -3988,14 +1148,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                846,
-                2310
-            ],
-            "end": [
-                957,
-                2310
-            ],
             "orientation": "horizontal",
             "length_m": 2.324,
             "thickness_m": 0.2,
@@ -4004,14 +1156,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                505,
-                2682
-            ],
-            "end": [
-                613,
-                2682
-            ],
             "orientation": "horizontal",
             "length_m": 2.262,
             "thickness_m": 0.2,
@@ -4020,14 +1164,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                1109,
-                1317
-            ],
-            "end": [
-                1216,
-                1317
-            ],
             "orientation": "horizontal",
             "length_m": 2.241,
             "thickness_m": 0.2,
@@ -4036,14 +1172,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                1655,
-                344
-            ],
-            "end": [
-                1762,
-                344
-            ],
             "orientation": "horizontal",
             "length_m": 2.241,
             "thickness_m": 0.2,
@@ -4052,14 +1180,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                1563,
-                963
-            ],
-            "end": [
-                1669,
-                963
-            ],
             "orientation": "horizontal",
             "length_m": 2.22,
             "thickness_m": 0.2,
@@ -4068,14 +1188,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                1391,
-                1135
-            ],
-            "end": [
-                1495,
-                1134
-            ],
             "orientation": "horizontal",
             "length_m": 2.178,
             "thickness_m": 0.2,
@@ -4084,14 +1196,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                1393,
-                2170
-            ],
-            "end": [
-                1393,
-                2066
-            ],
             "orientation": "vertical",
             "length_m": 2.178,
             "thickness_m": 0.2,
@@ -4100,14 +1204,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                837,
-                1492
-            ],
-            "end": [
-                837,
-                1390
-            ],
             "orientation": "vertical",
             "length_m": 2.136,
             "thickness_m": 0.2,
@@ -4116,14 +1212,6 @@
             "confidence": 0.85
         },
         {
-            "start": [
-                1646,
-                576
-            ],
-            "end": [
-                1746,
-                577
-            ],
             "orientation": "horizontal",
             "length_m": 2.094,
             "thickness_m": 0.2,
