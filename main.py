@@ -38,13 +38,13 @@ def run_demo():
     tasks, dependencies = generate_tasks_from_twin(twin)
     G, cycle_valid = build_dependency_graph(tasks, dependencies)
 
-    print("\nDependency Graph Valid:", cycle_valid)
-
-    if not cycle_valid:
-        print("Cycle detected. Scheduling aborted.")
+    if cycle_valid:
+        print("\nDependency Graph Valid: ✓ No Cycles")
+    else:
+        print("\nDependency Graph Invalid: ✗ Cycle Detected")
         return
 
-    # 🔥 RESOURCE-AWARE SCHEDULING
+    # RESOURCE-AWARE SCHEDULING
     G, critical_path, total_duration = run_cpm(G, crew_capacity=2)
 
     print("\nTotal Project Duration:", total_duration)
@@ -60,9 +60,9 @@ def run_demo():
         })
 
     # =====================
-    # CONFLICT DETECTION
+    # CONFLICT DETECTION (VALIDATION ONLY)
     # =====================
-    print("\n--- Conflict Detection ---")
+    print("\n--- Conflict Validation ---")
 
     conflicts = detect_conflicts(G, crew_capacity=2)
 
@@ -71,7 +71,7 @@ def run_demo():
         for conflict in conflicts:
             print(conflict)
     else:
-        print("No Conflicts Detected")
+        print("No Conflicts Detected ✓")
 
     # =====================
     # RISK ASSESSMENT
@@ -118,19 +118,13 @@ def run_demo():
         for conflict in scenario["conflicts"]:
             print(conflict)
     else:
-        print("No Conflicts in Scenario")
+        print("No Conflicts in Scenario ✓")
 
     print("New Risk Score:", scenario["risk"]["risk_score"])
     print("New Risk Level:", scenario["risk"]["risk_level"])
 
-    # 🔥 FIXED: USE SCENARIO GRAPH IF PROVIDED
-    if "graph" in scenario:
-        scenario_graph = scenario["graph"]
-    else:
-        # fallback rebuild (safe fallback)
-        scenario_tasks, scenario_deps = generate_tasks_from_twin(twin)
-        scenario_graph, _ = build_dependency_graph(scenario_tasks, scenario_deps)
-        scenario_graph, _, _ = run_cpm(scenario_graph, crew_capacity=3)
+    # USE SCENARIO GRAPH DIRECTLY
+    scenario_graph = scenario["graph"]
 
     scenario_buildability = calculate_buildability(
         scenario_graph,
