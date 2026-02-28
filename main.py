@@ -35,7 +35,14 @@ def run_demo():
     # =====================
     print("\n================ BASELINE EXECUTION INTELLIGENCE ================")
 
-    tasks, dependencies = generate_tasks_from_twin(twin)
+    # 🔥 UPDATED CALL (Crew-aware dependency generation)
+    tasks, dependencies = generate_tasks_from_twin(
+        twin,
+        productivity_factor=1.0,
+        curing_days=2,
+        crew_capacity=2
+    )
+
     G, cycle_valid = build_dependency_graph(tasks, dependencies)
 
     if cycle_valid:
@@ -74,7 +81,7 @@ def run_demo():
         print("No Conflicts Detected ✓")
 
     # =====================
-    # RISK ASSESSMENT (UPGRADED)
+    # RISK ASSESSMENT
     # =====================
     print("\n--- Risk Assessment ---")
 
