@@ -4,6 +4,7 @@ from core.graph.dependency_graph import generate_tasks_from_twin, build_dependen
 from core.scheduling.cpm_engine import run_cpm
 from core.conflict.conflict_engine import detect_conflicts
 from core.risk.risk_engine import calculate_risk
+from core.simulation.whatif_engine import run_simulation
 
 from pathlib import Path
 
@@ -29,15 +30,15 @@ def run_demo():
     print(twin)
 
     # =====================
-    # DEPENDENCY + CPM
+    # BASELINE SCHEDULING
     # =====================
-    print("\n--- Dependency & Scheduling Layer ---")
+    print("\n================ BASELINE EXECUTION INTELLIGENCE ================")
 
     tasks, dependencies = generate_tasks_from_twin(twin)
 
     G, cycle_valid = build_dependency_graph(tasks, dependencies)
 
-    print("Dependency Graph Valid:", cycle_valid)
+    print("\nDependency Graph Valid:", cycle_valid)
 
     if not cycle_valid:
         print("Cycle detected. Scheduling aborted.")
@@ -80,6 +81,42 @@ def run_demo():
 
     print("Risk Score:", risk["risk_score"])
     print("Risk Level:", risk["risk_level"])
+
+    # =====================
+    # WHAT-IF SIMULATION
+    # =====================
+    print("\n================ WHAT-IF SIMULATION ================")
+
+    scenario = run_simulation(
+        twin,
+        crew_capacity=3,
+        productivity_factor=1.2,
+        curing_days=1
+    )
+
+    if "error" in scenario:
+        print("Simulation Error:", scenario["error"])
+        return
+
+    print("\nScenario: Increased Crew + Faster Build + Shorter Cure")
+    print("New Total Duration:", scenario["total_duration"])
+    print("New Critical Path:", scenario["critical_path"])
+
+    if scenario["conflicts"]:
+        print("New Conflicts:")
+        for conflict in scenario["conflicts"]:
+            print(conflict)
+    else:
+        print("No Conflicts in Scenario")
+
+    print("New Risk Score:", scenario["risk"]["risk_score"])
+    print("New Risk Level:", scenario["risk"]["risk_level"])
+
+    print("\n================ INTELLIGENCE SUMMARY ================")
+    print("Baseline Duration:", total_duration)
+    print("Scenario Duration:", scenario["total_duration"])
+    print("Baseline Risk:", risk["risk_level"])
+    print("Scenario Risk:", scenario["risk"]["risk_level"])
 
 
 if __name__ == "__main__":
