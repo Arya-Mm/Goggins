@@ -10,7 +10,7 @@ class StructuralDetector:
     Safe fallback if model fails.
     """
 
-    def __init__(self, model_path: str = None):
+    def __init__(self, model_path: str = "core/data/best.pt"):
         self.model = None
         self.model_path = model_path
         self._load_model()
