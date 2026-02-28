@@ -1,156 +1,62 @@
 import os
 import json
-import streamlit as st
-from datetime import datetime
+import logging
+from ingestion.loader import DrawingLoader
+from vision.detector import StructuralDetector
+from twin.builder import DigitalTwinBuilder
+from graph.dependency import DependencyEngine
+from scheduling.planner import ConstructionPlanner
 
-    # ===== MODULE IMPORTS (Will exist soon) =====
-from core.ingestion.loader import load_blueprint
-from core.vision.detector import detect_structural_elements
-from core.vision.wall_hough import detect_walls
-from core.vision.ocr import extract_dimensions
-from core.twin.scale import calibrate_scale
-from core.twin.twin_builder import build_structural_twin
-from core.twin.takeoff import compute_quantities
-from core.graph.dependency import build_dependency_graph
-from core.scheduling.planner import generate_schedule
-from core.conflict.checker import detect_conflicts
-from core.risk.simulator import simulate_risk
-from core.optimization.buildability import compute_buildability_score
-from core.ai.explainer import generate_explanation
+# Setup Logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger("StructuraAI-Core")
 
-
-    # =====================================================
-    # CONFIGURATION
-    # =====================================================
-
-PROJECT_STATE_FILE = "project_state.json"
-DETECTED_STRUCTURE_FILE = "detected_structure.json"
-
-
-    # =====================================================
-    # STREAMLIT UI
-    # =====================================================
-
-st.set_page_config(page_title="StructuraAI", layout="wide")
-st.title("STRUCTURAAI — Autonomous Pre-Construction Intelligence Engine")
-
-uploaded_file = st.file_uploader("Upload Blueprint (Image or PDF)", type=["png", "jpg", "jpeg", "pdf"])
-
-
-    # =====================================================
-    # PIPELINE EXECUTION
-    # =====================================================
-
-def run_pipeline(file):
-        project_state = {
-            "timestamp": str(datetime.now()),
-            "status": "Running",
-            "confidence_overall": 1.0
+class StructuraAICore:
+    def __init__(self):
+        self.project_state = {
+            "project_metadata": {},
+            "detected_entities": [],
+            "spatial_twin": {},
+            "schedule": {},
+            "conflicts": [],
+            "risk_profile": {},
+            "buildability_score": 100
         }
 
-        # 1️⃣ Blueprint Ingestion
-        blueprint = load_blueprint(file)
+    def execute_pipeline(self, file_path):
+        logger.info(f"🚀 Starting Pipeline for: {file_path}")
 
-        # 2️⃣ Structural Detection
-        detections = detect_structural_elements(blueprint)
+        # 1. Ingestion
+        loader = DrawingLoader(file_path)
+        raw_data = loader.load()
 
-        # 3️⃣ Wall Detection
-        walls = detect_walls(blueprint)
+        # 2. Vision & Perception (YOLO + Hough + OCR)
+        # For now, initializing the detector
+        detector = StructuralDetector()
+        detections = detector.analyze(raw_data)
+        self.project_state["detected_entities"] = detections
 
-        # 4️⃣ OCR Dimension Extraction
-        blueprint["walls"] = walls
-        dimensions = extract_dimensions(blueprint)
+        # 3. Digital Twin & Takeoff
+        builder = DigitalTwinBuilder()
+        self.project_state["spatial_twin"] = builder.generate_twin(detections)
 
-        # 5️⃣ Scale Calibration
-        scale_factor, scale_confidence = calibrate_scale(
-        blueprint,
-        walls,
-        dimensions
-)
+        # 4. Dependency & Scheduling
+        dep_engine = DependencyEngine()
+        graph = dep_engine.build_graph(self.project_state["spatial_twin"])
+        
+        planner = ConstructionPlanner()
+        self.project_state["schedule"] = planner.generate_strategies(graph)
 
-        # 6️⃣ Digital Structural Twin
-        structural_twin = build_structural_twin(
-            detections,
-            walls,
-            dimensions,
-            scale_factor
-        )
+        # 5. Export Data Contract for Dashboard
+        self.export_state()
+        logger.info("✅ Pipeline Execution Complete.")
 
-        # Save detected structure
-        with open(DETECTED_STRUCTURE_FILE, "w") as f:
-            json.dump(structural_twin, f, indent=4)
+    def export_state(self):
+        with open("project_state.json", "w") as f:
+            json.dump(self.project_state, f, indent=4)
+        logger.info("📂 project_state.json exported for Dashboard.")
 
-        # 7️⃣ Quantity Takeoff
-        quantities = compute_quantities(structural_twin)
-
-        # 8️⃣ Dependency Graph
-        dependency_graph = build_dependency_graph(structural_twin)
-
-        # 9️⃣ Scheduling Engine
-        schedule = generate_schedule(dependency_graph, strategy="Balanced")
-
-        # 🔟 Conflict Detection
-        conflicts = detect_conflicts(schedule)
-
-        # 1️⃣1️⃣ Risk Simulation
-        risk_report = simulate_risk(schedule, conflicts)
-
-        # 1️⃣2️⃣ Buildability Score
-        buildability_score = compute_buildability_score(
-            dependency_graph,
-            conflicts,
-            risk_report
-        )
-
-        # 1️⃣3️⃣ Explanation Layer (LLM)
-        explanation = generate_explanation({
-            "schedule": schedule,
-            "conflicts": conflicts,
-            "risk": risk_report,
-            "buildability_score": buildability_score
-        })
-
-        # Final Project State
-        project_state.update({
-            "structural_twin": structural_twin,
-            "quantities": quantities,
-            "schedule": schedule,
-            "conflicts": conflicts,
-            "risk_report": risk_report,
-            "buildability_score": buildability_score,
-            "explanation": explanation,
-            "confidence_overall": min(scale_confidence, structural_twin.get("confidence", 1.0)),
-            "status": "Completed"
-        })
-
-        # Save JSON Contract
-        with open(PROJECT_STATE_FILE, "w") as f:
-            json.dump(project_state, f, indent=4)
-
-        return project_state
-
-
-    # =====================================================
-    # EXECUTION TRIGGER
-    # =====================================================
-
-if uploaded_file is not None:
-        with st.spinner("Running StructuraAI Intelligence Pipeline..."):
-            result = run_pipeline(uploaded_file)
-
-        st.success("Pipeline Completed Successfully")
-
-        st.subheader("Buildability Score")
-        st.metric("Score", f"{result['buildability_score']} / 100")
-
-        st.subheader("Conflicts Detected")
-        st.write(result["conflicts"])
-
-        st.subheader("Risk Report")
-        st.write(result["risk_report"])
-
-        st.subheader("AI Engineering Explanation")
-        st.write(result["explanation"])
-
-        st.subheader("Exported JSON")
-        st.json(result)
+if __name__ == "__main__":
+    core = StructuraAICore()
+    # Replace with actual path during hackathon
+    core.execute_pipeline("data/sample_blueprint.png")
