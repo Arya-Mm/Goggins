@@ -1,6 +1,5 @@
 import math
 
-
 COMMON_DIMENSIONS = [
     (20, 30),
     (24, 36),
@@ -8,22 +7,29 @@ COMMON_DIMENSIONS = [
     (27, 37),
     (30, 40),
     (30, 45),
-    (40, 60)
+    (40, 60),
+    (36, 36),
+    (40, 40),
+    (45, 50),
 ]
 
 
 def calibrate_scale(blueprint, walls, dimensions):
     if not walls:
-        return 1.0, 0.6
+        return 1.0, 0.5
 
-    horizontal = next((w for w in walls if w["orientation"] == "horizontal"), None)
-    vertical = next((w for w in walls if w["orientation"] == "vertical"), None)
+    horizontal_walls = [w for w in walls if w["orientation"] == "horizontal"]
+    vertical_walls = [w for w in walls if w["orientation"] == "vertical"]
 
-    if not horizontal or not vertical:
-        return 1.0, 0.6
+    if not horizontal_walls or not vertical_walls:
+        return 1.0, 0.5
 
-    pixel_width = horizontal["length_pixels"]
-    pixel_height = vertical["length_pixels"]
+    # Select longest outer boundaries
+    longest_horizontal = max(horizontal_walls, key=lambda w: w["length_pixels"])
+    longest_vertical = max(vertical_walls, key=lambda w: w["length_pixels"])
+
+    pixel_width = longest_horizontal["length_pixels"]
+    pixel_height = longest_vertical["length_pixels"]
 
     pixel_ratio = pixel_width / pixel_height
 
@@ -38,8 +44,8 @@ def calibrate_scale(blueprint, walls, dimensions):
             min_error = error
             best_match = (w, h)
 
-    # Accept match if close enough
-    if min_error < 0.1:
+    # Accept only if reasonable match
+    if min_error < 0.15:
         real_width = best_match[0]
         scale_factor = real_width / pixel_width
         return round(scale_factor, 6), 0.9

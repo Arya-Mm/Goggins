@@ -1,7 +1,7 @@
 {
-    "timestamp": "2026-02-28 15:51:56.342511",
+    "timestamp": "2026-02-28 15:54:06.636621",
     "status": "Completed",
-    "confidence_overall": 0.6,
+    "confidence_overall": 0.8,
     "structural_twin": {
         "columns": [],
         "beams": [],
@@ -3362,7 +3362,7 @@
                 "confidence": 0.85
             }
         ],
-        "scale_factor": 1.0,
+        "scale_factor": 0.02094,
         "confidence": 0.8
     },
     "quantities": {},

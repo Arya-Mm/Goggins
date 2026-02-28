@@ -1,56 +1,41 @@
+import math
+
+
+DEFAULT_WALL_THICKNESS = 0.2  # meters
+DEFAULT_WALL_HEIGHT = 3.0     # meters
+
+
 def build_structural_twin(detections, walls, dimensions, scale_factor):
-    """
-    Builds unified structural twin model.
-    Combines detections + wall data + dimensions.
-    """
 
-    columns = detections.get("columns", [])
-    beams = detections.get("beams", [])
-    slabs = detections.get("slabs", [])
+    structured_walls = []
+    total_confidence = []
 
-    twin = {
+    for w in walls:
+
+        real_length = w["length_pixels"] * scale_factor
+
+        volume = real_length * DEFAULT_WALL_THICKNESS * DEFAULT_WALL_HEIGHT
+
+        structured_walls.append({
+            "start": w["start"],
+            "end": w["end"],
+            "orientation": w["orientation"],
+            "length_m": round(real_length, 3),
+            "thickness_m": DEFAULT_WALL_THICKNESS,
+            "height_m": DEFAULT_WALL_HEIGHT,
+            "volume_m3": round(volume, 3),
+            "confidence": w["confidence"]
+        })
+
+        total_confidence.append(w["confidence"])
+
+    overall_conf = sum(total_confidence) / len(total_confidence) if total_confidence else 0.5
+
+    return {
         "columns": [],
         "beams": [],
         "slabs": [],
-        "walls": walls,
+        "walls": structured_walls,
         "scale_factor": scale_factor,
-        "confidence": detections.get("confidence", 0.8)
+        "confidence": round(overall_conf, 3)
     }
-
-    # Convert bbox to geometry with scale applied
-    for col in columns:
-        x1, y1, x2, y2 = col["bbox"]
-        width = (x2 - x1) * scale_factor
-        height = (y2 - y1) * scale_factor
-
-        twin["columns"].append({
-            "geometry": {
-                "width": round(width, 3),
-                "height": round(height, 3)
-            },
-            "confidence": col["confidence"]
-        })
-
-    for beam in beams:
-        x1, y1, x2, y2 = beam["bbox"]
-        length = (x2 - x1) * scale_factor
-
-        twin["beams"].append({
-            "geometry": {
-                "length": round(length, 3)
-            },
-            "confidence": beam["confidence"]
-        })
-
-    for slab in slabs:
-        x1, y1, x2, y2 = slab["bbox"]
-        area = ((x2 - x1) * (y2 - y1)) * scale_factor
-
-        twin["slabs"].append({
-            "geometry": {
-                "area": round(area, 3)
-            },
-            "confidence": slab["confidence"]
-        })
-
-    return twin
