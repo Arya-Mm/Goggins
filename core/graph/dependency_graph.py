@@ -10,17 +10,16 @@ def generate_tasks_from_twin(
     tasks = []
     dependencies = []
 
-    # =========================
-    # WALLS → BUILD → CURE → INSTALL (SEQUENCED)
-    # =========================
+    print(">>> USING SEQUENTIAL INSTALL MODEL <<<")
+
     for i, wall in enumerate(twin.get("walls", [])):
 
         build_id = f"wall_build_{i}"
         cure_id = f"wall_cure_{i}"
 
-        # -----------------------------------
-        # WALL BUILD DURATION (Productivity-aware)
-        # -----------------------------------
+        # -----------------------------
+        # WALL BUILD DURATION
+        # -----------------------------
         base_duration = max(
             1,
             math.ceil(wall.get("net_volume_cuft", 1) / 10)
@@ -31,9 +30,6 @@ def generate_tasks_from_twin(
             math.ceil(base_duration / productivity_factor)
         )
 
-        # -----------------------------------
-        # BUILD TASK
-        # -----------------------------------
         tasks.append({
             "task_id": build_id,
             "duration": adjusted_build_duration,
@@ -41,9 +37,6 @@ def generate_tasks_from_twin(
             "type": "wall_build"
         })
 
-        # -----------------------------------
-        # CURING TASK
-        # -----------------------------------
         tasks.append({
             "task_id": cure_id,
             "duration": curing_days,
@@ -53,44 +46,38 @@ def generate_tasks_from_twin(
 
         dependencies.append((build_id, cure_id))
 
-        # -----------------------------------
-        # INSTALL TASKS (SEQUENTIAL CHAIN)
-        # -----------------------------------
+        # -----------------------------
+        # INSTALL TASKS (STRICT CHAIN)
+        # -----------------------------
 
-        install_tasks = []
+        install_ids = []
 
-        # DOORS
         for d in range(wall.get("attached_doors", 0)):
             door_id = f"door_install_{i}_{d}"
-
             tasks.append({
                 "task_id": door_id,
                 "duration": 1,
                 "resource": 1,
                 "type": "door_install"
             })
+            install_ids.append(door_id)
 
-            install_tasks.append(door_id)
-
-        # WINDOWS
         for w in range(wall.get("attached_windows", 0)):
-            window_id = f"window_install_{i}_{w}"
-
+            win_id = f"window_install_{i}_{w}"
             tasks.append({
-                "task_id": window_id,
+                "task_id": win_id,
                 "duration": 1,
                 "resource": 1,
                 "type": "window_install"
             })
+            install_ids.append(win_id)
 
-            install_tasks.append(window_id)
+        # Force strict sequencing
+        if install_ids:
+            dependencies.append((cure_id, install_ids[0]))
 
-        # Chain installs sequentially
-        previous_task = cure_id
-
-        for install_id in install_tasks:
-            dependencies.append((previous_task, install_id))
-            previous_task = install_id
+            for j in range(1, len(install_ids)):
+                dependencies.append((install_ids[j-1], install_ids[j]))
 
     return tasks, dependencies
 
@@ -104,6 +91,10 @@ def build_dependency_graph(tasks, dependencies):
 
     for dep in dependencies:
         G.add_edge(dep[0], dep[1])
+
+    print("Dependencies:")
+    for edge in G.edges:
+        print(edge)
 
     cycle_valid = nx.is_directed_acyclic_graph(G)
 
