@@ -1,0 +1,13 @@
+streamlit==1.54.0
+plotly==5.22.0
+pandas==2.3.3
+numpy==2.4.2
+networkx==3.3
+pdfplumber
+pymupdf
+ultralytics
+reportlab
+regex
+opencv-python-headless
+ultralytics
+opencv-python-headless
