@@ -15,30 +15,24 @@ def run_cpm(G, crew_capacity=None):
     # Initial CPM
     G = compute_cpm(G)
 
-    # Resource leveling
+    # Resource leveling (non-destructive)
     if crew_capacity is not None and len(G.nodes) > 0:
         G = apply_resource_leveling(G, crew_capacity)
-        G = compute_cpm(G)  # Recalculate after leveling
+        G = compute_cpm(G)  # Recompute ES/EF/LS/LF after leveling
 
-    # Total duration
-    total_duration = max(
-        G.nodes[n].get("EF", 0) for n in G.nodes
-    )
+    total_duration = max(G.nodes[n]["EF"] for n in G.nodes)
 
-    # TRUE Critical Path (Longest Path in DAG)
+    # TRUE critical path using longest path
     critical_path = nx.algorithms.dag.dag_longest_path(G, weight="duration")
 
     return G, critical_path, total_duration
 
 
 # =====================================================
-# CPM CALCULATION
+# CPM CORE
 # =====================================================
 
 def compute_cpm(G):
-
-    if len(G.nodes) == 0:
-        return G
 
     topo_order = list(nx.topological_sort(G))
 
@@ -53,10 +47,9 @@ def compute_cpm(G):
             ES = max(G.nodes[p]["EF"] for p in preds)
 
         duration = G.nodes[node].get("duration", 0)
-        EF = ES + duration
 
         G.nodes[node]["ES"] = ES
-        G.nodes[node]["EF"] = EF
+        G.nodes[node]["EF"] = ES + duration
 
     total_duration = max(G.nodes[n]["EF"] for n in G.nodes)
 
@@ -71,23 +64,19 @@ def compute_cpm(G):
             LF = min(G.nodes[s]["LS"] for s in succs)
 
         duration = G.nodes[node].get("duration", 0)
-        LS = LF - duration
 
         G.nodes[node]["LF"] = LF
-        G.nodes[node]["LS"] = LS
-        G.nodes[node]["slack"] = LS - G.nodes[node]["ES"]
+        G.nodes[node]["LS"] = LF - duration
+        G.nodes[node]["slack"] = G.nodes[node]["LS"] - G.nodes[node]["ES"]
 
     return G
 
 
 # =====================================================
-# RESOURCE LEVELING
+# RESOURCE LEVELING (FLOAT-PRESERVING)
 # =====================================================
 
 def apply_resource_leveling(G, crew_capacity):
-
-    if len(G.nodes) == 0:
-        return G
 
     timeline = build_timeline(G)
 
@@ -97,7 +86,7 @@ def apply_resource_leveling(G, crew_capacity):
 
         if len(active_tasks) > crew_capacity:
 
-            # Sort by ES (priority = earlier tasks first)
+            # Sort by earliest start
             active_tasks_sorted = sorted(
                 active_tasks,
                 key=lambda n: G.nodes[n]["ES"]
@@ -110,7 +99,7 @@ def apply_resource_leveling(G, crew_capacity):
 
                 if G.nodes[task]["ES"] < new_start:
                     shift = new_start - G.nodes[task]["ES"]
-                    delay_task(G, task, shift)
+                    delay_task_non_recursive(G, task, shift)
 
     return G
 
@@ -129,13 +118,21 @@ def build_timeline(G):
     return timeline
 
 
-def delay_task(G, node, shift):
+# =====================================================
+# NON-RECURSIVE DELAY (CRITICAL FIX)
+# =====================================================
 
+def delay_task_non_recursive(G, node, shift):
+
+    # Shift only this node
     G.nodes[node]["ES"] += shift
     G.nodes[node]["EF"] += shift
 
-    # Propagate shift forward
+    # Only ensure precedence validity
     for succ in G.successors(node):
+
         if G.nodes[succ]["ES"] < G.nodes[node]["EF"]:
-            needed_shift = G.nodes[node]["EF"] - G.nodes[succ]["ES"]
-            delay_task(G, succ, needed_shift)
+            required_shift = G.nodes[node]["EF"] - G.nodes[succ]["ES"]
+
+            G.nodes[succ]["ES"] += required_shift
+            G.nodes[succ]["EF"] += required_shift
