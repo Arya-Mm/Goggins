@@ -110,7 +110,7 @@ if uploaded_file:
         df_qty = pd.DataFrame(qty_data)
         st.dataframe(df_qty, use_container_width=True)
     else:
-        st.info("No quantity data available.")
+        st.write("No quantity data available.")
 
     st.divider()
 
@@ -125,7 +125,7 @@ if uploaded_file:
         df_phase = pd.DataFrame(phase_data)
         st.dataframe(df_phase, use_container_width=True)
     else:
-        st.info("Phase breakdown not available.")
+        st.write("Phase breakdown not available.")
 
     st.divider()
 
@@ -137,7 +137,21 @@ if uploaded_file:
     sequence = data.get("execution_sequence", [])
 
     if sequence:
-        st.success(" → ".join(sequence))
+        formatted_sequence = "  →  ".join(
+            [humanize_label(s) for s in sequence]
+        )
+
+        st.markdown(
+            f"""
+            <div style="padding:15px;
+                        background-color:#1E293B;
+                        border-radius:8px;
+                        font-weight:600;">
+            {formatted_sequence}
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
 
     st.divider()
 
@@ -180,9 +194,10 @@ if uploaded_file:
 
     if conflicts:
         for conflict in conflicts:
-            st.warning(conflict.get("description", "Conflict detected"))
+            description = conflict.get("description", "Conflict detected")
+            st.write(f"• {humanize_label(description)}")
     else:
-        st.success("No resource overload conflicts detected.")
+        st.write("No resource conflicts detected.")
 
     st.divider()
 
