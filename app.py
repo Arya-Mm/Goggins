@@ -9,36 +9,56 @@ from core.pipeline.analyzer import analyze_project
 from core.pipeline.streamlit_adapter import adapt_to_dashboard_schema
 
 # ─────────────────────────────────────────
-# Page Config
+# Page Configuration
 # ─────────────────────────────────────────
 st.set_page_config(layout="wide")
 st.title("StructuraAI — Construction Intelligence Platform")
 
 # ─────────────────────────────────────────
-# Project Type Selection
+# Execution Strategy Selector (NEW)
 # ─────────────────────────────────────────
-project_type = st.radio(
-    "Project Category",
-    ["Residential", "Commercial", "Industrial"],
+st.subheader("Execution Strategy")
+
+strategy = st.radio(
+    "Select planning strategy",
+    ["Cost Optimized", "Balanced", "Fast Track"],
     horizontal=True
 )
 
-st.caption(f"Current Selection: {project_type}")
+st.caption(
+    "Cost Optimized reduces crew and extends timeline. "
+    "Balanced maintains baseline configuration. "
+    "Fast Track increases parallel execution and reduces schedule."
+)
+
+# Strategy multipliers
+if strategy == "Cost Optimized":
+    strategy_duration_factor = 1.15
+    strategy_cost_factor = 0.95
+elif strategy == "Fast Track":
+    strategy_duration_factor = 0.85
+    strategy_cost_factor = 1.10
+else:  # Balanced
+    strategy_duration_factor = 1.0
+    strategy_cost_factor = 1.0
 
 uploaded_file = st.file_uploader(
     "Upload Structural Blueprint (PDF)",
     type=["pdf"]
 )
 
+# ─────────────────────────────────────────
+# Main Processing
+# ─────────────────────────────────────────
 if uploaded_file:
 
-    with st.spinner("Running structural analysis..."):
+    with st.spinner("Analyzing structural drawing..."):
 
         with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
             tmp.write(uploaded_file.read())
             tmp_path = tmp.name
 
-        raw_result = analyze_project(tmp_path, project_type=project_type)
+        raw_result = analyze_project(tmp_path)
 
         if "error" in raw_result:
             st.error(raw_result["error"])
@@ -47,57 +67,70 @@ if uploaded_file:
         data = adapt_to_dashboard_schema(raw_result)
 
     # ─────────────────────────────────────────
-    # KPI Row
+    # Base Metrics
     # ─────────────────────────────────────────
-    col1, col2, col3, col4 = st.columns(4)
-
-    col1.metric("Detection Confidence",
-                f"{round(data['detection_confidence'] * 100, 2)}%")
-
-    col2.metric("Estimated Duration (days)",
-                data["adjusted_metrics"]["duration"])
-
-    col3.metric("Buildability Score",
-                data["adjusted_metrics"]["buildability"])
-
-    col4.metric("Overall Risk Index",
-                round(data["adjusted_metrics"]["risk"], 2))
-
-    st.divider()
-
-    # ─────────────────────────────────────────
-    # Scenario Simulation
-    # ─────────────────────────────────────────
-    st.subheader("Scenario Planning")
-
-    labor = st.slider("Workforce Available", 5, 100, 20)
-    delay = st.slider("Material Delay (days)", 0, 60, 5)
-    budget_factor = st.slider("Budget Flexibility", 0.8, 1.5, 1.0)
-
     base_duration = data["adjusted_metrics"]["duration"]
     base_cost = data["cost_estimation"]["total_project_cost"]
     base_risk = data["adjusted_metrics"]["risk"]
+    base_build = data["adjusted_metrics"]["buildability"]
 
-    revised_duration = int(base_duration * (1 + delay / 100))
-    revised_cost = base_cost * budget_factor
-    revised_risk = min(100, base_risk + delay * 0.3)
+    strategy_duration = int(base_duration * strategy_duration_factor)
+    strategy_cost = base_cost * strategy_cost_factor
 
-    c1, c2, c3 = st.columns(3)
-    c1.metric("Revised Duration", revised_duration)
-    c2.metric("Revised Budget", f"₹{revised_cost:,.0f}")
-    c3.metric("Revised Risk", round(revised_risk, 2))
+    st.subheader("Project Overview")
+
+    c1, c2, c3, c4 = st.columns(4)
+    c1.metric("Detection Confidence",
+              f"{round(data['detection_confidence']*100,2)}%")
+    c2.metric("Planned Duration (days)", strategy_duration)
+    c3.metric("Estimated Budget", f"₹{strategy_cost:,.0f}")
+    c4.metric("Buildability Score", base_build)
 
     st.divider()
 
     # ─────────────────────────────────────────
-    # Interactive Dependency Graph
+    # Advanced Scenario Simulation (± Values)
     # ─────────────────────────────────────────
-    st.subheader("Execution Flow & Dependencies")
+    st.subheader("Scenario Adjustment")
+
+    labor_delta = st.slider(
+        "Workforce Adjustment (%)",
+        -50, 50, 0
+    )
+
+    delay_delta = st.slider(
+        "Material Delay (days)",
+        -30, 60, 0
+    )
+
+    budget_delta = st.slider(
+        "Budget Adjustment (%)",
+        -30, 50, 0
+    )
+
+    # Revised logic (supports negative)
+    labor_factor = 1 - (labor_delta / 100)
+    revised_duration = int(strategy_duration * labor_factor + delay_delta)
+
+    revised_cost = strategy_cost * (1 + budget_delta / 100)
+    revised_risk = max(0, min(100, base_risk + delay_delta*0.4 - labor_delta*0.2))
+
+    s1, s2, s3 = st.columns(3)
+    s1.metric("Revised Duration", revised_duration)
+    s2.metric("Revised Budget", f"₹{revised_cost:,.0f}")
+    s3.metric("Revised Risk Index", round(revised_risk,2))
+
+    st.divider()
+
+    # ─────────────────────────────────────────
+    # Enterprise Dependency Graph
+    # ─────────────────────────────────────────
+    st.subheader("Execution Network")
 
     graph_data = data.get("dependency_graph", {})
     critical_path = data.get("critical_path", [])
 
-    show_only_critical = st.checkbox("Highlight Critical Path Only")
+    highlight_only = st.checkbox("Show only critical path")
 
     if graph_data:
 
@@ -105,7 +138,7 @@ if uploaded_file:
         G.add_nodes_from(graph_data["nodes"])
         G.add_edges_from(graph_data["edges"])
 
-        pos = nx.spring_layout(G, k=0.8, iterations=100, seed=42)
+        pos = nx.spring_layout(G, k=0.9, iterations=120, seed=42)
 
         edge_x, edge_y = [], []
         crit_x, crit_y = [], []
@@ -117,24 +150,24 @@ if uploaded_file:
             if edge[0] in critical_path and edge[1] in critical_path:
                 crit_x += [x0, x1, None]
                 crit_y += [y0, y1, None]
-            elif not show_only_critical:
+            elif not highlight_only:
                 edge_x += [x0, x1, None]
                 edge_y += [y0, y1, None]
 
         edge_trace = go.Scatter(
             x=edge_x,
             y=edge_y,
-            line=dict(width=1.5, color="#B0B0B0"),
-            hoverinfo="none",
-            mode="lines"
+            mode="lines",
+            line=dict(width=1.2, color="#B0B0B0"),
+            hoverinfo="none"
         )
 
         critical_trace = go.Scatter(
             x=crit_x,
             y=crit_y,
+            mode="lines",
             line=dict(width=4, color="#C62828"),
-            hoverinfo="none",
-            mode="lines"
+            hoverinfo="none"
         )
 
         node_x, node_y, node_text, node_color = [], [], [], []
@@ -145,10 +178,9 @@ if uploaded_file:
             node_y.append(y)
             node_text.append(node)
 
-            if node in critical_path:
-                node_color.append("#C62828")
-            else:
-                node_color.append("#2E4053")
+            node_color.append(
+                "#C62828" if node in critical_path else "#2E4053"
+            )
 
         node_trace = go.Scatter(
             x=node_x,
@@ -156,45 +188,43 @@ if uploaded_file:
             mode="markers+text",
             text=node_text,
             textposition="top center",
-            hovertemplate="<b>%{text}</b>",
             marker=dict(
-                size=28,
+                size=30,
                 color=node_color,
                 line=dict(width=2, color="#FFFFFF")
-            )
+            ),
+            hovertemplate="<b>%{text}</b><extra></extra>"
         )
 
-        fig_graph = go.Figure(data=[edge_trace, critical_trace, node_trace])
+        fig = go.Figure(data=[edge_trace, critical_trace, node_trace])
 
-        fig_graph.update_layout(
-            height=500,
+        fig.update_layout(
+            height=520,
             plot_bgcolor="white",
             paper_bgcolor="white",
             margin=dict(l=20, r=20, t=20, b=20),
-            xaxis=dict(showgrid=False, zeroline=False, visible=False),
-            yaxis=dict(showgrid=False, zeroline=False, visible=False)
+            xaxis=dict(showgrid=False, visible=False),
+            yaxis=dict(showgrid=False, visible=False)
         )
 
-        st.plotly_chart(fig_graph, use_container_width=True)
+        st.plotly_chart(fig, use_container_width=True)
 
-        st.markdown(
-            """
-            🔴 **Critical Path** — Any delay here impacts final delivery  
-            ⚫ **Parallel Tasks** — Independent or buffered activities
-            """
+        st.caption(
+            "Red nodes and connections indicate the critical execution path. "
+            "Delays here directly affect final completion."
         )
 
     st.divider()
 
     # ─────────────────────────────────────────
-    # Risk Overview
+    # Risk Distribution
     # ─────────────────────────────────────────
-    st.subheader("Risk Profile")
+    st.subheader("Risk by Phase")
 
     if data["risk_matrix"]:
         df_risk = pd.DataFrame(data["risk_matrix"])
 
-        fig = px.bar(
+        fig_risk = px.bar(
             df_risk,
             x="phase",
             y="risk",
@@ -202,13 +232,12 @@ if uploaded_file:
             color_continuous_scale="Reds"
         )
 
-        fig.update_layout(
-            title="Risk Distribution Across Phases",
+        fig_risk.update_layout(
             xaxis_title="Project Phase",
-            yaxis_title="Risk Index",
+            yaxis_title="Risk Index"
         )
 
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig_risk, use_container_width=True)
 
     st.divider()
 
@@ -222,26 +251,25 @@ if uploaded_file:
         df_schedule["start"] = pd.to_datetime(df_schedule["start"])
         df_schedule["finish"] = pd.to_datetime(df_schedule["finish"])
 
-        fig = px.timeline(
+        fig_timeline = px.timeline(
             df_schedule,
             x_start="start",
             x_end="finish",
             y="task"
         )
 
-        fig.update_yaxes(autorange="reversed")
-
-        st.plotly_chart(fig, use_container_width=True)
+        fig_timeline.update_yaxes(autorange="reversed")
+        st.plotly_chart(fig_timeline, use_container_width=True)
 
     st.divider()
 
     # ─────────────────────────────────────────
-    # PDF Download
+    # PDF Export
     # ─────────────────────────────────────────
     if "pdf_path" in raw_result:
         with open(raw_result["pdf_path"], "rb") as f:
             st.download_button(
-                label="Download Project Intelligence Report",
+                label="Download Full Intelligence Report",
                 data=f,
                 file_name="structuraai_report.pdf",
                 mime="application/pdf"
