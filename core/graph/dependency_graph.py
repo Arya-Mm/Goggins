@@ -1,17 +1,18 @@
+# core/graph/dependency_graph.py
+
 import networkx as nx
 import math
 
 
 def generate_tasks_from_twin(
     twin,
-    productivity_factor=1.0,
-    curing_days=2,
-    crew_capacity=2
+    productivity_factor=0.6,
+    curing_days=5,
+    crew_capacity=3
 ):
+
     tasks = []
     dependencies = []
-
-    print(">>> USING BATCHED INSTALL MODEL <<<")
 
     for i, wall in enumerate(twin.get("walls", [])):
 
@@ -19,11 +20,13 @@ def generate_tasks_from_twin(
         cure_id = f"wall_cure_{i}"
 
         # -----------------------------
-        # BUILD DURATION
+        # WALL BUILD DURATION
         # -----------------------------
+        volume = wall.get("net_volume_cuft", 10)
+
         base_duration = max(
             1,
-            math.ceil(wall.get("net_volume_cuft", 1) / 10)
+            math.ceil(volume / 8)
         )
 
         adjusted_build_duration = max(
@@ -48,7 +51,7 @@ def generate_tasks_from_twin(
         dependencies.append((build_id, cure_id))
 
         # -----------------------------
-        # INSTALL TASKS
+        # DOOR + WINDOW INSTALLS
         # -----------------------------
         install_ids = []
 
@@ -56,7 +59,7 @@ def generate_tasks_from_twin(
             door_id = f"door_install_{i}_{d}"
             tasks.append({
                 "task_id": door_id,
-                "duration": 1,
+                "duration": 2,
                 "resource": 1,
                 "type": "door_install"
             })
@@ -66,14 +69,14 @@ def generate_tasks_from_twin(
             win_id = f"window_install_{i}_{w}"
             tasks.append({
                 "task_id": win_id,
-                "duration": 1,
+                "duration": 2,
                 "resource": 1,
                 "type": "window_install"
             })
             install_ids.append(win_id)
 
         # -----------------------------
-        # BATCHING LOGIC
+        # PARALLEL BATCHING LOGIC
         # -----------------------------
         if install_ids:
 
@@ -88,7 +91,6 @@ def generate_tasks_from_twin(
 
                 batch_anchor = f"batch_{i}_{batch_index}"
 
-                # Dummy anchor node to represent batch completion
                 tasks.append({
                     "task_id": batch_anchor,
                     "duration": 0,
@@ -96,7 +98,7 @@ def generate_tasks_from_twin(
                     "type": "batch_anchor"
                 })
 
-                # All tasks in batch depend on previous anchor
+                # All installs in batch start after previous anchor
                 for task_id in batch:
                     dependencies.append((previous_anchor, task_id))
                     dependencies.append((task_id, batch_anchor))

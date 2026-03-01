@@ -30,9 +30,11 @@ def analyze_project(pdf_path, stress_config=None):
     twin = twin_builder.build(vision_output)
 
     # ======================
-    # Scale Calibration (FIXED)
+    # Scale Calibration
     # ======================
-    scale_info = calibrate_scale(vision_output.get("dimensions", []))
+    scale_info = calibrate_scale(
+        vision_output.get("dimensions", [])
+    )
 
     # ======================
     # Quantity
@@ -40,13 +42,13 @@ def analyze_project(pdf_path, stress_config=None):
     quantities = calculate_quantities(twin)
 
     # ======================
-    # Scheduling
+    # Scheduling (Improved Realism)
     # ======================
     tasks, dependencies = generate_tasks_from_twin(
         twin,
-        productivity_factor=1.0,
-        curing_days=2,
-        crew_capacity=2
+        productivity_factor=0.6,
+        curing_days=5,
+        crew_capacity=3
     )
 
     G, cycle_valid = build_dependency_graph(tasks, dependencies)
@@ -54,9 +56,15 @@ def analyze_project(pdf_path, stress_config=None):
     if not cycle_valid:
         return {"error": "Dependency cycle detected"}
 
-    G, critical_path, total_duration = run_cpm(G, crew_capacity=2)
+    G, critical_path, total_duration = run_cpm(
+        G,
+        crew_capacity=3
+    )
 
-    conflicts = detect_conflicts(G, crew_capacity=2)
+    conflicts = detect_conflicts(
+        G,
+        crew_capacity=3
+    )
 
     # ======================
     # Risk
@@ -68,6 +76,9 @@ def analyze_project(pdf_path, stress_config=None):
         twin=twin,
         critical_path=critical_path
     )
+
+    # Inject real conflict details into risk
+    risk["conflict_details"] = conflicts
 
     # ======================
     # Buildability
