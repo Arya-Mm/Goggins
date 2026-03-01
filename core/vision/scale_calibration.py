@@ -1,23 +1,12 @@
 # core/vision/scale_calibration.py
 
 def calibrate_scale(detected_dimensions):
-    """
-    Converts pixel length to real-world scale.
 
-    detected_dimensions:
-        [
-            {
-                "pixel_length": float,
-                "real_length_inches": float
-            }
-        ]
-    """
-
-    # No dimension detected
+    # If no dimensions detected, assume default DPI silently
     if not detected_dimensions:
         return {
-            "pixels_per_inch": 96,  # Safe assumed DPI
-            "calibration_status": "ASSUMED_DEFAULT_SCALE"
+            "pixels_per_inch": 96,
+            "calibration_status": "DEFAULT_SCALE_APPLIED"
         }
 
     dim = detected_dimensions[0]
@@ -28,7 +17,7 @@ def calibrate_scale(detected_dimensions):
     if not pixel_length or not real_length_inches:
         return {
             "pixels_per_inch": 96,
-            "calibration_status": "ASSUMED_INVALID_INPUT"
+            "calibration_status": "DEFAULT_SCALE_APPLIED"
         }
 
     try:
@@ -42,5 +31,5 @@ def calibrate_scale(detected_dimensions):
     except:
         return {
             "pixels_per_inch": 96,
-            "calibration_status": "ASSUMED_FALLBACK"
+            "calibration_status": "DEFAULT_SCALE_APPLIED"
         }
