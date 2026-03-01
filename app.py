@@ -1,158 +1,289 @@
 import streamlit as st
-import pandas as pd
 import plotly.express as px
-import networkx as nx
 import plotly.graph_objects as go
+import pandas as pd
+from pathlib import Path
+import tempfile
 
-from main import run_vision_stage, run_planning_stage, export_pdf
+# Backend imports
+from core.pipeline.analyzer import analyze_project
+from core.pipeline.streamlit_adapter import adapt_to_dashboard_schema
 
-st.set_page_config(layout="wide")
-st.title("STRUCTURA AI — Production Intelligence")
+# ============================================================
+# PAGE CONFIG
+# ============================================================
 
-# ─────────────────────────────────────────────
-# SESSION STATE
-# ─────────────────────────────────────────────
-if "twin" not in st.session_state:
-    st.session_state.twin = None
+st.set_page_config(
+    layout="wide",
+    page_title="StructuraAI — Command Center",
+    page_icon="🏗️"
+)
 
-if "planning_state" not in st.session_state:
-    st.session_state.planning_state = None
+st.title("🏗️ StructuraAI — Construction Intelligence Command Center")
+st.caption("AI-Powered Structural Analysis | Scheduling | Risk | Buildability")
 
-if "profiling" not in st.session_state:
-    st.session_state.profiling = {}
+# ============================================================
+# SIDEBAR — WHAT IF CONTROLS
+# ============================================================
 
-# ─────────────────────────────────────────────
+st.sidebar.header("🔧 What-If Simulation Controls")
+
+crew_capacity = st.sidebar.slider("Crew Capacity", 1, 10, 2)
+productivity_factor = st.sidebar.slider("Productivity Factor", 0.5, 2.0, 1.0)
+curing_days = st.sidebar.slider("Curing Days", 1, 7, 2)
+
+st.sidebar.divider()
+
+selected_strategy = st.sidebar.selectbox(
+    "Execution Strategy",
+    ["Baseline", "Fast Track", "Cost Optimized"]
+)
+
+# ============================================================
 # FILE UPLOAD
-# ─────────────────────────────────────────────
-uploaded_files = st.file_uploader(
-    "Upload Blueprint PDFs",
-    type=["pdf"],
-    accept_multiple_files=True
+# ============================================================
+
+uploaded_file = st.file_uploader(
+    "Upload Civil Drawing (PDF)",
+    type=["pdf"]
 )
 
-# ─────────────────────────────────────────────
-# SIDEBAR CONTROLS
-# ─────────────────────────────────────────────
-strategy = st.sidebar.selectbox(
-    "Strategy", ["Balanced", "FastTrack", "CostOptimized"]
-)
+if uploaded_file:
 
-crew = st.sidebar.slider("Crew Capacity", 1, 6, 2)
-productivity = st.sidebar.slider("Productivity", 0.5, 1.5, 1.0)
-curing = st.sidebar.slider("Curing Days", 1, 5, 2)
+    with st.spinner("Analyzing blueprint and generating structural intelligence..."):
 
-# ─────────────────────────────────────────────
-# RUN VISION
-# ─────────────────────────────────────────────
-if st.button("Run Vision Stage"):
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
+            tmp.write(uploaded_file.read())
+            tmp_path = tmp.name
 
-    if not uploaded_files:
-        st.warning("Upload at least one PDF.")
-        st.stop()
+        # Pass dynamic simulation parameters to backend
+        raw_result = analyze_project(
+            tmp_path,
+            crew_capacity=crew_capacity,
+            productivity_factor=productivity_factor,
+            curing_days=curing_days,
+            strategy=selected_strategy
+        )
 
-    progress = st.progress(0)
+        if "error" in raw_result:
+            st.error(raw_result["error"])
+            st.stop()
 
-    for file in uploaded_files:
+        data = adapt_to_dashboard_schema(raw_result)
 
-        progress.progress(10)
+    # ============================================================
+    # EXECUTIVE KPI SECTION
+    # ============================================================
 
-        result = run_vision_stage(file.read())
+    st.markdown("## 📊 Executive Metrics")
 
-        st.session_state.twin = result
-        st.session_state.profiling["vision_time"] = result["stage_time"]
+    risk_score = raw_result["risk"]["risk_score"]
+    build_score = raw_result["buildability"]["final_score"]
 
-        progress.progress(100)
+    def risk_color(score):
+        if score < 40:
+            return "green"
+        elif score < 70:
+            return "orange"
+        else:
+            return "red"
 
-# ─────────────────────────────────────────────
-# RUN PLANNING
-# ─────────────────────────────────────────────
-if st.button("Run Planning Stage"):
+    col1, col2, col3, col4 = st.columns(4)
 
-    if st.session_state.twin is None:
-        st.warning("Run Vision Stage first.")
-        st.stop()
-
-    progress = st.progress(0)
-
-    result = run_planning_stage(
-        st.session_state.twin["twin"],
-        strategy,
-        crew,
-        productivity,
-        curing
+    col1.metric(
+        "Detection Confidence",
+        f"{round(data['detection_confidence'] * 100, 2)}%"
     )
 
-    if "error" in result:
-        st.error(result["error"])
-        st.stop()
+    col2.metric(
+        "Project Duration (Days)",
+        data["adjusted_metrics"]["duration"]
+    )
 
-    st.session_state.planning_state = result
-    st.session_state.profiling["planning_time"] = result["stage_time"]
+    col3.markdown(
+        f"<h3 style='color:{risk_color(risk_score)}'>Risk Score: {risk_score}</h3>",
+        unsafe_allow_html=True
+    )
 
-    progress.progress(100)
+    col4.markdown(
+        f"<h3 style='color:{risk_color(100 - build_score)}'>Buildability: {build_score}</h3>",
+        unsafe_allow_html=True
+    )
 
-# ─────────────────────────────────────────────
-# DASHBOARD DISPLAY
-# ─────────────────────────────────────────────
-state = st.session_state.planning_state
+    st.divider()
 
-if state:
+    # ============================================================
+    # RISK GAUGE
+    # ============================================================
 
-    st.metric("Total Duration", state["duration"])
+    st.subheader("🚨 Overall Risk Gauge")
 
-    st.subheader("Conflicts")
-    for c in state["conflicts"]:
-        st.warning(c.get("description"))
+    fig_gauge = go.Figure(go.Indicator(
+        mode="gauge+number",
+        value=risk_score,
+        title={'text': "Project Risk"},
+        gauge={
+            'axis': {'range': [0, 100]},
+            'bar': {'color': risk_color(risk_score)},
+            'steps': [
+                {'range': [0, 40], 'color': "green"},
+                {'range': [40, 70], 'color': "orange"},
+                {'range': [70, 100], 'color': "red"}
+            ],
+        }
+    ))
 
-    st.subheader("Risk")
-    df_risk = pd.DataFrame(state["risk"]["phase_risk"])
-    fig = px.bar(df_risk, x="phase", y="risk")
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig_gauge, use_container_width=True)
 
-    st.subheader("Dependency Graph")
+    st.divider()
 
-    G = state["graph"]
-    pos = nx.spring_layout(G, seed=42)
+    # ============================================================
+    # QUANTITY TAKEOFF
+    # ============================================================
 
-    edge_x, edge_y = [], []
-    for e in G.edges():
-        x0,y0 = pos[e[0]]
-        x1,y1 = pos[e[1]]
-        edge_x.extend([x0,x1,None])
-        edge_y.extend([y0,y1,None])
+    st.subheader("📦 Quantity Takeoff")
 
-    node_x, node_y = [], []
-    for n in G.nodes():
-        x,y = pos[n]
-        node_x.append(x)
-        node_y.append(y)
+    if data["quantity_takeoff"]:
+        df_qto = pd.DataFrame(data["quantity_takeoff"])
+        st.dataframe(df_qto, use_container_width=True)
+    else:
+        st.info("No quantity data available.")
 
-    fig_graph = go.Figure()
-    fig_graph.add_trace(go.Scatter(x=edge_x, y=edge_y, mode="lines"))
-    fig_graph.add_trace(go.Scatter(x=node_x, y=node_y, mode="markers+text", text=list(G.nodes())))
-    st.plotly_chart(fig_graph, use_container_width=True)
+    st.divider()
 
-    # ─────────────────────────────────────────
-    # PDF EXPORT
-    # ─────────────────────────────────────────
-    if st.button("Generate PDF Report"):
-        filename = export_pdf(state)
-        with open(filename, "rb") as f:
+    # ============================================================
+    # COST ESTIMATION
+    # ============================================================
+
+    st.subheader("💰 Cost Estimation")
+
+    total_cost = data["cost_estimation"]["total_project_cost"]
+    st.metric("Total Project Cost", f"₹{total_cost:,.0f}")
+
+    if "phase_costs" in data["cost_estimation"]:
+        df_cost = pd.DataFrame(data["cost_estimation"]["phase_costs"])
+        fig_cost = px.bar(df_cost, x="phase", y="cost", title="Phase Cost Distribution")
+        st.plotly_chart(fig_cost, use_container_width=True)
+
+    st.divider()
+
+    # ============================================================
+    # SCHEDULE (GANTT)
+    # ============================================================
+
+    st.subheader("📅 Project Schedule")
+
+    if data["schedule"]:
+        df_schedule = pd.DataFrame(data["schedule"])
+        df_schedule["start"] = pd.to_datetime(df_schedule["start"])
+        df_schedule["finish"] = pd.to_datetime(df_schedule["finish"])
+
+        fig_schedule = px.timeline(
+            df_schedule,
+            x_start="start",
+            x_end="finish",
+            y="task"
+        )
+
+        fig_schedule.update_yaxes(autorange="reversed")
+        st.plotly_chart(fig_schedule, use_container_width=True)
+    else:
+        st.info("No schedule data available.")
+
+    st.divider()
+
+    # ============================================================
+    # STRATEGY COMPARISON
+    # ============================================================
+
+    st.subheader("⚡ Strategy Comparison")
+
+    baseline_duration = data["adjusted_metrics"]["duration"]
+    fast_track = int(baseline_duration * 0.9)
+    cost_opt = int(baseline_duration * 1.1)
+
+    df_strategy = pd.DataFrame({
+        "Strategy": ["Baseline", "Fast Track", "Cost Optimized"],
+        "Duration": [baseline_duration, fast_track, cost_opt]
+    })
+
+    fig_strategy = px.bar(df_strategy, x="Strategy", y="Duration")
+    st.plotly_chart(fig_strategy, use_container_width=True)
+
+    st.divider()
+
+    # ============================================================
+    # RISK MATRIX
+    # ============================================================
+
+    st.subheader("📊 Risk Matrix")
+
+    if data["risk_matrix"]:
+        df_risk = pd.DataFrame(data["risk_matrix"])
+        fig_risk = px.bar(
+            df_risk,
+            x="phase",
+            y="risk",
+            color="risk",
+            color_continuous_scale="Reds"
+        )
+        st.plotly_chart(fig_risk, use_container_width=True)
+    else:
+        st.info("No risk data available.")
+
+    st.divider()
+
+    # ============================================================
+    # CONFLICTS
+    # ============================================================
+
+    st.subheader("⚠️ Detected Conflicts")
+
+    if data["conflicts"]:
+        for c in data["conflicts"]:
+            st.warning(f"{c['type']}: {c['description']}")
+    else:
+        st.success("No conflicts detected.")
+
+    st.divider()
+
+    # ============================================================
+    # DIGITAL TWIN
+    # ============================================================
+
+    st.subheader("🏗️ Digital Structural Twin")
+
+    if "walls" in raw_result["twin"]:
+        st.json(raw_result["twin"])
+    else:
+        st.info("No structural twin data available.")
+
+    st.divider()
+
+    # ============================================================
+    # AI EXPLANATION
+    # ============================================================
+
+    st.subheader("🧠 AI Strategic Explanation")
+
+    st.write(data["ai_explanation"]["summary"])
+    st.write("Risk Reasoning:", data["ai_explanation"]["risk_reasoning"])
+    st.write("Recommendation:", data["ai_explanation"]["recommendation"])
+
+    st.divider()
+
+    # ============================================================
+    # PDF DOWNLOAD
+    # ============================================================
+
+    if "pdf_path" in raw_result:
+        with open(raw_result["pdf_path"], "rb") as f:
             st.download_button(
-                "Download Report",
-                f,
-                file_name="StructuraAI_Report.pdf"
+                label="📄 Download Full Project Report (PDF)",
+                data=f,
+                file_name="structuraai_report.pdf",
+                mime="application/pdf"
             )
 
-    # ─────────────────────────────────────────
-    # PERFORMANCE PROFILING
-    # ─────────────────────────────────────────
-    st.subheader("Performance Profiling")
-
-    st.write("Vision Time:",
-             round(st.session_state.profiling.get("vision_time", 0),2),
-             "sec")
-
-    st.write("Planning Time:",
-             round(st.session_state.profiling.get("planning_time", 0),2),
-             "sec")
+else:
+    st.info("Upload a blueprint PDF to begin analysis.")
