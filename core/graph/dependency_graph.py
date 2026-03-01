@@ -1,40 +1,38 @@
+# core/graph/dependency_graph.py
+
 import networkx as nx
 import math
 
 
 def generate_tasks_from_twin(
     twin,
-    productivity_factor=1.0,
-    curing_days=2,
-    crew_capacity=2
+    productivity_factor=0.6,
+    curing_days=5,
+    crew_capacity=3
 ):
+
     tasks = []
     dependencies = []
 
-    print(">>> USING BATCHED INSTALL MODEL <<<")
-
     for i, wall in enumerate(twin.get("walls", [])):
 
+        # -----------------------------
+        # WALL BUILD
+        # -----------------------------
         build_id = f"wall_build_{i}"
         cure_id = f"wall_cure_{i}"
 
-        # -----------------------------
-        # BUILD DURATION
-        # -----------------------------
-        base_duration = max(
-            1,
-            math.ceil(wall.get("net_volume_cuft", 1) / 10)
-        )
+        volume = wall.get("net_volume_cuft", 10)
 
-        adjusted_build_duration = max(
-            1,
-            math.ceil(base_duration / productivity_factor)
+        build_duration = max(
+            2,
+            math.ceil((volume / 6) / productivity_factor)
         )
 
         tasks.append({
             "task_id": build_id,
-            "duration": adjusted_build_duration,
-            "resource": 1,
+            "duration": build_duration,
+            "resource": 2,
             "type": "wall_build"
         })
 
@@ -48,60 +46,80 @@ def generate_tasks_from_twin(
         dependencies.append((build_id, cure_id))
 
         # -----------------------------
-        # INSTALL TASKS
+        # DOOR INSTALLS (VARIABLE DURATIONS)
         # -----------------------------
-        install_ids = []
+        door_ids = []
 
         for d in range(wall.get("attached_doors", 0)):
             door_id = f"door_install_{i}_{d}"
+
+            # variable duration (creates asymmetry)
+            duration = 1 + (d % 3)
+
             tasks.append({
                 "task_id": door_id,
-                "duration": 1,
+                "duration": duration,
                 "resource": 1,
                 "type": "door_install"
             })
-            install_ids.append(door_id)
+
+            dependencies.append((cure_id, door_id))
+            door_ids.append(door_id)
+
+        # -----------------------------
+        # WINDOW INSTALLS (VARIABLE DURATIONS)
+        # -----------------------------
+        window_ids = []
 
         for w in range(wall.get("attached_windows", 0)):
             win_id = f"window_install_{i}_{w}"
+
+            duration = 2 + (w % 2)
+
             tasks.append({
                 "task_id": win_id,
-                "duration": 1,
+                "duration": duration,
                 "resource": 1,
                 "type": "window_install"
             })
-            install_ids.append(win_id)
+
+            dependencies.append((cure_id, win_id))
+            window_ids.append(win_id)
 
         # -----------------------------
-        # BATCHING LOGIC
+        # STRUCTURAL COMPLETION NODE
         # -----------------------------
-        if install_ids:
+        structural_complete = f"structural_complete_{i}"
 
-            batches = [
-                install_ids[x:x + crew_capacity]
-                for x in range(0, len(install_ids), crew_capacity)
-            ]
+        tasks.append({
+            "task_id": structural_complete,
+            "duration": 0,
+            "resource": 0,
+            "type": "milestone"
+        })
 
-            previous_anchor = cure_id
+        # Structural completion waits for longest install only
+        # (instead of all installs forcing chain)
 
-            for batch_index, batch in enumerate(batches):
+        if door_ids:
+            dependencies.append((max(door_ids), structural_complete))
 
-                batch_anchor = f"batch_{i}_{batch_index}"
+        if window_ids:
+            dependencies.append((max(window_ids), structural_complete))
 
-                # Dummy anchor node to represent batch completion
-                tasks.append({
-                    "task_id": batch_anchor,
-                    "duration": 0,
-                    "resource": 0,
-                    "type": "batch_anchor"
-                })
+        # -----------------------------
+        # FINISHING PHASE
+        # -----------------------------
+        finishing_id = f"finishing_{i}"
 
-                # All tasks in batch depend on previous anchor
-                for task_id in batch:
-                    dependencies.append((previous_anchor, task_id))
-                    dependencies.append((task_id, batch_anchor))
+        tasks.append({
+            "task_id": finishing_id,
+            "duration": 6,
+            "resource": 2,
+            "type": "finishing"
+        })
 
-                previous_anchor = batch_anchor
+        dependencies.append((structural_complete, finishing_id))
 
     return tasks, dependencies
 
