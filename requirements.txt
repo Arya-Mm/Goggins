@@ -8,3 +8,6 @@ pymupdf
 ultralytics
 reportlab
 regex
+opencv-python-headless
+ultralytics
+opencv-python-headless
