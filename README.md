@@ -11,8 +11,6 @@
 
 > Transforming static civil blueprints into executable construction strategy, risk intelligence, and optimization decisions.
 
-🌐 **Live Dashboard:**
-[https://structuraii.streamlit.app/](https://structuraii.streamlit.app/)
 
 ---
 
@@ -210,12 +208,6 @@ Runs fully offline for data privacy.
 ✔ Demo stability > feature count
 
 ---
-
-## 📊 Live Demo
-
-Try it here:
-
-👉 [https://structuraii.streamlit.app/](https://structuraii.streamlit.app/)
 
 Upload a structural blueprint and explore:
 
