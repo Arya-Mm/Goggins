@@ -6,7 +6,7 @@
 //
 //   Leave VIDEO_URL as an empty string ("") to keep the "Coming Soon" placeholder.
 // ─────────────────────────────────────────────────────────────────────────────
-const VIDEO_URL = "/asset/demovideo.mp4"
+const VIDEO_URL = ""
 // ─────────────────────────────────────────────────────────────────────────────
 
 export default function DemoPage() {
@@ -35,15 +35,21 @@ export default function DemoPage() {
 
                     {VIDEO_URL ? (
                         /* ── Real video player (shown when VIDEO_URL is set) ── */
-                        <div className="relative w-full rounded-2xl overflow-hidden border border-border shadow-2xl">
-                            <video
-                                src={VIDEO_URL}
-                                controls
-                                className="w-full aspect-video bg-black"
-                                poster="/demo-poster.png"
-                            >
-                                Your browser does not support the video tag.
-                            </video>
+{VIDEO_URL ? (
+    /* ── Real video player (shown when VIDEO_URL is set) ── */
+    <div
+        className="relative w-full rounded-2xl overflow-hidden border border-border"
+        style={{ paddingBottom: "56.25%" /* 16:9 ratio */ }}
+    >
+        <iframe
+            src={VIDEO_URL}
+            title="StructuraAI Demo Video"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowFullScreen
+            className="absolute inset-0 w-full h-full"
+        />
+    </div>
+) : (
                         </div>
                     ) : (
                         /* ── Placeholder (shown when VIDEO_URL is empty) ── */
