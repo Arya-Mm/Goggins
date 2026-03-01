@@ -4,6 +4,7 @@ import plotly.graph_objects as go
 import pandas as pd
 import networkx as nx
 import tempfile
+import re
 
 from core.pipeline.analyzer import analyze_project
 from core.pipeline.streamlit_adapter import adapt_to_dashboard_schema
@@ -15,30 +16,23 @@ st.set_page_config(layout="wide")
 st.title("StructuraAI — Construction Intelligence Platform")
 
 # ─────────────────────────────────────────
-# Execution Strategy Selector (NEW)
+# Strategy Selection
 # ─────────────────────────────────────────
 st.subheader("Execution Strategy")
 
 strategy = st.radio(
-    "Select planning strategy",
+    "Planning approach",
     ["Cost Optimized", "Balanced", "Fast Track"],
     horizontal=True
 )
 
-st.caption(
-    "Cost Optimized reduces crew and extends timeline. "
-    "Balanced maintains baseline configuration. "
-    "Fast Track increases parallel execution and reduces schedule."
-)
-
-# Strategy multipliers
 if strategy == "Cost Optimized":
     strategy_duration_factor = 1.15
     strategy_cost_factor = 0.95
 elif strategy == "Fast Track":
     strategy_duration_factor = 0.85
-    strategy_cost_factor = 1.10
-else:  # Balanced
+    strategy_cost_factor = 1.12
+else:
     strategy_duration_factor = 1.0
     strategy_cost_factor = 1.0
 
@@ -48,11 +42,19 @@ uploaded_file = st.file_uploader(
 )
 
 # ─────────────────────────────────────────
-# Main Processing
+# Helper: Humanize Node Names
+# ─────────────────────────────────────────
+def humanize_label(label):
+    label = label.replace("_", " ")
+    label = re.sub(r"\d+", "", label)
+    return label.title()
+
+# ─────────────────────────────────────────
+# Main Logic
 # ─────────────────────────────────────────
 if uploaded_file:
 
-    with st.spinner("Analyzing structural drawing..."):
+    with st.spinner("Building structural execution model..."):
 
         with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
             tmp.write(uploaded_file.read())
@@ -66,9 +68,6 @@ if uploaded_file:
 
         data = adapt_to_dashboard_schema(raw_result)
 
-    # ─────────────────────────────────────────
-    # Base Metrics
-    # ─────────────────────────────────────────
     base_duration = data["adjusted_metrics"]["duration"]
     base_cost = data["cost_estimation"]["total_project_cost"]
     base_risk = data["adjusted_metrics"]["risk"]
@@ -77,7 +76,10 @@ if uploaded_file:
     strategy_duration = int(base_duration * strategy_duration_factor)
     strategy_cost = base_cost * strategy_cost_factor
 
-    st.subheader("Project Overview")
+    # ─────────────────────────────────────────
+    # Executive Metrics
+    # ─────────────────────────────────────────
+    st.subheader("Project Snapshot")
 
     c1, c2, c3, c4 = st.columns(4)
     c1.metric("Detection Confidence",
@@ -89,31 +91,30 @@ if uploaded_file:
     st.divider()
 
     # ─────────────────────────────────────────
-    # Advanced Scenario Simulation (± Values)
+    # Scenario Modeling (Realistic Economics)
     # ─────────────────────────────────────────
     st.subheader("Scenario Adjustment")
 
-    labor_delta = st.slider(
-        "Workforce Adjustment (%)",
-        -50, 50, 0
-    )
+    labor_delta = st.slider("Workforce Change (%)", -50, 50, 0)
+    delay_delta = st.slider("Material Delay (days)", -30, 60, 0)
+    budget_delta = st.slider("Budget Adjustment (%)", -30, 50, 0)
 
-    delay_delta = st.slider(
-        "Material Delay (days)",
-        -30, 60, 0
-    )
+    # Duration Impact
+    labor_efficiency = 1 - (labor_delta / 100)
+    revised_duration = int(strategy_duration * labor_efficiency + delay_delta)
 
-    budget_delta = st.slider(
-        "Budget Adjustment (%)",
-        -30, 50, 0
-    )
+    # Cost Impact (proper coupling)
+    labor_cost_impact = base_cost * (labor_delta / 200)
+    delay_cost_impact = base_cost * (delay_delta / 365) * 0.6
+    budget_direct_impact = strategy_cost * (budget_delta / 100)
 
-    # Revised logic (supports negative)
-    labor_factor = 1 - (labor_delta / 100)
-    revised_duration = int(strategy_duration * labor_factor + delay_delta)
+    revised_cost = strategy_cost + labor_cost_impact + delay_cost_impact + budget_direct_impact
 
-    revised_cost = strategy_cost * (1 + budget_delta / 100)
-    revised_risk = max(0, min(100, base_risk + delay_delta*0.4 - labor_delta*0.2))
+    # Risk Impact
+    revised_risk = max(0, min(100,
+                              base_risk +
+                              delay_delta * 0.5 -
+                              labor_delta * 0.3))
 
     s1, s2, s3 = st.columns(3)
     s1.metric("Revised Duration", revised_duration)
@@ -123,7 +124,7 @@ if uploaded_file:
     st.divider()
 
     # ─────────────────────────────────────────
-    # Enterprise Dependency Graph
+    # Enterprise Dependency Network
     # ─────────────────────────────────────────
     st.subheader("Execution Network")
 
@@ -158,7 +159,7 @@ if uploaded_file:
             x=edge_x,
             y=edge_y,
             mode="lines",
-            line=dict(width=1.2, color="#B0B0B0"),
+            line=dict(width=1.2, color="#555555"),
             hoverinfo="none"
         )
 
@@ -166,7 +167,7 @@ if uploaded_file:
             x=crit_x,
             y=crit_y,
             mode="lines",
-            line=dict(width=4, color="#C62828"),
+            line=dict(width=4, color="#E53935"),
             hoverinfo="none"
         )
 
@@ -176,10 +177,10 @@ if uploaded_file:
             x, y = pos[node]
             node_x.append(x)
             node_y.append(y)
-            node_text.append(node)
+            node_text.append(humanize_label(node))
 
             node_color.append(
-                "#C62828" if node in critical_path else "#2E4053"
+                "#E53935" if node in critical_path else "#1E2A38"
             )
 
         node_trace = go.Scatter(
@@ -189,7 +190,7 @@ if uploaded_file:
             text=node_text,
             textposition="top center",
             marker=dict(
-                size=30,
+                size=32,
                 color=node_color,
                 line=dict(width=2, color="#FFFFFF")
             ),
@@ -200,8 +201,9 @@ if uploaded_file:
 
         fig.update_layout(
             height=520,
-            plot_bgcolor="white",
-            paper_bgcolor="white",
+            plot_bgcolor="#0F172A",
+            paper_bgcolor="#0F172A",
+            font=dict(color="white"),
             margin=dict(l=20, r=20, t=20, b=20),
             xaxis=dict(showgrid=False, visible=False),
             yaxis=dict(showgrid=False, visible=False)
@@ -210,16 +212,15 @@ if uploaded_file:
         st.plotly_chart(fig, use_container_width=True)
 
         st.caption(
-            "Red nodes and connections indicate the critical execution path. "
-            "Delays here directly affect final completion."
+            "Red nodes and connections represent the critical execution sequence."
         )
 
     st.divider()
 
     # ─────────────────────────────────────────
-    # Risk Distribution
+    # Risk Breakdown
     # ─────────────────────────────────────────
-    st.subheader("Risk by Phase")
+    st.subheader("Risk Profile")
 
     if data["risk_matrix"]:
         df_risk = pd.DataFrame(data["risk_matrix"])
@@ -233,8 +234,11 @@ if uploaded_file:
         )
 
         fig_risk.update_layout(
+            plot_bgcolor="#0F172A",
+            paper_bgcolor="#0F172A",
+            font=dict(color="white"),
             xaxis_title="Project Phase",
-            yaxis_title="Risk Index"
+            yaxis_title="Risk Level"
         )
 
         st.plotly_chart(fig_risk, use_container_width=True)
@@ -259,6 +263,12 @@ if uploaded_file:
         )
 
         fig_timeline.update_yaxes(autorange="reversed")
+        fig_timeline.update_layout(
+            plot_bgcolor="#0F172A",
+            paper_bgcolor="#0F172A",
+            font=dict(color="white")
+        )
+
         st.plotly_chart(fig_timeline, use_container_width=True)
 
     st.divider()
@@ -269,11 +279,11 @@ if uploaded_file:
     if "pdf_path" in raw_result:
         with open(raw_result["pdf_path"], "rb") as f:
             st.download_button(
-                label="Download Full Intelligence Report",
+                label="Download Detailed Project Report",
                 data=f,
                 file_name="structuraai_report.pdf",
                 mime="application/pdf"
             )
 
 else:
-    st.info("Upload a structural blueprint to begin.")
+    st.info("Upload a structural blueprint to begin analysis.")
