@@ -1,3 +1,5 @@
+# core/vision/vision_engine.py
+
 from pathlib import Path
 from .dim_extractor.pdf_processor import PDFProcessor
 from .yolo_adapter import YOLOAdapter
@@ -10,7 +12,6 @@ class VisionEngine:
     def __init__(self):
         self.processor = PDFProcessor()
 
-        # Safe absolute model path
         base_dir = Path(__file__).resolve().parents[2]
         model_path = base_dir / "core" / "data" / "best.pt"
 
@@ -32,34 +33,58 @@ class VisionEngine:
         return img
 
     # -----------------------------
-    # Normalize labels for Twin Layer
+    # Robust Label Normalization (FIXED)
     # -----------------------------
     def _normalize_label(self, label):
 
+        label = str(label).lower().strip().replace(" ", "_")
+
         mapping = {
-            "Wall": "walls",
-            "Door": "doors",
-            "Window": "windows",
-            "Column": "columns",
-            "Beam": "beams",
-            "Slab": "slabs",
-            "Dimension": "dimension_marks"
+            "wall": "walls",
+            "walls": "walls",
+
+            "door": "doors",
+            "sliding_door": "doors",
+            "doors": "doors",
+
+            "window": "windows",
+            "windows": "windows",
+
+            "column": "columns",
+            "columns": "columns",
+
+            "beam": "beams",
+            "beams": "beams",
+
+            "slab": "slabs",
+            "slabs": "slabs"
         }
 
-        return mapping.get(label, label.lower())
+        return mapping.get(label, None)
 
     # -----------------------------
-    # Structure & Filter Objects
+    # Structure & Filter Objects (FIXED)
     # -----------------------------
     def _structure_objects(self, detections, min_conf=0.4):
-        structured = {}
+
+        structured = {
+            "walls": [],
+            "doors": [],
+            "windows": [],
+            "columns": [],
+            "beams": [],
+            "slabs": []
+        }
 
         for obj in detections:
+
             if obj["confidence"] < min_conf:
                 continue
 
             norm_label = self._normalize_label(obj["label"])
-            structured.setdefault(norm_label, []).append(obj)
+
+            if norm_label:
+                structured[norm_label].append(obj)
 
         return structured
 
@@ -68,7 +93,7 @@ class VisionEngine:
     # -----------------------------
     def run(self, pdf_path):
 
-        # 1️⃣ Dimension Extraction
+        # 1️⃣ Extract Dimensions
         data = self.processor.extract_with_pymupdf(pdf_path)
 
         dimensions = []
@@ -77,10 +102,10 @@ class VisionEngine:
 
         # 2️⃣ YOLO Detection
         image = self._pdf_to_image(pdf_path)
-        raw_objects = self.yolo.detect(image)
+        raw_detections = self.yolo.detect(image)
 
         # 3️⃣ Structure Objects
-        structured_objects = self._structure_objects(raw_objects)
+        structured_objects = self._structure_objects(raw_detections)
 
         return {
             "dimensions": dimensions,
