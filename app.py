@@ -9,11 +9,13 @@ import re
 from core.pipeline.analyzer import analyze_project
 from core.pipeline.streamlit_adapter import adapt_to_dashboard_schema
 
+
 # ─────────────────────────────────────────
 # PAGE CONFIG
 # ─────────────────────────────────────────
 st.set_page_config(layout="wide")
-st.title("StructuraAI — Autonomous Construction Intelligence")
+st.title("StructuraAI — Autonomous Construction Intelligence Platform")
+
 
 # ─────────────────────────────────────────
 # STRATEGY SELECTION
@@ -36,10 +38,12 @@ else:
     strategy_duration_factor = 1.0
     strategy_cost_factor = 1.0
 
+
 uploaded_file = st.file_uploader(
     "Upload Structural Blueprint (PDF or DXF)",
     type=["pdf", "dxf"]
 )
+
 
 # ─────────────────────────────────────────
 # HELPERS
@@ -48,6 +52,7 @@ def humanize_label(label):
     label = label.replace("_", " ")
     label = re.sub(r"\d+", "", label)
     return label.title()
+
 
 # ─────────────────────────────────────────
 # MAIN EXECUTION
@@ -85,11 +90,12 @@ if uploaded_file:
     st.subheader("Executive Snapshot")
 
     c1, c2, c3, c4 = st.columns(4)
+
     c1.metric("Detection Confidence",
-              f"{round(data['detection_confidence']*100,2)}%")
-    c2.metric("Planned Duration (days)", strategy_duration)
+              f"{round(data['detection_confidence'] * 100, 2)}%")
+    c2.metric("Planned Duration (Days)", strategy_duration)
     c3.metric("Estimated Budget", f"₹{strategy_cost:,.0f}")
-    c4.metric("Buildability Score", base_build)
+    c4.metric("Buildability Score", round(base_build, 2))
 
     st.divider()
 
@@ -98,9 +104,13 @@ if uploaded_file:
     # ─────────────────────────────────────────
     st.subheader("Material Quantity Take-Off")
 
-    if "quantities" in data:
-        df_qty = pd.DataFrame(data["quantities"])
+    qty_data = data.get("quantity_takeoff", [])
+
+    if qty_data:
+        df_qty = pd.DataFrame(qty_data)
         st.dataframe(df_qty, use_container_width=True)
+    else:
+        st.info("No quantity data available.")
 
     st.divider()
 
@@ -109,10 +119,13 @@ if uploaded_file:
     # ─────────────────────────────────────────
     st.subheader("Phase-wise Construction Breakdown")
 
-    if "schedule" in data:
-        df_schedule = pd.DataFrame(data["schedule"])
-        phase_summary = df_schedule.groupby("phase")["duration"].sum().reset_index()
-        st.dataframe(phase_summary, use_container_width=True)
+    phase_data = data.get("phase_breakdown", [])
+
+    if phase_data:
+        df_phase = pd.DataFrame(phase_data)
+        st.dataframe(df_phase, use_container_width=True)
+    else:
+        st.info("Phase breakdown not available.")
 
     st.divider()
 
@@ -121,19 +134,20 @@ if uploaded_file:
     # ─────────────────────────────────────────
     st.subheader("Execution Sequence")
 
-    if "execution_sequence" in data:
-        sequence = " → ".join(data["execution_sequence"])
-        st.success(sequence)
+    sequence = data.get("execution_sequence", [])
+
+    if sequence:
+        st.success(" → ".join(sequence))
 
     st.divider()
 
     # ─────────────────────────────────────────
-    # SCENARIO MODELING
+    # WHAT-IF SIMULATION
     # ─────────────────────────────────────────
     st.subheader("What-If Scenario Simulation")
 
     labor_delta = st.slider("Workforce Change (%)", -50, 50, 0)
-    delay_delta = st.slider("Material Delay (days)", -30, 60, 0)
+    delay_delta = st.slider("Material Delay (Days)", -30, 60, 0)
     budget_delta = st.slider("Budget Adjustment (%)", -30, 50, 0)
 
     labor_efficiency = 1 - (labor_delta / 100)
@@ -153,20 +167,22 @@ if uploaded_file:
     s1, s2, s3 = st.columns(3)
     s1.metric("Revised Duration", revised_duration)
     s2.metric("Revised Budget", f"₹{revised_cost:,.0f}")
-    s3.metric("Revised Risk Index", round(revised_risk,2))
+    s3.metric("Revised Risk Index", round(revised_risk, 2))
 
     st.divider()
 
     # ─────────────────────────────────────────
     # CONFLICT DETECTION
     # ─────────────────────────────────────────
-    st.subheader("Construction Conflicts")
+    st.subheader("Resource Conflict Detection")
 
-    if "conflicts" in data and data["conflicts"]:
-        for conflict in data["conflicts"]:
-            st.warning(conflict)
+    conflicts = data.get("conflicts", [])
+
+    if conflicts:
+        for conflict in conflicts:
+            st.warning(conflict.get("description", "Conflict detected"))
     else:
-        st.success("No structural conflicts detected.")
+        st.success("No resource overload conflicts detected.")
 
     st.divider()
 
@@ -193,7 +209,7 @@ if uploaded_file:
             edge_x += [x0, x1, None]
             edge_y += [y0, y1, None]
 
-        node_x, node_y, node_text = [], [], []
+        node_x, node_y, node_text, node_color = [], [], [], []
 
         for node in G.nodes():
             x, y = pos[node]
@@ -201,16 +217,22 @@ if uploaded_file:
             node_y.append(y)
             node_text.append(humanize_label(node))
 
+            if node in critical_path:
+                node_color.append("#E53935")
+            else:
+                node_color.append("#1E88E5")
+
         fig = go.Figure()
         fig.add_trace(go.Scatter(x=edge_x, y=edge_y,
                                  mode="lines",
                                  line=dict(width=1, color="#888"),
                                  hoverinfo="none"))
+
         fig.add_trace(go.Scatter(x=node_x, y=node_y,
                                  mode="markers+text",
                                  text=node_text,
                                  textposition="top center",
-                                 marker=dict(size=25),
+                                 marker=dict(size=25, color=node_color),
                                  hoverinfo="text"))
 
         fig.update_layout(height=500,
@@ -229,19 +251,24 @@ if uploaded_file:
     # ─────────────────────────────────────────
     st.subheader("Risk Profile")
 
-    if data["risk_matrix"]:
-        df_risk = pd.DataFrame(data["risk_matrix"])
+    risk_matrix = data.get("risk_matrix", [])
+
+    if risk_matrix:
+        df_risk = pd.DataFrame(risk_matrix)
         fig_risk = px.bar(df_risk, x="phase", y="risk", color="risk")
         st.plotly_chart(fig_risk, use_container_width=True)
 
     st.divider()
 
     # ─────────────────────────────────────────
-    # GANTT TIMELINE
+    # PROJECT TIMELINE
     # ─────────────────────────────────────────
     st.subheader("Project Timeline")
 
-    if "schedule" in data:
+    schedule = data.get("schedule", [])
+
+    if schedule:
+        df_schedule = pd.DataFrame(schedule)
         df_schedule["start"] = pd.to_datetime(df_schedule["start"])
         df_schedule["finish"] = pd.to_datetime(df_schedule["finish"])
 
@@ -259,20 +286,29 @@ if uploaded_file:
     st.divider()
 
     # ─────────────────────────────────────────
-    # AI EXPLANATION PANEL
+    # EXECUTION AUDIT PANEL
     # ─────────────────────────────────────────
-    st.subheader("AI Engineering Explanation")
+    trace = data.get("computation_trace", {})
 
-    if "explanation" in data:
-        st.info(data["explanation"])
+    st.subheader("Execution Audit Summary")
+
+    col1, col2, col3, col4 = st.columns(4)
+
+    col1.metric("Total Tasks", trace.get("graph_stats", {}).get("total_nodes", 0))
+    col2.metric("Critical Path Length", len(trace.get("critical_path", [])))
+    col3.metric("Project Duration (Days)", trace.get("total_duration_days", 0))
+    col4.metric("Conflict Count", trace.get("conflict_count", 0))
+
+    st.write("### Risk Drivers")
+
+    risk_breakdown = trace.get("risk_breakdown", {}).get("breakdown", {})
+    for k, v in risk_breakdown.items():
+        st.write(f"- **{k.replace('_', ' ').title()}**: {v}")
+
+    with st.expander("Advanced Technical Trace"):
+        st.json(trace)
 
     st.divider()
-
-    # ─────────────────────────────────────────
-    # COMPUTATION TRACE (AUDIT)
-    # ─────────────────────────────────────────
-    with st.expander("Computation Trace (Auditable Logic)"):
-        st.json(data.get("computation_trace", {}))
 
     # ─────────────────────────────────────────
     # PDF EXPORT
