@@ -8,7 +8,7 @@ def generate_tasks_from_twin(
     twin,
     productivity_factor=0.6,
     curing_days=5,
-    crew_capacity=3
+    crew_capacity=3  # kept for compatibility but NOT used for dependencies
 ):
 
     tasks = []
@@ -16,27 +16,22 @@ def generate_tasks_from_twin(
 
     for i, wall in enumerate(twin.get("walls", [])):
 
+        # -----------------------------
+        # WALL BUILD
+        # -----------------------------
         build_id = f"wall_build_{i}"
         cure_id = f"wall_cure_{i}"
 
-        # -----------------------------
-        # WALL BUILD DURATION
-        # -----------------------------
         volume = wall.get("net_volume_cuft", 10)
 
-        base_duration = max(
+        build_duration = max(
             1,
-            math.ceil(volume / 8)
-        )
-
-        adjusted_build_duration = max(
-            1,
-            math.ceil(base_duration / productivity_factor)
+            math.ceil((volume / 8) / productivity_factor)
         )
 
         tasks.append({
             "task_id": build_id,
-            "duration": adjusted_build_duration,
+            "duration": build_duration,
             "resource": 1,
             "type": "wall_build"
         })
@@ -51,59 +46,53 @@ def generate_tasks_from_twin(
         dependencies.append((build_id, cure_id))
 
         # -----------------------------
-        # DOOR + WINDOW INSTALLS
+        # DOOR INSTALLS (PARALLEL)
         # -----------------------------
-        install_ids = []
-
         for d in range(wall.get("attached_doors", 0)):
             door_id = f"door_install_{i}_{d}"
+
             tasks.append({
                 "task_id": door_id,
                 "duration": 2,
                 "resource": 1,
                 "type": "door_install"
             })
-            install_ids.append(door_id)
 
+            # Logical dependency only
+            dependencies.append((cure_id, door_id))
+
+        # -----------------------------
+        # WINDOW INSTALLS (PARALLEL)
+        # -----------------------------
         for w in range(wall.get("attached_windows", 0)):
             win_id = f"window_install_{i}_{w}"
+
             tasks.append({
                 "task_id": win_id,
                 "duration": 2,
                 "resource": 1,
                 "type": "window_install"
             })
-            install_ids.append(win_id)
+
+            dependencies.append((cure_id, win_id))
 
         # -----------------------------
-        # PARALLEL BATCHING LOGIC
+        # FINISHING PHASE
         # -----------------------------
-        if install_ids:
+        finishing_id = f"finishing_{i}"
 
-            batches = [
-                install_ids[x:x + crew_capacity]
-                for x in range(0, len(install_ids), crew_capacity)
-            ]
+        tasks.append({
+            "task_id": finishing_id,
+            "duration": 6,
+            "resource": 2,
+            "type": "finishing"
+        })
 
-            previous_anchor = cure_id
-
-            for batch_index, batch in enumerate(batches):
-
-                batch_anchor = f"batch_{i}_{batch_index}"
-
-                tasks.append({
-                    "task_id": batch_anchor,
-                    "duration": 0,
-                    "resource": 0,
-                    "type": "batch_anchor"
-                })
-
-                # All installs in batch start after previous anchor
-                for task_id in batch:
-                    dependencies.append((previous_anchor, task_id))
-                    dependencies.append((task_id, batch_anchor))
-
-                previous_anchor = batch_anchor
+        # Finishing depends on ALL installs for this wall
+        for t in tasks:
+            if t["task_id"].startswith(f"door_install_{i}_") or \
+               t["task_id"].startswith(f"window_install_{i}_"):
+                dependencies.append((t["task_id"], finishing_id))
 
     return tasks, dependencies
 

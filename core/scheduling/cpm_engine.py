@@ -1,36 +1,32 @@
+# core/scheduling/cpm_engine.py
+
 import networkx as nx
 
 
 def run_cpm(G, crew_capacity=None):
 
-    # ✅ EMPTY GRAPH SAFE EXIT
+    # SAFE EXIT
     if G is None or len(G.nodes) == 0:
         return G, [], 0
 
     if not nx.is_directed_acyclic_graph(G):
         raise Exception("Graph contains cycle. Cannot schedule.")
 
-    # Initial CPM computation
+    # Initial CPM
     G = compute_cpm(G)
 
-    # Apply resource leveling if capacity defined
+    # Resource leveling
     if crew_capacity is not None and len(G.nodes) > 0:
         G = apply_resource_leveling(G, crew_capacity)
-        G = compute_cpm(G)  # Recompute after leveling
+        G = compute_cpm(G)  # Recalculate after leveling
 
-    # ✅ SAFE total_duration
-    if len(G.nodes) == 0:
-        total_duration = 0
-    else:
-        total_duration = max(
-            G.nodes[n].get("EF", 0) for n in G.nodes
-        )
+    # Total duration
+    total_duration = max(
+        G.nodes[n].get("EF", 0) for n in G.nodes
+    )
 
-    # Critical path (safe)
-    critical_path = [
-        n for n in nx.topological_sort(G)
-        if G.nodes[n].get("slack", 0) == 0
-    ] if len(G.nodes) > 0 else []
+    # TRUE Critical Path (Longest Path in DAG)
+    critical_path = nx.algorithms.dag.dag_longest_path(G, weight="duration")
 
     return G, critical_path, total_duration
 
@@ -41,7 +37,6 @@ def run_cpm(G, crew_capacity=None):
 
 def compute_cpm(G):
 
-    # ✅ EMPTY SAFE
     if len(G.nodes) == 0:
         return G
 
@@ -55,7 +50,7 @@ def compute_cpm(G):
         if not preds:
             ES = 0
         else:
-            ES = max(G.nodes[p].get("EF", 0) for p in preds)
+            ES = max(G.nodes[p]["EF"] for p in preds)
 
         duration = G.nodes[node].get("duration", 0)
         EF = ES + duration
@@ -63,10 +58,7 @@ def compute_cpm(G):
         G.nodes[node]["ES"] = ES
         G.nodes[node]["EF"] = EF
 
-    # SAFE total duration
-    total_duration = max(
-        G.nodes[n].get("EF", 0) for n in G.nodes
-    ) if len(G.nodes) > 0 else 0
+    total_duration = max(G.nodes[n]["EF"] for n in G.nodes)
 
     # BACKWARD PASS
     for node in reversed(topo_order):
@@ -76,20 +68,20 @@ def compute_cpm(G):
         if not succs:
             LF = total_duration
         else:
-            LF = min(G.nodes[s].get("LS", total_duration) for s in succs)
+            LF = min(G.nodes[s]["LS"] for s in succs)
 
         duration = G.nodes[node].get("duration", 0)
         LS = LF - duration
 
         G.nodes[node]["LF"] = LF
         G.nodes[node]["LS"] = LS
-        G.nodes[node]["slack"] = LS - G.nodes[node].get("ES", 0)
+        G.nodes[node]["slack"] = LS - G.nodes[node]["ES"]
 
     return G
 
 
 # =====================================================
-# RESOURCE LEVELING (BATCHING MODEL)
+# RESOURCE LEVELING
 # =====================================================
 
 def apply_resource_leveling(G, crew_capacity):
@@ -105,9 +97,10 @@ def apply_resource_leveling(G, crew_capacity):
 
         if len(active_tasks) > crew_capacity:
 
+            # Sort by ES (priority = earlier tasks first)
             active_tasks_sorted = sorted(
                 active_tasks,
-                key=lambda n: G.nodes[n].get("ES", 0)
+                key=lambda n: G.nodes[n]["ES"]
             )
 
             for i, task in enumerate(active_tasks_sorted):
@@ -115,7 +108,7 @@ def apply_resource_leveling(G, crew_capacity):
                 batch_index = i // crew_capacity
                 new_start = time + batch_index
 
-                if G.nodes[task].get("ES", 0) < new_start:
+                if G.nodes[task]["ES"] < new_start:
                     shift = new_start - G.nodes[task]["ES"]
                     delay_task(G, task, shift)
 
@@ -127,13 +120,11 @@ def build_timeline(G):
     timeline = {}
 
     for node in G.nodes:
-        ES = G.nodes[node].get("ES", 0)
-        EF = G.nodes[node].get("EF", 0)
+        ES = G.nodes[node]["ES"]
+        EF = G.nodes[node]["EF"]
 
         for t in range(ES, EF):
-            if t not in timeline:
-                timeline[t] = []
-            timeline[t].append(node)
+            timeline.setdefault(t, []).append(node)
 
     return timeline
 
@@ -143,8 +134,8 @@ def delay_task(G, node, shift):
     G.nodes[node]["ES"] += shift
     G.nodes[node]["EF"] += shift
 
-    # Propagate shift safely
+    # Propagate shift forward
     for succ in G.successors(node):
-        if G.nodes[succ].get("ES", 0) < G.nodes[node]["EF"]:
+        if G.nodes[succ]["ES"] < G.nodes[node]["EF"]:
             needed_shift = G.nodes[node]["EF"] - G.nodes[succ]["ES"]
             delay_task(G, succ, needed_shift)
