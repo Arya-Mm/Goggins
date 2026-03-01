@@ -1,181 +1,120 @@
 import streamlit as st
-from main import run_engine
+import threading
+import time
+import pandas as pd
+import plotly.express as px
 import networkx as nx
 import plotly.graph_objects as go
-import plotly.express as px
-import pandas as pd
-from datetime import datetime
+from main import run_vision_stage, run_planning_stage, export_pdf
+
+st.set_page_config(layout="wide")
+
+st.title("STRUCTURA AI — Production Intelligence")
 
 # ─────────────────────────────────────────────
-# PAGE CONFIG
+# SESSION STATE
 # ─────────────────────────────────────────────
-st.set_page_config(
-    layout="wide",
-    page_title="StructuraAI — Command Center",
-    page_icon="🏗️"
+if "twin_cache" not in st.session_state:
+    st.session_state.twin_cache = None
+
+if "dashboard_state" not in st.session_state:
+    st.session_state.dashboard_state = None
+
+if "profiling" not in st.session_state:
+    st.session_state.profiling = {}
+
+# ─────────────────────────────────────────────
+# FILE UPLOAD (MULTI-FILE SUPPORT)
+# ─────────────────────────────────────────────
+uploaded_files = st.file_uploader(
+    "Upload Blueprint Files",
+    type=["pdf", "png", "jpg"],
+    accept_multiple_files=True
 )
-
-# ─────────────────────────────────────────────
-# ENGINE CACHE (Heavy Vision + CPM)
-# ─────────────────────────────────────────────
-@st.cache_data(show_spinner=False)
-def cached_engine(strategy, crew, productivity, curing):
-    return run_engine(
-        strategy=strategy,
-        crew_capacity=crew,
-        productivity_factor=productivity,
-        curing_days=curing
-    )
 
 # ─────────────────────────────────────────────
 # SIDEBAR CONTROLS
 # ─────────────────────────────────────────────
-st.sidebar.title("⚙ Execution Controls")
-
 strategy = st.sidebar.selectbox(
-    "Strategy",
-    ["Balanced", "FastTrack", "CostOptimized"]
+    "Strategy", ["Balanced", "FastTrack", "CostOptimized"]
 )
 
 crew = st.sidebar.slider("Crew Capacity", 1, 6, 2)
 productivity = st.sidebar.slider("Productivity", 0.5, 1.5, 1.0)
 curing = st.sidebar.slider("Curing Days", 1, 5, 2)
 
-run_btn = st.sidebar.button("Run StructuraAI")
+# ─────────────────────────────────────────────
+# RUN VISION (HEAVY — ONLY ONCE)
+# ─────────────────────────────────────────────
+if st.button("Run Vision Stage"):
 
-if "state" not in st.session_state:
-    st.session_state.state = None
+    progress = st.progress(0)
+    status = st.empty()
 
-if run_btn:
-    with st.spinner("Running full AI pipeline..."):
-        st.session_state.state = cached_engine(
-            strategy, crew, productivity, curing
-        )
+    for file in uploaded_files:
 
-state = st.session_state.state
+        status.text("Running Vision Engine...")
+        progress.progress(10)
 
-if state is None:
-    st.info("Configure parameters and run the engine.")
-    st.stop()
+        result = run_vision_stage(file)
 
-if "error" in state:
-    st.error(state["error"])
-    st.stop()
+        st.session_state.twin_cache = result
+        st.session_state.profiling["vision_time"] = result["stage_time"]
+
+        progress.progress(100)
+        status.text("Vision Stage Complete")
 
 # ─────────────────────────────────────────────
-# HERO
+# RUN PLANNING (FAST RE-RUN)
 # ─────────────────────────────────────────────
-st.title("STRUCTURA AI — Autonomous Construction Intelligence")
+if st.button("Run Planning Stage"):
+
+    if st.session_state.twin_cache is None:
+        st.warning("Run Vision stage first.")
+        st.stop()
+
+    progress = st.progress(0)
+    status = st.empty()
+
+    status.text("Running Scheduling + Intelligence...")
+    progress.progress(30)
+
+    result = run_planning_stage(
+        st.session_state.twin_cache["twin"],
+        strategy,
+        crew,
+        productivity,
+        curing
+    )
+
+    st.session_state.dashboard_state = result
+    st.session_state.profiling["planning_time"] = result["stage_time"]
+
+    progress.progress(100)
+    status.text("Planning Stage Complete")
 
 # ─────────────────────────────────────────────
-# KPI BAR
+# DISPLAY DASHBOARD
 # ─────────────────────────────────────────────
-risk_matrix = state.get("risk_matrix", [])
-avg_risk = round(sum(r["risk"] for r in risk_matrix)/len(risk_matrix), 1) if risk_matrix else 0
+state = st.session_state.dashboard_state
 
-k1, k2, k3, k4 = st.columns(4)
+if state:
 
-k1.metric("AI Confidence", f"{state['detection_confidence']*100:.1f}%")
-k2.metric("Duration (days)", state["execution_strategies"][state["strategy_selected"]]["duration_days"])
-k3.metric("Buildability Score", state["execution_strategies"][state["strategy_selected"]]["buildability_score"])
-k4.metric("Avg Risk Index", avg_risk)
+    st.subheader("Duration")
+    st.metric("Total Duration", state["duration"])
 
-st.divider()
+    st.subheader("Conflicts")
+    for c in state["conflicts"]:
+        st.warning(c.get("description"))
 
-# ─────────────────────────────────────────────
-# TABS
-# ─────────────────────────────────────────────
-tab1, tab2, tab3, tab4 = st.tabs(
-    ["Overview", "Quantities & Cost", "Planning", "Intelligence"]
-)
-
-# ==========================================================
-# OVERVIEW
-# ==========================================================
-with tab1:
-
-    col1, col2 = st.columns([1,2])
-
-    with col1:
-        st.subheader("Strategy")
-        st.write("Selected:", state["strategy_selected"])
-
-        st.subheader("Executive Insight")
-        ai = state["ai_explanation"]
-        st.write("Summary:", ai["summary"])
-        st.write("Risk Reasoning:", ai["risk_reasoning"])
-        st.write("Recommendation:", ai["recommendation"])
-
-    with col2:
-        st.subheader("Digital Structural Twin")
-
-        twin = state["digital_twin"]
-
-        fig = go.Figure()
-
-        for slab in twin.get("slabs", []):
-            corners = slab.get("corners", [])
-            if corners:
-                xs = [pt[0] for pt in corners] + [corners[0][0]]
-                ys = [pt[1] for pt in corners] + [corners[0][1]]
-                fig.add_trace(go.Scatter(x=xs, y=ys, fill="toself"))
-
-        for beam in twin.get("beams", []):
-            s, e = beam["start"], beam["end"]
-            fig.add_trace(go.Scatter(x=[s[0],e[0]], y=[s[1],e[1]]))
-
-        for col in twin.get("columns", []):
-            fig.add_trace(go.Scatter(
-                x=[col["x"]], y=[col["y"]],
-                mode="markers+text",
-                text=[col["id"]]
-            ))
-
-        fig.update_layout(height=400)
-        st.plotly_chart(fig, use_container_width=True)
-
-# ==========================================================
-# QUANTITIES
-# ==========================================================
-with tab2:
-
-    st.subheader("Bill of Quantities")
-    df_qty = pd.DataFrame(state["quantity_takeoff"])
-    st.dataframe(df_qty, use_container_width=True)
-
-    st.subheader("Cost Breakdown")
-
-    cost = state["cost_estimation"]
-    if "phase_costs" in cost:
-        df_cost = pd.DataFrame(cost["phase_costs"])
-        fig_cost = px.bar(df_cost, x="phase", y="cost")
-        st.plotly_chart(fig_cost, use_container_width=True)
-
-# ==========================================================
-# PLANNING
-# ==========================================================
-with tab3:
-
-    st.subheader("Schedule")
-
-    schedule = state["schedule"]
-    if schedule:
-        df_sched = pd.DataFrame(schedule)
-        fig_gantt = px.timeline(df_sched,
-            x_start="start", x_end="finish",
-            y="task"
-        )
-        fig_gantt.update_yaxes(autorange="reversed")
-        st.plotly_chart(fig_gantt, use_container_width=True)
+    st.subheader("Risk")
+    df_risk = pd.DataFrame(state["risk"]["phase_risk"])
+    fig = px.bar(df_risk, x="phase", y="risk")
+    st.plotly_chart(fig, use_container_width=True)
 
     st.subheader("Dependency Graph")
-
-    graph_data = state["dependency_graph"]
-    G = nx.DiGraph()
-    G.add_nodes_from(graph_data["nodes"])
-    G.add_edges_from(graph_data["edges"])
-
-    pos = nx.spring_layout(G, seed=42)
+    G = state["graph"]
+    pos = nx.spring_layout(G)
 
     edge_x, edge_y = [], []
     for e in G.edges():
@@ -190,25 +129,30 @@ with tab3:
         node_x.append(x)
         node_y.append(y)
 
-    fig = go.Figure()
-    fig.add_trace(go.Scatter(x=edge_x, y=edge_y, mode="lines"))
-    fig.add_trace(go.Scatter(x=node_x, y=node_y,
-                             mode="markers+text",
-                             text=list(G.nodes())))
-    st.plotly_chart(fig, use_container_width=True)
+    fig_graph = go.Figure()
+    fig_graph.add_trace(go.Scatter(x=edge_x, y=edge_y, mode="lines"))
+    fig_graph.add_trace(go.Scatter(x=node_x, y=node_y, mode="markers+text", text=list(G.nodes())))
+    st.plotly_chart(fig_graph, use_container_width=True)
 
-# ==========================================================
-# INTELLIGENCE
-# ==========================================================
-with tab4:
+    # ─────────────────────────────────────────
+    # PDF EXPORT
+    # ─────────────────────────────────────────
+    if st.button("Generate PDF Report"):
+        pdf_path = export_pdf(state)
+        with open(pdf_path, "rb") as f:
+            st.download_button(
+                "Download Report",
+                f,
+                file_name="StructuraAI_Report.pdf"
+            )
 
-    st.subheader("Conflicts")
+    # ─────────────────────────────────────────
+    # PERFORMANCE PROFILING
+    # ─────────────────────────────────────────
+    st.subheader("Performance Profiling")
 
-    for c in state["conflicts"]:
-        st.warning(f"{c['type']}: {c['description']}")
+    vision_time = st.session_state.profiling.get("vision_time", 0)
+    planning_time = st.session_state.profiling.get("planning_time", 0)
 
-    st.subheader("Risk Matrix")
-
-    df_risk = pd.DataFrame(state["risk_matrix"])
-    fig_risk = px.bar(df_risk, x="phase", y="risk")
-    st.plotly_chart(fig_risk, use_container_width=True)
+    st.write("Vision Stage Time:", round(vision_time,2), "sec")
+    st.write("Planning Stage Time:", round(planning_time,2), "sec")
