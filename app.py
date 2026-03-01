@@ -1,247 +1,179 @@
 import streamlit as st
-import json
 import plotly.graph_objects as go
 import plotly.express as px
 import pandas as pd
 import networkx as nx
-from PIL import Image
-from datetime import datetime
-import random
+from main import run_engine
+from core.exports.pdf_report import generate_pdf_report
 
-# ============================================
+# ─────────────────────────────────────────────
 # PAGE CONFIG
-# ============================================
+# ─────────────────────────────────────────────
+st.set_page_config(
+    layout="wide",
+    page_title="StructuraAI — AI Construction Intelligence",
+)
 
-st.set_page_config(layout="wide", page_title="StructuraAI", page_icon="🏗️")
-
-# ============================================
-# DESIGN TOKENS
-# ============================================
-
-BG = "#0F172A"
-CARD = "#1E293B"
-BORDER = "#334155"
-PRIMARY = "#6366F1"
-CYAN = "#22D3EE"
-SUCCESS = "#10B981"
-WARNING = "#F59E0B"
-DANGER = "#EF4444"
-TEXT = "#E2E8F0"
-MUTED = "#94A3B8"
-
-st.markdown(f"""
+# ─────────────────────────────────────────────
+# CUSTOM CSS (Minimal / Premium)
+# ─────────────────────────────────────────────
+st.markdown("""
 <style>
-body {{ background:{BG}; color:{TEXT}; }}
-.block-container {{ padding:2rem 3rem; }}
-.metric-card {{
-    background:{CARD};
-    padding:20px;
-    border-radius:16px;
-    border:1px solid {BORDER};
-}}
-.section-card {{
-    background:{CARD};
-    padding:24px;
-    border-radius:18px;
-    border:1px solid {BORDER};
-    margin-bottom:24px;
-}}
+body { background-color: #0E1117; }
+.metric-card {
+    background-color: #1C1F26;
+    padding: 20px;
+    border-radius: 12px;
+    border: 1px solid #2A2E39;
+}
 </style>
 """, unsafe_allow_html=True)
 
-# ============================================
-# LOAD DATA
-# ============================================
+st.title("🏗 StructuraAI — Autonomous Construction Intelligence")
 
-with open("data/project_state.json") as f:
-    state = json.load(f)
+# ─────────────────────────────────────────────
+# STRATEGY SELECTION
+# ─────────────────────────────────────────────
+strategy = st.radio(
+    "Select Construction Strategy",
+    ["Balanced", "FastTrack", "CostOptimized"],
+    horizontal=True
+)
 
-risk_matrix = state["risk_matrix"]
-schedule = state["schedule"]
-cost = state["cost_estimation"]
-strategies = state["execution_strategies"]
-selected = state["strategy_selected"]
-twin = state["digital_twin"]
+# ─────────────────────────────────────────────
+# WHAT-IF SIMULATION POPUP
+# ─────────────────────────────────────────────
+with st.expander("⚙ What-If Simulation Layer"):
 
-# ============================================
-# HEADER
-# ============================================
+    crew_capacity = st.slider("Crew Capacity", 1, 10, 2)
+    productivity = st.slider("Productivity Factor", 0.5, 2.0, 1.0)
+    curing_days = st.slider("Curing Days", 1, 7, 2)
 
-st.title("StructuraAI — Autonomous Construction Intelligence")
+    run_simulation = st.button("Run What-If Scenario")
 
-# ============================================
-# KPI GRID WITH SPARKLINES
-# ============================================
+# ─────────────────────────────────────────────
+# RUN ENGINE
+# ─────────────────────────────────────────────
+with st.spinner("Running AI Construction Engine..."):
 
-def sparkline(base):
-    values = [base + random.randint(-3,3) for _ in range(10)]
-    fig = go.Figure(go.Scatter(y=values, mode="lines",
-                               line=dict(color=PRIMARY,width=2)))
-    fig.update_layout(height=60, margin=dict(l=0,r=0,t=0,b=0),
-                      plot_bgcolor=CARD, paper_bgcolor=CARD,
-                      xaxis=dict(visible=False),
-                      yaxis=dict(visible=False))
-    return fig
-
-col1,col2,col3,col4 = st.columns(4)
-
-with col1:
-    st.markdown('<div class="metric-card">', unsafe_allow_html=True)
-    conf = state["detection_confidence"]*100
-    st.metric("AI Confidence", f"{conf:.1f}%")
-    st.plotly_chart(sparkline(int(conf)),use_container_width=True)
-    st.markdown('</div>', unsafe_allow_html=True)
-
-with col2:
-    st.markdown('<div class="metric-card">', unsafe_allow_html=True)
-    total_cost = cost["total_project_cost"]
-    st.metric("Total Cost", f"₹ {total_cost:,}")
-    st.plotly_chart(sparkline(total_cost//1000000),use_container_width=True)
-    st.markdown('</div>', unsafe_allow_html=True)
-
-with col3:
-    st.markdown('<div class="metric-card">', unsafe_allow_html=True)
-    build = strategies[selected]["buildability_score"]
-    st.metric("Buildability", build)
-    st.plotly_chart(sparkline(build),use_container_width=True)
-    st.markdown('</div>', unsafe_allow_html=True)
-
-with col4:
-    st.markdown('<div class="metric-card">', unsafe_allow_html=True)
-    avg_risk = round(sum(r["risk"] for r in risk_matrix)/len(risk_matrix),1)
-    st.metric("Risk Index", f"{avg_risk}/5")
-    st.plotly_chart(sparkline(int(avg_risk*10)),use_container_width=True)
-    st.markdown('</div>', unsafe_allow_html=True)
-
-st.markdown("<br>", unsafe_allow_html=True)
-
-# ============================================
-# PROFESSIONAL GAUGE METER
-# ============================================
-
-left,right = st.columns(2)
-
-with left:
-    st.markdown('<div class="section-card">', unsafe_allow_html=True)
-    fig_gauge = go.Figure(go.Indicator(
-        mode="gauge+number",
-        value=build,
-        gauge={
-            "axis": {"range":[0,100]},
-            "bar": {"color":PRIMARY},
-            "steps":[
-                {"range":[0,40],"color":DANGER},
-                {"range":[40,70],"color":WARNING},
-                {"range":[70,100],"color":SUCCESS}
-            ]
-        }
-    ))
-    fig_gauge.update_layout(height=300,paper_bgcolor=CARD,font=dict(color=TEXT))
-    st.subheader("Buildability Score")
-    st.plotly_chart(fig_gauge,use_container_width=True)
-    st.markdown('</div>', unsafe_allow_html=True)
-
-with right:
-    st.markdown('<div class="section-card">', unsafe_allow_html=True)
-    fig_gauge2 = go.Figure(go.Indicator(
-        mode="gauge+number",
-        value=avg_risk,
-        gauge={
-            "axis": {"range":[0,5]},
-            "bar": {"color":DANGER},
-            "steps":[
-                {"range":[0,2],"color":SUCCESS},
-                {"range":[2,4],"color":WARNING},
-                {"range":[4,5],"color":DANGER}
-            ]
-        }
-    ))
-    fig_gauge2.update_layout(height=300,paper_bgcolor=CARD,font=dict(color=TEXT))
-    st.subheader("Risk Gauge")
-    st.plotly_chart(fig_gauge2,use_container_width=True)
-    st.markdown('</div>', unsafe_allow_html=True)
-
-# ============================================
-# BLUEPRINT OVERLAY DIGITAL TWIN
-# ============================================
-
-st.markdown('<div class="section-card">', unsafe_allow_html=True)
-st.subheader("Blueprint Overlay + Structural Twin")
-
-uploaded = st.file_uploader("Upload Blueprint Image (for overlay)",type=["png","jpg","jpeg"])
-
-fig_overlay = go.Figure()
-
-if uploaded:
-    image = Image.open(uploaded)
-    fig_overlay.add_layout_image(
-        dict(
-            source=image,
-            x=0,
-            y=0,
-            sizex=20,
-            sizey=20,
-            xref="x",
-            yref="y",
-            opacity=0.6,
-            layer="below"
-        )
+    result = run_engine(
+        strategy=strategy,
+        crew_capacity=crew_capacity,
+        productivity_factor=productivity,
+        curing_days=curing_days
     )
 
-for beam in twin["beams"]:
-    fig_overlay.add_trace(go.Scatter(
-        x=[beam["start"][0],beam["end"][0]],
-        y=[beam["start"][1],beam["end"][1]],
-        mode="lines",
-        line=dict(width=4,color=PRIMARY)
-    ))
+# ─────────────────────────────────────────────
+# KPI ROW
+# ─────────────────────────────────────────────
+col1, col2, col3, col4 = st.columns(4)
 
-for col in twin["columns"]:
-    fig_overlay.add_trace(go.Scatter(
-        x=[col["x"]],
-        y=[col["y"]],
-        mode="markers",
-        marker=dict(size=14,color=CYAN)
-    ))
+col1.metric("Duration (Days)", result["duration"])
+col2.metric("Buildability", round(result["buildability"]["final_score"], 2))
+col3.metric("Risk Score", round(result["risk"]["risk_score"], 2))
+col4.metric("Strategy", strategy)
 
-fig_overlay.update_layout(
-    plot_bgcolor=CARD,
-    paper_bgcolor=CARD,
-    height=500,
-    xaxis=dict(visible=False),
-    yaxis=dict(visible=False)
+st.divider()
+
+# ─────────────────────────────────────────────
+# GAUGE
+# ─────────────────────────────────────────────
+fig = go.Figure(go.Indicator(
+    mode="gauge+number",
+    value=result["buildability"]["final_score"],
+    gauge={
+        "axis": {"range": [0, 100]},
+        "bar": {"color": "#00D084"},
+        "steps": [
+            {"range": [0, 40], "color": "#FF4B4B"},
+            {"range": [40, 70], "color": "#FFA500"},
+            {"range": [70, 100], "color": "#00D084"},
+        ],
+    }
+))
+st.plotly_chart(fig, use_container_width=True)
+
+# ─────────────────────────────────────────────
+# GANTT CHART
+# ─────────────────────────────────────────────
+st.subheader("📅 Construction Timeline")
+
+schedule_data = []
+
+G = result["graph"]
+
+for node in G.nodes:
+    if "ES" in G.nodes[node] and "EF" in G.nodes[node]:
+        schedule_data.append({
+            "Task": node,
+            "Start": G.nodes[node]["ES"],
+            "Finish": G.nodes[node]["EF"]
+        })
+
+df = pd.DataFrame(schedule_data)
+
+fig_gantt = px.timeline(
+    df,
+    x_start="Start",
+    x_end="Finish",
+    y="Task"
 )
 
-st.plotly_chart(fig_overlay,use_container_width=True)
-st.markdown('</div>', unsafe_allow_html=True)
-
-# ============================================
-# ANIMATED GANTT
-# ============================================
-
-st.markdown('<div class="section-card">', unsafe_allow_html=True)
-st.subheader("Execution Timeline")
-
-df_s = pd.DataFrame(schedule)
-
-fig_timeline = px.timeline(
-    df_s,
-    x_start="start",
-    x_end="finish",
-    y="task",
-    color="task"
+fig_gantt.update_layout(
+    plot_bgcolor="#0E1117",
+    paper_bgcolor="#0E1117",
+    font_color="white"
 )
 
-fig_timeline.update_layout(
-    plot_bgcolor=CARD,
-    paper_bgcolor=CARD,
-    font=dict(color=TEXT),
-    showlegend=False,
-    height=350,
-    transition_duration=800
+st.plotly_chart(fig_gantt, use_container_width=True)
+
+# ─────────────────────────────────────────────
+# RISK DIAGRAM
+# ─────────────────────────────────────────────
+st.subheader("⚠ Risk Breakdown")
+
+risk_df = pd.DataFrame([
+    result["risk"]["breakdown"]
+]).T.reset_index()
+
+risk_df.columns = ["Factor", "Score"]
+
+fig_risk = px.bar(
+    risk_df,
+    x="Factor",
+    y="Score",
+    color="Score",
+    color_continuous_scale="Reds"
 )
 
-fig_timeline.update_yaxes(autorange="reversed")
+fig_risk.update_layout(
+    plot_bgcolor="#0E1117",
+    paper_bgcolor="#0E1117",
+    font_color="white"
+)
 
-st.plotly_chart(fig_timeline,use_container_width=True)
-st.markdown('</div>', unsafe_allow_html=True)
+st.plotly_chart(fig_risk, use_container_width=True)
+
+# ─────────────────────────────────────────────
+# AI EXPLANATION
+# ─────────────────────────────────────────────
+st.subheader("🧠 AI Construction Intelligence")
+
+st.write(result["ai_explanation"])
+
+st.divider()
+
+# ─────────────────────────────────────────────
+# PDF GENERATION
+# ─────────────────────────────────────────────
+if st.button("📄 Generate Investor-Grade PDF Report"):
+
+    pdf_path = generate_pdf_report(result["pdf_data"])
+
+    with open(pdf_path, "rb") as f:
+        st.download_button(
+            label="Download Report",
+            data=f,
+            file_name="StructuraAI_Report.pdf",
+            mime="application/pdf"
+        )
