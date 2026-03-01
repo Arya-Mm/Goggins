@@ -4,6 +4,7 @@ from core.graph.dependency_graph import generate_tasks_from_twin, build_dependen
 from core.scheduling.cpm_engine import run_cpm
 from core.conflict.conflict_engine import detect_conflicts
 from core.risk.risk_engine import calculate_risk
+from core.simulation.whatif_engine import run_simulation
 from core.buildability.buildability_engine import calculate_buildability
 from core.utils.heat_visualizer import classify_heat
 from core.ai.buildability_explainer import explain_buildability
@@ -16,97 +17,143 @@ from core.exports.pdf_report import generate_pdf_report
 from pathlib import Path
 
 
-# ==========================================================
-# CORE ENGINE (Reusable by Streamlit)
-# ==========================================================
+def run_demo():
 
-def run_engine(
-    strategy="Balanced",
-    crew_capacity=2,
-    productivity_factor=1.0,
-    curing_days=2,
-    demo_pdf_path="core/vision/house_plan.pdf"
-):
-    """
-    strategy:
-        - Balanced
-        - FastTrack
-        - CostOptimized
-    """
+    # ======================================================
+    # STRESS TEST CONTROL PANEL
+    # Toggle True / False only here
+    # ======================================================
 
-    # ------------------------------------------------------
-    # STRATEGY LOGIC
-    # ------------------------------------------------------
-    if strategy == "FastTrack":
-        crew_capacity = max(crew_capacity, 4)
-        productivity_factor = max(productivity_factor, 1.2)
-        curing_days = max(1, curing_days - 1)
+    STRESS_EMPTY_TWIN = False
+    STRESS_NO_DIMENSION = False
+    STRESS_HIGH_UNCERTAINTY = False
+    STRESS_NO_WALLS = False
+    STRESS_FORCE_CYCLE = False
+    STRESS_ZERO_DURATION = False
+    STRESS_MAX_RISK = False
 
-    elif strategy == "CostOptimized":
-        crew_capacity = min(crew_capacity, 1)
-        productivity_factor = min(productivity_factor, 0.85)
+    print("Running StructuraAI Vision + Twin Demo...")
 
-    # ------------------------------------------------------
+    demo_pdf = Path("core/vision/house_plan.pdf")
+
+    # =====================
     # VISION
-    # ------------------------------------------------------
-    demo_pdf = Path(demo_pdf_path)
-
+    # =====================
     vision = VisionEngine()
     vision_output = vision.run(str(demo_pdf))
 
-    # ------------------------------------------------------
+    # =====================
     # TWIN
-    # ------------------------------------------------------
+    # =====================
     twin_builder = StructuralTwinBuilder()
     twin = twin_builder.build(vision_output)
 
-    # ------------------------------------------------------
-    # SCALE CALIBRATION
-    # ------------------------------------------------------
-    detected_dimensions = [
-        {
-            "pixel_length": 240,
-            "real_length_inches": 144
+    # 🔥 STRESS: EMPTY TWIN
+    if STRESS_EMPTY_TWIN:
+        twin = {
+            "walls": [],
+            "doors": [],
+            "windows": [],
+            "columns": [],
+            "beams": [],
+            "slabs": [],
+            "summary": {}
         }
-    ]
+
+    # 🔥 STRESS: HIGH UNCERTAINTY
+    if STRESS_HIGH_UNCERTAINTY and twin.get("walls"):
+        twin["walls"][0]["dimension_uncertain"] = True
+        twin["confidence_score"] = 20
+
+    # 🔥 STRESS: REMOVE WALLS
+    if STRESS_NO_WALLS:
+        twin["walls"] = []
+
+    print("\nDigital Structural Twin:")
+    print(twin)
+
+    # =====================
+    # SCALE CALIBRATION
+    # =====================
+    print("\n================ SCALE CALIBRATION ================")
+
+    if STRESS_NO_DIMENSION:
+        detected_dimensions = []
+    else:
+        detected_dimensions = [
+            {
+                "pixel_length": 240,
+                "real_length_inches": 144
+            }
+        ]
 
     scale_info = calibrate_scale(detected_dimensions)
 
-    # ------------------------------------------------------
-    # QUANTITY & COST
-    # ------------------------------------------------------
+    print("Pixels per Inch:", scale_info["pixels_per_inch"])
+    print("Calibration Status:", scale_info["calibration_status"])
+
+    # =====================
+    # QUANTITY ENGINE
+    # =====================
+    print("\n================ QUANTITY & COST ESTIMATION ================")
+
     quantities = calculate_quantities(twin)
 
-    # ------------------------------------------------------
+    print("\n--- Material Quantities ---")
+    for k, v in quantities["material_quantities"].items():
+        print(f"{k}: {v}")
+
+    print("\n--- Cost Breakdown (₹) ---")
+    for k, v in quantities["cost_breakdown"].items():
+        print(f"{k}: ₹{v}")
+
+    # =====================
     # SCHEDULING
-    # ------------------------------------------------------
+    # =====================
+    print("\n================ BASELINE EXECUTION INTELLIGENCE ================")
+
     tasks, dependencies = generate_tasks_from_twin(
         twin,
-        productivity_factor=productivity_factor,
-        curing_days=curing_days,
-        crew_capacity=crew_capacity
+        productivity_factor=1.0,
+        curing_days=2,
+        crew_capacity=2
     )
 
     G, cycle_valid = build_dependency_graph(tasks, dependencies)
 
+    # 🔥 STRESS: FORCE CYCLE
+    if STRESS_FORCE_CYCLE and len(G.nodes) > 1:
+        nodes = list(G.nodes)
+        G.add_edge(nodes[-1], nodes[0])
+
     if not cycle_valid:
-        return {"error": "Dependency cycle detected in graph."}
+        print("Dependency Graph Invalid: ✗ Cycle Detected")
+        return
 
-    G, critical_path, total_duration = run_cpm(
-        G,
-        crew_capacity=crew_capacity
-    )
+    print("Dependency Graph Valid: ✓ No Cycles")
 
+    G, critical_path, total_duration = run_cpm(G, crew_capacity=2)
+
+    # 🔥 STRESS: ZERO DURATION
+    if STRESS_ZERO_DURATION and len(G.nodes) > 0:
+        node = list(G.nodes)[0]
+        G.nodes[node]["EF"] = G.nodes[node]["ES"]
+
+    print("\nTotal Project Duration:", total_duration)
+    print("Critical Path:", critical_path)
+
+    print("\nGenerating Gantt Chart...")
     gantt_path = generate_gantt_chart(G)
+    print("Gantt Chart Saved:", gantt_path)
 
-    # ------------------------------------------------------
+    # =====================
     # CONFLICTS
-    # ------------------------------------------------------
-    conflicts = detect_conflicts(G, crew_capacity=crew_capacity)
+    # =====================
+    conflicts = detect_conflicts(G, crew_capacity=2)
 
-    # ------------------------------------------------------
+    # =====================
     # RISK
-    # ------------------------------------------------------
+    # =====================
     risk = calculate_risk(
         total_duration=total_duration,
         conflicts=conflicts,
@@ -115,14 +162,21 @@ def run_engine(
         critical_path=critical_path
     )
 
+    # 🔥 STRESS: MAX RISK
+    if STRESS_MAX_RISK:
+        risk["risk_score"] = 100
+
     risk_emoji, _, risk_label = classify_heat(
         risk["risk_score"],
         inverse=True
     )
 
-    # ------------------------------------------------------
+    print("\nRisk Score:", risk["risk_score"], risk_emoji)
+    print("Risk Level:", risk_label)
+
+    # =====================
     # BUILDABILITY
-    # ------------------------------------------------------
+    # =====================
     buildability = calculate_buildability(
         G,
         total_duration,
@@ -135,17 +189,35 @@ def run_engine(
         inverse=False
     )
 
-    # ------------------------------------------------------
+    print("\nBuildability Score:", buildability["final_score"], build_emoji)
+    print("Buildability Level:", build_label)
+
+    # =====================
     # AI EXPLANATION
-    # ------------------------------------------------------
+    # =====================
     try:
         ai_explanation = explain_buildability(buildability)
-    except Exception:
-        ai_explanation = "AI explanation unavailable."
+        print("\nAI Explanation:")
+        print(ai_explanation)
+    except Exception as e:
+        print("AI Explanation Failed:", e)
 
-    # ------------------------------------------------------
+    # =====================
+    # PDF EXPORT
+    # =====================
+    pdf_data = {
+        "Material Quantities": quantities["material_quantities"],
+        "Cost Breakdown": quantities["cost_breakdown"],
+        "Risk Summary": risk,
+        "Buildability Summary": buildability,
+    }
+
+    pdf_path = generate_pdf_report(pdf_data)
+    print("\nPDF Report Saved:", pdf_path)
+
+    # =====================
     # EXECUTIVE SUMMARY
-    # ------------------------------------------------------
+    # =====================
     summary = generate_executive_summary(
         total_duration,
         total_duration,
@@ -155,78 +227,8 @@ def run_engine(
         build_label
     )
 
-    # ------------------------------------------------------
-    # PDF DATA PACKAGE
-    # ------------------------------------------------------
-    pdf_data = {
-        "Twin Summary": twin.get("summary", {}),
-        "Material Quantities": quantities.get("material_quantities", {}),
-        "Cost Breakdown": quantities.get("cost_breakdown", {}),
-        "Risk Summary": risk,
-        "Buildability Summary": buildability,
-        "AI Explanation": ai_explanation,
-        "Executive Summary": summary
-    }
-
-    # DO NOT auto-generate PDF here in engine
-    # Let Streamlit trigger it when needed
-
-    return {
-        "twin": twin,
-        "scale_info": scale_info,
-        "quantities": quantities,
-        "graph": G,
-        "critical_path": critical_path,
-        "duration": total_duration,
-        "conflicts": conflicts,
-        "risk": risk,
-        "risk_label": risk_label,
-        "risk_emoji": risk_emoji,
-        "buildability": buildability,
-        "build_label": build_label,
-        "build_emoji": build_emoji,
-        "ai_explanation": ai_explanation,
-        "summary": summary,
-        "pdf_data": pdf_data,
-        "gantt_path": gantt_path
-    }
-
-
-# ==========================================================
-# CLI MODE (python main.py)
-# ==========================================================
-
-def run_demo():
-    print("Running StructuraAI Vision + Twin Demo...\n")
-
-    result = run_engine(strategy="Balanced")
-
-    if "error" in result:
-        print(result["error"])
-        return
-
-    print("Digital Structural Twin:")
-    print(result["twin"])
-    print("\nScale Calibration:", result["scale_info"])
-
-    print("\n================ QUANTITY & COST =================")
-    print(result["quantities"])
-
-    print("\n================ EXECUTION =================")
-    print("Duration:", result["duration"])
-    print("Critical Path:", result["critical_path"])
-
-    print("\nRisk Score:", result["risk"]["risk_score"], result["risk_emoji"])
-    print("Risk Level:", result["risk_label"])
-
-    print("\nBuildability Score:", result["buildability"]["final_score"], result["build_emoji"])
-    print("Buildability Level:", result["build_label"])
-
-    print("\n================ AI EXPLANATION =================")
-    print(result["ai_explanation"])
-
-    print("\n================ EXECUTIVE SUMMARY =================")
-    print(result["summary"])
+    print("\n================ EXECUTIVE SUMMARY ================")
+    print(summary)
 
 
 if __name__ == "__main__":
