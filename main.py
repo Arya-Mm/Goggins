@@ -1,5 +1,4 @@
 import time
-from pathlib import Path
 
 from core.vision.vision_engine import VisionEngine
 from core.twin.twin_builder import StructuralTwinBuilder
@@ -10,39 +9,33 @@ from core.risk.risk_engine import calculate_risk
 from core.buildability.buildability_engine import calculate_buildability
 from core.ai.buildability_explainer import explain_buildability
 from core.quantity.quantity_engine import calculate_quantities
-from core.vision.scale_calibration import calibrate_scale
 from core.exports.pdf_report import generate_pdf_report
 
 
 # ─────────────────────────────────────────────
-# STAGE 1 — VISION + TWIN (Heavy)
+# STAGE 1 — VISION (IN-MEMORY)
 # ─────────────────────────────────────────────
-def run_vision_stage(file_path):
+def run_vision_stage(pdf_bytes):
 
     start = time.time()
 
     vision = VisionEngine()
-    vision_output = vision.run(str(file_path))
+    vision_output = vision.run(pdf_bytes)
 
     twin_builder = StructuralTwinBuilder()
     twin = twin_builder.build(vision_output)
-
-    scale = calibrate_scale([
-        {"pixel_length": 240, "real_length_inches": 144}
-    ])
 
     duration = time.time() - start
 
     return {
         "twin": twin,
-        "scale_info": scale,
         "confidence": vision_output.get("confidence", 0.95),
         "stage_time": duration
     }
 
 
 # ─────────────────────────────────────────────
-# STAGE 2 — SCHEDULING + INTELLIGENCE
+# STAGE 2 — PLANNING
 # ─────────────────────────────────────────────
 def run_planning_stage(twin, strategy, crew, productivity, curing):
 
@@ -102,6 +95,6 @@ def run_planning_stage(twin, strategy, crew, productivity, curing):
 # ─────────────────────────────────────────────
 # PDF EXPORT
 # ─────────────────────────────────────────────
-def export_pdf(data, output_path="report.pdf"):
-    generate_pdf_report(data, output_path)
-    return output_path
+def export_pdf(data, filename="StructuraAI_Report.pdf"):
+    generate_pdf_report(data, filename)
+    return filename

@@ -1,34 +1,32 @@
 import streamlit as st
-import threading
-import time
 import pandas as pd
 import plotly.express as px
 import networkx as nx
 import plotly.graph_objects as go
+
 from main import run_vision_stage, run_planning_stage, export_pdf
 
 st.set_page_config(layout="wide")
-
 st.title("STRUCTURA AI — Production Intelligence")
 
 # ─────────────────────────────────────────────
 # SESSION STATE
 # ─────────────────────────────────────────────
-if "twin_cache" not in st.session_state:
-    st.session_state.twin_cache = None
+if "twin" not in st.session_state:
+    st.session_state.twin = None
 
-if "dashboard_state" not in st.session_state:
-    st.session_state.dashboard_state = None
+if "planning_state" not in st.session_state:
+    st.session_state.planning_state = None
 
 if "profiling" not in st.session_state:
     st.session_state.profiling = {}
 
 # ─────────────────────────────────────────────
-# FILE UPLOAD (MULTI-FILE SUPPORT)
+# FILE UPLOAD
 # ─────────────────────────────────────────────
 uploaded_files = st.file_uploader(
-    "Upload Blueprint Files",
-    type=["pdf", "png", "jpg"],
+    "Upload Blueprint PDFs",
+    type=["pdf"],
     accept_multiple_files=True
 )
 
@@ -44,63 +42,62 @@ productivity = st.sidebar.slider("Productivity", 0.5, 1.5, 1.0)
 curing = st.sidebar.slider("Curing Days", 1, 5, 2)
 
 # ─────────────────────────────────────────────
-# RUN VISION (HEAVY — ONLY ONCE)
+# RUN VISION
 # ─────────────────────────────────────────────
 if st.button("Run Vision Stage"):
 
-    progress = st.progress(0)
-    status = st.empty()
-
-    for file in uploaded_files:
-
-        status.text("Running Vision Engine...")
-        progress.progress(10)
-
-        result = run_vision_stage(file)
-
-        st.session_state.twin_cache = result
-        st.session_state.profiling["vision_time"] = result["stage_time"]
-
-        progress.progress(100)
-        status.text("Vision Stage Complete")
-
-# ─────────────────────────────────────────────
-# RUN PLANNING (FAST RE-RUN)
-# ─────────────────────────────────────────────
-if st.button("Run Planning Stage"):
-
-    if st.session_state.twin_cache is None:
-        st.warning("Run Vision stage first.")
+    if not uploaded_files:
+        st.warning("Upload at least one PDF.")
         st.stop()
 
     progress = st.progress(0)
-    status = st.empty()
 
-    status.text("Running Scheduling + Intelligence...")
-    progress.progress(30)
+    for file in uploaded_files:
+
+        progress.progress(10)
+
+        result = run_vision_stage(file.read())
+
+        st.session_state.twin = result
+        st.session_state.profiling["vision_time"] = result["stage_time"]
+
+        progress.progress(100)
+
+# ─────────────────────────────────────────────
+# RUN PLANNING
+# ─────────────────────────────────────────────
+if st.button("Run Planning Stage"):
+
+    if st.session_state.twin is None:
+        st.warning("Run Vision Stage first.")
+        st.stop()
+
+    progress = st.progress(0)
 
     result = run_planning_stage(
-        st.session_state.twin_cache["twin"],
+        st.session_state.twin["twin"],
         strategy,
         crew,
         productivity,
         curing
     )
 
-    st.session_state.dashboard_state = result
+    if "error" in result:
+        st.error(result["error"])
+        st.stop()
+
+    st.session_state.planning_state = result
     st.session_state.profiling["planning_time"] = result["stage_time"]
 
     progress.progress(100)
-    status.text("Planning Stage Complete")
 
 # ─────────────────────────────────────────────
-# DISPLAY DASHBOARD
+# DASHBOARD DISPLAY
 # ─────────────────────────────────────────────
-state = st.session_state.dashboard_state
+state = st.session_state.planning_state
 
 if state:
 
-    st.subheader("Duration")
     st.metric("Total Duration", state["duration"])
 
     st.subheader("Conflicts")
@@ -113,8 +110,9 @@ if state:
     st.plotly_chart(fig, use_container_width=True)
 
     st.subheader("Dependency Graph")
+
     G = state["graph"]
-    pos = nx.spring_layout(G)
+    pos = nx.spring_layout(G, seed=42)
 
     edge_x, edge_y = [], []
     for e in G.edges():
@@ -138,8 +136,8 @@ if state:
     # PDF EXPORT
     # ─────────────────────────────────────────
     if st.button("Generate PDF Report"):
-        pdf_path = export_pdf(state)
-        with open(pdf_path, "rb") as f:
+        filename = export_pdf(state)
+        with open(filename, "rb") as f:
             st.download_button(
                 "Download Report",
                 f,
@@ -151,8 +149,10 @@ if state:
     # ─────────────────────────────────────────
     st.subheader("Performance Profiling")
 
-    vision_time = st.session_state.profiling.get("vision_time", 0)
-    planning_time = st.session_state.profiling.get("planning_time", 0)
+    st.write("Vision Time:",
+             round(st.session_state.profiling.get("vision_time", 0),2),
+             "sec")
 
-    st.write("Vision Stage Time:", round(vision_time,2), "sec")
-    st.write("Planning Stage Time:", round(planning_time,2), "sec")
+    st.write("Planning Time:",
+             round(st.session_state.profiling.get("planning_time", 0),2),
+             "sec")
