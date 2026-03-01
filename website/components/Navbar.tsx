@@ -23,13 +23,13 @@ export default function Navbar() {
                 <div className="hidden md:flex items-center gap-8 text-sm font-medium text-muted-light">
                     <Link href="/architecture" className="hover:text-white transition-colors">Architecture</Link>
                     <Link href="/about" className="hover:text-white transition-colors">About</Link>
-                    <a href="#features" className="hover:text-white transition-colors">Features</a>
-                    <a href="#pipeline" className="hover:text-white transition-colors">Pipeline</a>
+                    <a href="/#features" className="hover:text-white transition-colors">Features</a>
+                    <a href="/#pipeline" className="hover:text-white transition-colors">Pipeline</a>
                 </div>
 
                 {/* CTA */}
                 <Link
-                    href="#demo"
+                    href="/demo"
                     className="btn-primary text-sm hidden md:inline-flex items-center gap-2"
                 >
                     Request Demo
