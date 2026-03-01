@@ -6,7 +6,7 @@
 //
 //   Leave VIDEO_URL as an empty string ("") to keep the "Coming Soon" placeholder.
 // ─────────────────────────────────────────────────────────────────────────────
-const VIDEO_URL = "/videos/desc.mp4"
+const VIDEO_URL = "/asset/demovideo.mp4"
 // ─────────────────────────────────────────────────────────────────────────────
 
 export default function DemoPage() {
