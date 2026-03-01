@@ -1,3 +1,5 @@
+# core/pipeline/streamlit_adapter.py
+
 from datetime import datetime, timedelta
 
 
@@ -8,36 +10,34 @@ def adapt_to_dashboard_schema(result):
     risk = result["risk"]
     buildability = result["buildability"]
     schedule_data = result["schedule"]
+    G = schedule_data["graph"]
 
     # -----------------------------
-    # Build Schedule Timeline
+    # Build Real Schedule Timeline (FIXED)
     # -----------------------------
     today = datetime.today()
 
     schedule = []
-    day_cursor = today
 
-    for i, task in enumerate(schedule_data["critical_path"]):
+    for node in G.nodes:
 
-        start = day_cursor
-        finish = start + timedelta(days=1)
+        ES = G.nodes[node].get("ES", 0)
+        EF = G.nodes[node].get("EF", 0)
+
+        start = today + timedelta(days=ES)
+        finish = today + timedelta(days=EF)
 
         schedule.append({
-            "task": task,
+            "task": node,
             "start": start.strftime("%Y-%m-%d"),
             "finish": finish.strftime("%Y-%m-%d")
         })
 
-        day_cursor = finish
-
     # -----------------------------
     # Build Dependency Graph
     # -----------------------------
-    nodes = schedule_data["critical_path"]
-
-    edges = []
-    for i in range(len(nodes) - 1):
-        edges.append([nodes[i], nodes[i + 1]])
+    nodes = list(G.nodes)
+    edges = list(G.edges)
 
     # -----------------------------
     # Quantity Takeoff
@@ -70,9 +70,9 @@ def adapt_to_dashboard_schema(result):
     # -----------------------------
     risk_matrix = []
 
-    for task in schedule_data["critical_path"]:
+    for node in nodes:
         risk_matrix.append({
-            "phase": task,
+            "phase": node,
             "risk": min(5, int(risk["risk_score"] / 20))
         })
 
@@ -84,7 +84,7 @@ def adapt_to_dashboard_schema(result):
     if risk["breakdown"]["conflict_risk"] > 0:
         conflicts.append({
             "type": "Scheduling Conflict",
-            "description": "Resource overlap detected",
+            "description": "Resource overload detected",
             "severity": "High"
         })
 

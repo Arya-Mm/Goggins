@@ -1,3 +1,5 @@
+# core/pipeline/analyzer.py
+
 from core.vision.vision_engine import VisionEngine
 from core.twin.twin_builder import StructuralTwinBuilder
 from core.graph.dependency_graph import generate_tasks_from_twin, build_dependency_graph
@@ -28,30 +30,9 @@ def analyze_project(pdf_path, stress_config=None):
     twin = twin_builder.build(vision_output)
 
     # ======================
-    # Stress Injection
+    # Scale Calibration (FIXED)
     # ======================
-    if stress_config.get("high_uncertainty"):
-        twin["confidence_score"] = 20
-        twin["summary"]["confidence_score"] = 20
-
-        for wall in twin.get("walls", []):
-            wall["dimension_uncertain"] = True
-
-    if stress_config.get("empty"):
-        twin = {
-            "walls": [],
-            "doors": [],
-            "windows": [],
-            "columns": [],
-            "beams": [],
-            "slabs": [],
-            "summary": {}
-        }
-
-    # ======================
-    # Scale Calibration
-    # ======================
-    scale_info = calibrate_scale([])
+    scale_info = calibrate_scale(vision_output.get("dimensions", []))
 
     # ======================
     # Quantity
@@ -111,10 +92,7 @@ def analyze_project(pdf_path, stress_config=None):
         "Cost Breakdown": quantities["cost_breakdown"],
         "Risk Summary": risk,
         "Buildability Summary": buildability,
-        "Schedule Summary": {
-            "Total Duration": total_duration,
-            "Critical Path": critical_path
-        }
+        "Duration": total_duration
     }
 
     pdf_path = generate_pdf_report(pdf_data)
@@ -130,7 +108,8 @@ def analyze_project(pdf_path, stress_config=None):
         "buildability": buildability,
         "schedule": {
             "total_duration": total_duration,
-            "critical_path": critical_path
+            "critical_path": critical_path,
+            "graph": G
         },
         "gantt_path": gantt_path,
         "pdf_path": pdf_path
