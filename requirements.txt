@@ -7,3 +7,4 @@ pdfplumber
 pymupdf
 ultralytics
 reportlab
+regex
